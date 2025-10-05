@@ -448,7 +448,7 @@ local Label = SellTab:Label({
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local plantSellRemote = ReplicatedStorage.Remotes.Plants
+local plantSellRemote = ReplicatedStorage.Remotes.ItemSell
 
 getgenv().PlantSellDelay = 1
 getgenv().AutoSellPlants = false
@@ -514,7 +514,7 @@ SellTab:Section("Auto Sell Brainrots + Plants")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local itemSellRemote = ReplicatedStorage.Remotes.ItemSell
-local plantSellRemote = ReplicatedStorage.Remotes.Plants
+local plantSellRemote = ReplicatedStorage.Remotes.ItemSell
 
 getgenv().AutoSellAllFull = false
 
