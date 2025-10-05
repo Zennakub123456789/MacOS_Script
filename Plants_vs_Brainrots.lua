@@ -245,7 +245,7 @@ getgenv().SelectedBuySeeds = {}
 getgenv().AutoBuySeedSelected = false
 getgenv().AutoBuySeedAll = false
 
-local SeedDropdown = MainTab:Dropdown({
+local SeedDropdown = ShopTab:Dropdown({
     Title = "Select Seeds",
     Options = AllSeeds,
     Multi = true,
@@ -255,7 +255,7 @@ local SeedDropdown = MainTab:Dropdown({
     end
 })
 
-local AutoBuySeedSelectedToggle = MainTab:Toggle({
+local AutoBuySeedSelectedToggle = ShopTab:Toggle({
     Title = "Auto Buy Seed [Selected]",
     Default = false,
     Flag = "AutoBuySeedSelected",
@@ -279,7 +279,7 @@ local AutoBuySeedSelectedToggle = MainTab:Toggle({
     end
 })
 
-local AutoBuyAllToggle = MainTab:Toggle({
+local AutoBuyAllToggle = ShopTab:Toggle({
     Title = "Auto Buy Seed [All]",
     Default = false,
     Flag = "AutoBuySeedAll",
@@ -310,7 +310,7 @@ getgenv().SelectedBuyItems = {}
 getgenv().AutoBuySelected = false
 getgenv().AutoBuyAll = false
 
-local ItemDropdown = MainTab:Dropdown({
+local ItemDropdown = ShopTab:Dropdown({
     Title = "Select Gear",
     Options = AllItems,
     Multi = true,
@@ -320,7 +320,7 @@ local ItemDropdown = MainTab:Dropdown({
     end
 })
 
-local AutoBuySelectedToggle = MainTab:Toggle({
+local AutoBuySelectedToggle = ShopTab:Toggle({
     Title = "Auto Buy Gear [Selected]",
     Default = false,
     Flag = "AutoBuySelected",
@@ -345,7 +345,7 @@ local AutoBuySelectedToggle = MainTab:Toggle({
     end
 })
 
-local AutoBuyAllToggle = MainTab:Toggle({
+local AutoBuyAllToggle = ShopTab:Toggle({
     Title = "Auto Buy Gear [All]",
     Default = false,
     Flag = "AutoBuyAll",
