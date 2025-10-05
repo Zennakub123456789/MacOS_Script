@@ -230,7 +230,7 @@ local AutoEquipToggle = AutoTab:Toggle({
     end
 })
 
-local ShopTab = Window:Tab("Shop", "rbxassetid://7733779610")
+local ShopTab = Window:Tab("Shop", "rbxassetid://11385419674")
 
 ShopTab:Section("Auto Buy Seed")
 
