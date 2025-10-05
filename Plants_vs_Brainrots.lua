@@ -229,3 +229,137 @@ local AutoEquipToggle = AutoTab:Toggle({
         end
     end
 })
+
+local ShopTab = Window:Tab("Shop", "rbxassetid://7733779610")
+
+ShopTab:Section("Auto Buy Seed")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
+
+local AllSeeds = { "Strawberry Seed", "Pumpkin Seed", "Wheat Seed", "Carrot Seed", "Cabbage Seed" }
+
+getgenv().SelectedBuySeeds = {}
+getgenv().AutoBuySeedSelected = false
+getgenv().AutoBuySeedAll = false
+
+local SeedDropdown = MainTab:Dropdown({
+    Title = "Select Seeds",
+    Options = AllSeeds,
+    Multi = true,
+    Default = {},
+    Callback = function(selected)
+        getgenv().SelectedBuySeeds = selected
+    end
+})
+
+local AutoBuySeedSelectedToggle = MainTab:Toggle({
+    Title = "Auto Buy Seed [Selected]",
+    Default = false,
+    Flag = "AutoBuySeedSelected",
+    Callback = function(value)
+        getgenv().AutoBuySeedSelected = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoBuySeedSelected do
+                    if #getgenv().SelectedBuySeeds > 0 then
+                        for _, seed in ipairs(getgenv().SelectedBuySeeds) do
+                            if not getgenv().AutoBuySeedSelected then break end
+                            buySeedRemote:FireServer(seed, true)
+                            task.wait(0.5)
+                        end
+                    else
+                        task.wait(1)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+local AutoBuyAllToggle = MainTab:Toggle({
+    Title = "Auto Buy Seed [All]",
+    Default = false,
+    Flag = "AutoBuySeedAll",
+    Callback = function(value)
+        getgenv().AutoBuySeedAll = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoBuySeedAll do
+                    for _, seed in ipairs(AllSeeds) do
+                        if not getgenv().AutoBuySeedAll then break end
+                        buySeedRemote:FireServer(seed, true)
+                        task.wait(0.5)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+ShopTab:Section("Auto Buy Gear")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local buyRemote = ReplicatedStorage.Remotes.BuyGear
+
+local AllItems = { "Water Bucket", "Fire Sword", "Magic Shield", "Golden Apple" }
+
+getgenv().SelectedBuyItems = {}
+getgenv().AutoBuySelected = false
+getgenv().AutoBuyAll = false
+
+local ItemDropdown = MainTab:Dropdown({
+    Title = "Select Gear",
+    Options = AllItems,
+    Multi = true,
+    Default = {},
+    Callback = function(selected)
+        getgenv().SelectedBuyItems = selected
+    end
+})
+
+local AutoBuySelectedToggle = MainTab:Toggle({
+    Title = "Auto Buy Gear [Selected]",
+    Default = false,
+    Flag = "AutoBuySelected",
+    Callback = function(value)
+        getgenv().AutoBuySelected = value
+
+        if value then
+            task.spawn(function()
+                while getgenv().AutoBuySelected do
+                    if #getgenv().SelectedBuyItems > 0 then
+                        for _, item in ipairs(getgenv().SelectedBuyItems) do
+                            if not getgenv().AutoBuySelected then break end
+                            buyRemote:FireServer(item, true)
+                            task.wait(0.5)
+                        end
+                    else
+                        task.wait(1)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+local AutoBuyAllToggle = MainTab:Toggle({
+    Title = "Auto Buy Gear [All]",
+    Default = false,
+    Flag = "AutoBuyAll",
+    Callback = function(value)
+        getgenv().AutoBuyAll = value
+
+        if value then
+            task.spawn(function()
+                while getgenv().AutoBuyAll do
+                    for _, item in ipairs(AllItems) do
+                        if not getgenv().AutoBuyAll then break end
+                        buyRemote:FireServer(item, true)
+                        task.wait(0.5)
+                    end
+                end
+            end)
+        end
+    end
+})
