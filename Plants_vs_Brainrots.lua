@@ -138,7 +138,7 @@ local player = Players.LocalPlayer
 
 getgenv().AttackSpeed = 0.25
 
-local SpeedSlider = MainTab:Slider({
+local SpeedSlider = AutoTab:Slider({
     Title = "Hit Speed",
     Description = "Set Speed to Auto Hit",
     Min = 0,
@@ -154,7 +154,7 @@ local SpeedSlider = MainTab:Slider({
 
 getgenv().AutoFarm = false
 
-local AutoFarmToggle = MainTab:Toggle({
+local AutoFarmToggle = AutoTab:Toggle({
     Title = "Auto Hit",
     Default = false,
     Flag = "AutoFarm",
