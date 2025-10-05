@@ -21,7 +21,7 @@ local Window = MacUI:Window({
     }
 })
 
-local MainTab = Window:Tab("Main", "rbxassetid://7733779610")
+local MainTab = Window:Tab("Main", "rbxassetid://11347112400")
 
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
