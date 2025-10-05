@@ -239,7 +239,7 @@ ShopTab:Section("Auto Buy Seed")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
-local AllSeeds = { "Strawberry Seed", "Pumpkin Seed", "Wheat Seed", "Carrot Seed", "Cabbage Seed" }
+local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed" }
 
 getgenv().SelectedBuySeeds = {}
 getgenv().AutoBuySeedSelected = false
