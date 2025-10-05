@@ -372,3 +372,67 @@ local AutoBuyAllToggle = ShopTab:Toggle({
         end
     end
 })
+
+local SellTab = Window:Tab("Sell", "rbxassetid://10698878025")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local itemSellRemote = ReplicatedStorage.Remotes.ItemSell
+
+getgenv().SellDelay = 1
+getgenv().AutoSell = false
+getgenv().AutoSellFull = false
+
+local SellDelaySlider = SellTab:Slider({
+    Title = "Sell Brainrots Delay",
+    Min = 1,
+    Max = 600,
+    Default = 1,
+    Rounding = 0,
+    Suffix = "s",
+    Flag = "SellDelaySlider",
+    Callback = function(value)
+        getgenv().SellDelay = value
+    end
+})
+
+local AutoSellToggle = SellTab:Toggle({
+    Title = "Auto Sell Brainrots",
+    Default = false,
+    Flag = "AutoSell",
+    Callback = function(value)
+        getgenv().AutoSell = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoSell do
+                    itemSellRemote:FireServer()
+                    task.wait(getgenv().SellDelay)
+                end
+            end)
+        end
+    end
+})
+
+local AutoSellFullToggle = SellTab:Toggle({
+    Title = "Auto Sell Brainrots When Inventory Full",
+    Default = false,
+    Flag = "AutoSellFull",
+    Callback = function(value)
+        getgenv().AutoSellFull = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoSellFull do
+                    local player = Players.LocalPlayer
+                    if player then
+                        local backpack = player:WaitForChild("Backpack")
+                        if #backpack:GetChildren() >= 250 then
+                            itemSellRemote:FireServer()
+                        end
+                    end
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
+
