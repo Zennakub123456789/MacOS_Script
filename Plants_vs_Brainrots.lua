@@ -375,6 +375,12 @@ local AutoBuyAllToggle = ShopTab:Toggle({
 
 local SellTab = Window:Tab("Sell", "rbxassetid://10698878025")
 
+SellTab:Section("Auto Sell")
+
+local Label = SellTab:Label({
+    Text = "1 = 1 sec / 600 = 10 min"
+})
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local itemSellRemote = ReplicatedStorage.Remotes.ItemSell
@@ -397,7 +403,7 @@ local SellDelaySlider = SellTab:Slider({
 })
 
 local AutoSellToggle = SellTab:Toggle({
-    Title = "Auto Sell Brainrots",
+    Title = "Auto Sell Brainrots All",
     Default = false,
     Flag = "AutoSell",
     Callback = function(value)
@@ -414,7 +420,7 @@ local AutoSellToggle = SellTab:Toggle({
 })
 
 local AutoSellFullToggle = SellTab:Toggle({
-    Title = "Auto Sell Brainrots When Inventory Full",
+    Title = "Auto Sell Brainrots All When Inventory Full",
     Default = false,
     Flag = "AutoSellFull",
     Callback = function(value)
@@ -436,3 +442,103 @@ local AutoSellFullToggle = SellTab:Toggle({
     end
 })
 
+local Label = SellTab:Label({
+    Text = "1 = 1 sec / 600 = 10 min"
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local plantSellRemote = ReplicatedStorage.Remotes.Plants
+
+getgenv().PlantSellDelay = 1
+getgenv().AutoSellPlants = false
+getgenv().AutoSellPlantsFull = false
+
+local PlantSellDelaySlider = SellTab:Slider({
+    Title = "Sell Plants Delay",
+    Min = 1,
+    Max = 600,
+    Default = 1,
+    Rounding = 0,
+    Suffix = "s",
+    Flag = "PlantSellDelaySlider",
+    Callback = function(value)
+        getgenv().PlantSellDelay = value
+    end
+})
+
+local AutoSellPlantsToggle = SellTab:Toggle({
+    Title = "Auto Sell Plants All",
+    Default = false,
+    Flag = "AutoSellPlants",
+    Callback = function(value)
+        getgenv().AutoSellPlants = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoSellPlants do
+                    local args = { [2] = true }
+                    plantSellRemote:FireServer(unpack(args))
+                    task.wait(getgenv().PlantSellDelay)
+                end
+            end)
+        end
+    end
+})
+
+local AutoSellPlantsFullToggle = SellTab:Toggle({
+    Title = "Auto Sell Plants All When Inventory Full",
+    Default = false,
+    Flag = "AutoSellPlantsFull",
+    Callback = function(value)
+        getgenv().AutoSellPlantsFull = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoSellPlantsFull do
+                    local player = Players.LocalPlayer
+                    if player then
+                        local backpack = player:WaitForChild("Backpack")
+                        if #backpack:GetChildren() >= 250 then
+                            local args = { [2] = true }
+                            plantSellRemote:FireServer(unpack(args))
+                        end
+                    end
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
+
+SellTab:Section("Auto Sell Brainrots + Plants")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local itemSellRemote = ReplicatedStorage.Remotes.ItemSell
+local plantSellRemote = ReplicatedStorage.Remotes.Plants
+
+getgenv().AutoSellAllFull = false
+
+local AutoSellAllFullToggle = SellTab:Toggle({
+    Title = "Auto Sell All When Inventory Full",
+    Default = false,
+    Flag = "AutoSellAllFull",
+    Callback = function(value)
+        getgenv().AutoSellAllFull = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoSellAllFull do
+                    local player = Players.LocalPlayer
+                    if player then
+                        local backpack = player:WaitForChild("Backpack")
+                        if #backpack:GetChildren() >= 250 then
+                            local args = { [2] = true }
+                            itemSellRemote:FireServer(unpack(args))
+                            plantSellRemote:FireServer(unpack(args))
+                        end
+                    end
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
