@@ -21,7 +21,7 @@ local Window = MacUI:Window({
     }
 })
 
-local MainTab = Window:Tab("Main", "rbxassetid://11347112400")
+local MainTab = Window:Tab("Main", "rbxassetid://128706247346129")
 
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
@@ -63,7 +63,7 @@ local AntiAFKToggle = MainTab:Toggle({
     end
 })
 
-local AutoTab = Window:Tab("Auto", "rbxassetid://7733779610")
+local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
 
 AutoTab:Section("Auto Fram Brainrots")
 
