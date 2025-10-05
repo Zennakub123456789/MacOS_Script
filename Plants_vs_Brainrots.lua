@@ -187,6 +187,8 @@ local AutoFarmToggle = AutoTab:Toggle({
     end
 })
 
+AutoTab:Section("Auto Equip And Collect Money")
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Label = AutoTab:Label({
@@ -196,7 +198,7 @@ local Label = AutoTab:Label({
 getgenv().EquipDelay = 60
 
 local DelaySlider = AutoTab:Slider({
-    Title = "Equip Delay",
+    Title = "Equip Best Brainrots Delay",
     Description = "Set Speed to Equip Best Brainrots",
     Min = 1,
     Max = 600,
