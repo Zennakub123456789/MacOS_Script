@@ -304,7 +304,7 @@ ShopTab:Section("Auto Buy Gear")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buyRemote = ReplicatedStorage.Remotes.BuyGear
 
-local AllItems = { "Water Bucket", "Fire Sword", "Magic Shield", "Golden Apple" }
+local AllItems = { "Water Bucket", "Frost Grenade", "Banana Gun", "Frost Blower", "Carrot Launcher" }
 
 getgenv().SelectedBuyItems = {}
 getgenv().AutoBuySelected = false
