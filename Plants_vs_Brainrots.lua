@@ -1,12 +1,19 @@
 local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
 
 local Window = MacUI:Window({
-    Title = "My Amazing Script",
-    Theme = "Dark",
-    LoadingTitle = "Loading",
-    LoadingSubtitle = "Please wait...",
+    Title = "MacUI Demo",
+    Size = UDim2.new(0, 600, 0, 400),
+    Theme = "Dark", -- "Default", "Dark", "Ocean"
+    Icon = 0, -- Asset ID or URL (optional)
+    
+    LoadingTitle = "MacUI",
+    LoadingSubtitle = "Loading...",
+    
     ToggleUIKeybind = "RightControl",
     ShowText = "Menu",
+    
+    NotifyFromBottom = true,
+    
     ConfigurationSaving = {
         Enabled = true,
         FileName = "MyConfig"
