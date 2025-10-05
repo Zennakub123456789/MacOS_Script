@@ -11,7 +11,7 @@ local Window = MacUI:Window({
         Enabled = true,
         FileName = "MyConfig"
     },
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
         Title = "Enter Key",
         Subtitle = "Join Discord for key",
