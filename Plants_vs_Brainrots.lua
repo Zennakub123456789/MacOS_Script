@@ -133,32 +133,28 @@ local AutoTeleportToggle = AutoTab:Toggle({
 
 AutoTab:Section("Auto Hit")
 
-local Label = AutoTab:Label({
-    Text = "1 = 0.01 / 50 = 0.5"
-})
-
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 getgenv().AttackSpeed = 0.25
 
-local SpeedSlider = AutoTab:Slider({
+local SpeedSlider = MainTab:Slider({
     Title = "Hit Speed",
-    Description = "ปรับความเร็วในการโจมตี (น้อย = เร็วขึ้น)",
-    Min = 1,
-    Max = 50,
-    Default = 25,
+    Description = "Set Speed to Auto Hit",
+    Min = 0,
+    Max = 1,
+    Default = 0.25,
     Suffix = "s",
     Rounding = 2,
     Flag = "AttackSpeedSlider",
     Callback = function(value)
-        getgenv().AttackSpeed = value / 100
+        getgenv().AttackSpeed = value
     end
 })
 
 getgenv().AutoFarm = false
 
-local AutoFarmToggle = AutoTab:Toggle({
+local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Hit",
     Default = false,
     Flag = "AutoFarm",
