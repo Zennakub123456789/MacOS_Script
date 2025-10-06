@@ -198,7 +198,7 @@ AutoTab:Section("Auto Equip And Collect Money")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Label = AutoTab:Label({
+local BestBrainrotsLabel = AutoTab:Label({
     Text = "1 = 1 sec / 600 = 10 min"
 })
 
@@ -622,8 +622,12 @@ local languageScripts = {
         AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
         SpeedSlider:SetTitle("ความเร็วการตี")
         AutoFarmToggle:SetTitle("ตีอัตโนมัติ)
-        ApplyButton:SetTitle("ใช้งาน")
-        ApplyButton:SetDesc("ใช้ภาษาที่เลือก")
+        BestBrainrotsLabel:SetText("1 = 1วิ / 600วิ = 10นาที")
+        DelaySlider:SetTitle("ดีเลย์การสวม Brainrots ที่ดีที่สุด")
+        AutoEquipToggle:SetTitle("ใส่ Brainrots ที่ดีที่สุดอัตโน")
+        SeedDropdown:SetTitle("เลือกเมล็ดพันธุ์")
+        AutoBuySeedSelectedToggle:SetTitle("ซื้อเมล็ดพันธุ์อัตโนมัติ [ที่เลือก]")
+        AutoBuyAllToggle:SetTitle("ซื้อเมล็ดพันธุ์อัตโนมัติ [ทั้งหมด]")
     end
 }
 
