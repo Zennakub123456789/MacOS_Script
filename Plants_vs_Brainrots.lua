@@ -584,3 +584,14 @@ local TeleportFixedButton = TeleportTab:Button({
         end
     end
 })
+
+local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
+
+EventTab:Section("Coming soon...")
+
+
+
+
+local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
+
+SettingTab:Section("Settings")
