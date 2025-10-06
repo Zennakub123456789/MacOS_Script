@@ -545,7 +545,7 @@ local AutoSellAllFullToggle = SellTab:Toggle({
     end
 })
 
-local TeleportTab = Window:Tab("Teleport", "rbxassetid://10698878025")
+local TeleportTab = Window:Tab("Teleport", "rbxassetid://6723742952")
 
 TeleportTab:Section("Home")
 
