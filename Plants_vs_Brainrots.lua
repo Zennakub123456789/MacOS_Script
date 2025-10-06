@@ -375,7 +375,7 @@ local AutoBuyAllToggle = ShopTab:Toggle({
 
 local SellTab = Window:Tab("Sell", "rbxassetid://10698878025")
 
-SellTab:Section("Auto Sell")
+SellTab:Section("Auto Sell Brainrots")
 
 local Label = SellTab:Label({
     Text = "1 = 1 sec / 600 = 10 min"
@@ -441,6 +441,8 @@ local AutoSellFullToggle = SellTab:Toggle({
         end
     end
 })
+
+SellTab:Section("Auto Sell Plants")
 
 local Label = SellTab:Label({
     Text = "1 = 1 sec / 600 = 10 min"
@@ -539,6 +541,46 @@ local AutoSellAllFullToggle = SellTab:Toggle({
                     task.wait(1)
                 end
             end)
+        end
+    end
+})
+
+local TeleportTab = Window:Tab("Teleport", "rbxassetid://10698878025")
+
+TeleportTab:Section("Home")
+
+local TeleportGrassButton = TeleportTab:Button({
+    Title = "Teleport to Plots",
+    Desc = "Goto Your Plots",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local plots = workspace:WaitForChild("Plots")
+
+        for i = 1, 6 do
+            local plot = plots:FindFirstChild(tostring(i))
+            if plot and plot:GetAttribute("Owner") == player.Name then
+                pcall(function()
+                    local target = plot:WaitForChild("Rows"):WaitForChild("1"):WaitForChild("Grass"):GetChildren()[9]
+                    if target and target:IsA("BasePart") then
+                        player.Character:WaitForChild("HumanoidRootPart").CFrame = target.CFrame + Vector3.new(0, 5, 0)
+                    end
+                end)
+                break
+            end
+        end
+    end
+})
+
+SellTab:Section("Event")
+
+local TeleportFixedButton = TeleportTab:Button({
+    Title = "Teleport to Prison Event",
+    Desc = "Goto Event Area",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(-173.82, 12.49, 999.30)
         end
     end
 })
