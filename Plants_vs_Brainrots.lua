@@ -352,7 +352,7 @@ local AutoBuySelectedToggle = ShopTab:Toggle({
     end
 })
 
-local AutoBuyAllToggle = ShopTab:Toggle({
+local AutoBuyGearAllToggle = ShopTab:Toggle({
     Title = "Auto Buy Gear [All]",
     Default = false,
     Flag = "AutoBuyAll",
@@ -630,7 +630,7 @@ local languageScripts = {
         AutoBuyAllToggle:SetTitle("ซื้อเมล็ดพันธุ์อัตโนมัติ [ทั้งหมด]")
         ItemDropdown:SetTitle("เลือกอุปกรณ์")
         AutoBuySelectedToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ที่เลือก]")
-        AutoBuyAllToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ทั้งหมด]")
+        AutoBuyGearAllToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ทั้งหมด]")
     end
 }
 
