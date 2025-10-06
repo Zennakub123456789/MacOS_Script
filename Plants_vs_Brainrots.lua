@@ -598,8 +598,9 @@ SettingTab:Section("Settings")
 
 local selectedLanguage = "English"
 
-local LanguageSection = SettingsTab:Section("Language Settings")
-local LanguageDropdown = SettingsTab:Dropdown({
+SettingTab:Section("Language Settings")
+
+local LanguageDropdown = SettingTab:Dropdown({
     Title = "Select Language",
     Options = {"English", "ภาษาไทย"},
     Default = selectedLanguage,
@@ -607,7 +608,7 @@ local LanguageDropdown = SettingsTab:Dropdown({
         selectedLanguage = chosenLanguage
     end
 })
-local ApplyButton = SettingsTab:Button({
+local ApplyButton = SettingTab:Button({
     Title = "Apply",
     Desc = "Apply the selected language"
 })
@@ -621,7 +622,7 @@ local languageScripts = {
         AntiAFKToggle:SetTitle("ป้องกัน AFK")
         AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
         SpeedSlider:SetTitle("ความเร็วการตี")
-        AutoFarmToggle:SetTitle("ตีอัตโนมัติ)
+        AutoFarmToggle:SetTitle("ตีอัตโนมัติ")
         BestBrainrotsLabel:SetText("1 = 1วิ / 600วิ = 10นาที")
         DelaySlider:SetTitle("ดีเลย์การสวม Brainrots ที่ดีที่สุด")
         AutoEquipToggle:SetTitle("ใส่ Brainrots ที่ดีที่สุดอัตโน")
