@@ -595,3 +595,59 @@ EventTab:Section("Coming soon...")
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
 SettingTab:Section("Settings")
+
+local selectedLanguage = "English"
+
+local LanguageSection = SettingsTab:Section("Language Settings")
+local LanguageDropdown = SettingsTab:Dropdown({
+    Title = "Select Language",
+    Options = {"English", "ภาษาไทย"},
+    Default = selectedLanguage,
+    Callback = function(chosenLanguage)
+        selectedLanguage = chosenLanguage
+    end
+})
+local ApplyButton = SettingsTab:Button({
+    Title = "Apply",
+    Desc = "Apply the selected language"
+})
+
+local languageScripts = {
+    ["English"] = function()
+        print("English")
+    end,
+    
+    ["ภาษาไทย"] = function()
+        AntiAFKToggle:SetTitle("ป้องกัน AFK")
+        AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
+        SpeedSlider:SetTitle("ความเร็วการตี")
+        AutoFarmToggle:SetTitle("ตีอัตโนมัติ)
+        ApplyButton:SetTitle("ใช้งาน")
+        ApplyButton:SetDesc("ใช้ภาษาที่เลือก")
+    end
+}
+
+ApplyButton:SetCallback(function()
+    if languageScripts[selectedLanguage] then
+        languageScripts[selectedLanguage]()
+        
+        MacUI:Notify({
+            Title = "Success",
+            Content = "Language has been set to: " .. selectedLanguage,
+            Duration = 4
+        })
+    else
+        MacUI:Notify({
+            Title = "Error",
+            Content = "No script found for language: " .. selectedLanguage,
+            Duration = 4
+        })
+    end
+end)
+
+MacUI:Notify({
+    Title = "Script Loaded",
+    Content = "Settings panel is ready.",
+    Duration = 3
+})
+
