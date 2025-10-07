@@ -1,10 +1,10 @@
 local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS/refs/heads/main/Main.lua"))()
 
 local Window = MacUI:Window({
-    Title = "MacUI Demo",
+    Title = "Tad Hub | PvB",
     Size = UDim2.new(0, 600, 0, 400),
     Theme = "Dark", -- "Default", "Dark", "Ocean"
-    Icon = 0, -- Asset ID or URL (optional)
+    Icon = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png",
     
     LoadingTitle = "MacUI",
     LoadingSubtitle = "Loading...",
@@ -16,7 +16,7 @@ local Window = MacUI:Window({
     
     ConfigurationSaving = {
         Enabled = true,
-        FileName = "MyConfig"
+        FileName = "MacUI_Config"
     },
     KeySystem = false,
     KeySettings = {
