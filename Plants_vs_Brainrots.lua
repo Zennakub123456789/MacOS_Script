@@ -592,7 +592,7 @@ local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
 EventTab:Section("Coming soon...")
 
 local List = { 
-    "Alessio", 
+    "Alessio",
     "Item B", 
     "Item C", 
     "Item D"
@@ -600,9 +600,9 @@ local List = {
 
 getgenv().AutoTurnIn = false
 
-local AutoTurnInToggle = MainTab:Toggle({
-    Title = "Auto TurnIn (Smart Equip & Save)",
-    Desc = "โหลด list ล่าสุด เลือกไอเท็มตรงชื่อในกระเป๋า แล้ว Equip + TurnIn",
+local AutoTurnInToggle = EventTab:Toggle({
+    Title = "Auto Turn In",
+    Desc = "Auto Turn In",
     Default = false,
     Flag = "AutoTurnIn",
     Callback = function(value)
@@ -634,23 +634,28 @@ local AutoTurnInToggle = MainTab:Toggle({
                         saveProgress(1)
                     end
 
-                    local itemName = List[index]
+                    local keyword = List[index]
                     
                     local matches = {}
+                    
                     for _, tool in ipairs(backpack:GetChildren()) do
-                        if tool.Name == itemName then
+                        if string.find(tool.Name, keyword) then
                             table.insert(matches, tool)
                         end
                     end
 
-                    local selectedTool = nil
+                    local toolToEquip = nil
                     if #matches > 0 then
                         if #matches == 1 then
-                            selectedTool = matches[1]
+                            toolToEquip = matches[1]
                         else
-                            selectedTool = matches[math.random(1, #matches)]
+                            toolToEquip = matches[math.random(1, #matches)]
                         end
-                        player.Character.Humanoid:EquipTool(selectedTool)
+
+                        if player.Character and player.Character:FindFirstChild("Humanoid") then
+                           player.Character.Humanoid:EquipTool(toolToEquip)
+                           task.wait(0.2)
+                        end
                     end
 
                     local args = { [1] = "TurnIn" }
