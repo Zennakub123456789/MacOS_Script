@@ -1,4 +1,4 @@
-local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS/refs/heads/main/Main.lua"))()
 
 local Window = MacUI:Window({
     Title = "MacUI Demo",
@@ -29,6 +29,8 @@ local Window = MacUI:Window({
 })
 
 local MainTab = Window:Tab("Main", "rbxassetid://128706247346129")
+
+MainTab:Section("Anti AFK")
 
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
@@ -571,7 +573,7 @@ local TeleportGrassButton = TeleportTab:Button({
     end
 })
 
-SellTab:Section("Event")
+TeleportTab:Section("Event")
 
 local TeleportFixedButton = TeleportTab:Button({
     Title = "Teleport to Prison Event",
