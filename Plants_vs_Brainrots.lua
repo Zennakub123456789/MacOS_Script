@@ -593,7 +593,8 @@ EventTab:Section("Coming soon...")
 
 local List = { 
     "Alessio",
-    "Orcalero Orcala", 
+    "Orcalero Orcala",
+    "Trippi Troppi",
     "Bandito Bobrito"
 }
 
