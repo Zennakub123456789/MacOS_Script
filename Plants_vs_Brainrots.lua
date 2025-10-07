@@ -594,8 +594,15 @@ EventTab:Section("Coming soon...")
 local List = { 
     "Alessio",
     "Orcalero Orcala",
+    "Bandito Bobrito",
     "Trippi Troppi",
-    "Bandito Bobrito"
+    "Bombardiro Crocodilo",
+    "Trippi Troppi",
+    "Trippi Troppi",
+    "Trippi Troppi",
+    "Trippi Troppi",
+    "Trippi Troppi",
+    "Trippi Troppi"
 }
 
 getgenv().AutoTurnIn = false
