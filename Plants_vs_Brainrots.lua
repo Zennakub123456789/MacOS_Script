@@ -636,7 +636,6 @@ local AutoTurnInToggle = EventTab:Toggle({
                     local keyword = List[index]
                     
                     local matches = {}
-                    
                     for _, tool in ipairs(backpack:GetChildren()) do
                         if string.find(tool.Name, keyword) then
                             table.insert(matches, tool)
@@ -656,12 +655,24 @@ local AutoTurnInToggle = EventTab:Toggle({
                            task.wait(0.2)
                         end
                     end
+                    
+                    -- ▼▼▼ ส่วนที่แก้ไขใหม่ ▼▼▼
+                    if toolToEquip then
+                        local args = { [1] = "TurnIn" }
+                        game:GetService("ReplicatedStorage").Remotes.Events.Prison.Interact:FireServer(unpack(args))
+                        
+                        -- รอสักครู่ให้เซิร์ฟเวอร์ประมวลผล
+                        task.wait(1.0)
+                        
+                        -- ตรวจสอบว่าของหายไปจากกระเป๋าหรือยัง
+                        if not toolToEquip.Parent then
+                            -- ถ้าของหายไปแล้ว (ส่งสำเร็จ) ค่อยบันทึกเลขถัดไป
+                            saveProgress(index + 1)
+                        end
+                    end
+                    -- ▲▲▲ จบส่วนที่แก้ไข ▲▲▲
 
-                    local args = { [1] = "TurnIn" }
-                    game:GetService("ReplicatedStorage").Remotes.Events.Prison.Interact:FireServer(unpack(args))
-
-                    saveProgress(index + 1)
-                    task.wait(1.5)
+                    task.wait(0.5) -- ลด Delay ตรงนี้ลง เหลือแค่รอเช็ครอบต่อไป
                 end
             end)
         end
