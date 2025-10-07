@@ -594,7 +594,7 @@ EventTab:Section("Coming soon...")
 local List = { 
     "Alessio",
     "Orcalero Orcala", 
-    "Item D"
+    "Bandito Bobrito"
 }
 
 getgenv().AutoTurnIn = false
