@@ -597,9 +597,9 @@ local List = {
     "Bandito Bobrito",
     "Trippi Troppi",
     "Bombardiro Crocodilo",
-    "Trippi Troppi",
-    "Trippi Troppi",
-    "Trippi Troppi",
+    "Brr Brr Patapim",
+    "Ballerina Cappuccina",
+    "Bananita Dolphinita",
     "Trippi Troppi",
     "Trippi Troppi",
     "Trippi Troppi"
