@@ -600,9 +600,22 @@ local List = {
     "Brr Brr Patapim",
     "Ballerina Cappuccina",
     "Bananita Dolphinita",
+    "Burbaloni Lulliloli",
+    "Cappuccino Assasino",
+    "Orcalero Orcala",
+    "Svinino Bombondino",
+    "Bombini Gussini",
+    "Bandito Bobrito",
+    "Bombardiro Crocodilo",
+    "Elefanto Cocofanto",
     "Trippi Troppi",
-    "Trippi Troppi",
-    "Trippi Troppi"
+    "Frigo Camelo",
+    "Orcalero Orcala",
+    "Orcalero Orcala",
+    "Orcalero Orcala",
+    "Orcalero Orcala",
+    "Orcalero Orcala",
+    "Orcalero Orcala"
 }
 
 getgenv().AutoTurnIn = false
