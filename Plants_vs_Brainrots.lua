@@ -591,8 +591,78 @@ local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
 
 EventTab:Section("Coming soon...")
 
+local List = { 
+    "Alessio", 
+    "Item B", 
+    "Item C", 
+    "Item D"
+}
 
+getgenv().AutoTurnIn = false
 
+local AutoTurnInToggle = MainTab:Toggle({
+    Title = "Auto TurnIn (Smart Equip & Save)",
+    Desc = "โหลด list ล่าสุด เลือกไอเท็มตรงชื่อในกระเป๋า แล้ว Equip + TurnIn",
+    Default = false,
+    Flag = "AutoTurnIn",
+    Callback = function(value)
+        getgenv().AutoTurnIn = value
+
+        if value then
+            task.spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local backpack = player:WaitForChild("Backpack")
+                local fileName = "ListSave.txt"
+
+                if not isfile(fileName) then
+                    writefile(fileName, "1")
+                end
+
+                local function readProgress()
+                    return tonumber(readfile(fileName)) or 1
+                end
+
+                local function saveProgress(num)
+                    writefile(fileName, tostring(num))
+                end
+                
+                while getgenv().AutoTurnIn do
+                    local index = readProgress()
+
+                    if index > #List then
+                        index = 1
+                        saveProgress(1)
+                    end
+
+                    local itemName = List[index]
+                    
+                    local matches = {}
+                    for _, tool in ipairs(backpack:GetChildren()) do
+                        if tool.Name == itemName then
+                            table.insert(matches, tool)
+                        end
+                    end
+
+                    local selectedTool = nil
+                    if #matches > 0 then
+                        if #matches == 1 then
+                            selectedTool = matches[1]
+                        else
+                            selectedTool = matches[math.random(1, #matches)]
+                        end
+                        player.Character.Humanoid:EquipTool(selectedTool)
+                    end
+
+                    local args = { [1] = "TurnIn" }
+                    game:GetService("ReplicatedStorage").Remotes.Events.Prison.Interact:FireServer(unpack(args))
+
+                    saveProgress(index + 1)
+                    task.wait(1.5)
+                end
+            end)
+        end
+    end
+})
 
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
