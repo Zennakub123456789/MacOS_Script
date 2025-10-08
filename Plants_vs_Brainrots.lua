@@ -610,12 +610,10 @@ local List = {
     "Elefanto Cocofanto",
     "Trippi Troppi",
     "Frigo Camelo",
-    "Orcalero Orcala",
-    "Orcalero Orcala",
-    "Orcalero Orcala",
-    "Orcalero Orcala",
-    "Orcalero Orcala",
-    "Orcalero Orcala"
+    "Bambini Crostini",
+    "Gangster Footera",
+    "Madung",
+    "Crazylone Pizaione"
 }
 
 getgenv().AutoTurnIn = false
