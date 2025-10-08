@@ -41,12 +41,12 @@ local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "K"
+ScreenGui.Name = "k"
 ScreenGui.Parent = PlayerGui
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 100, 0, 100)
-Frame.Position = UDim2.new(0.5, -50, 0.5, -50)
+Frame.Size = UDim2.new(0, 60, 0, 60)
+Frame.Position = UDim2.new(0.5, -30, 0.5, -30)
 Frame.BackgroundTransparency = 1
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 Frame.Parent = ScreenGui
@@ -94,12 +94,17 @@ end)
 
 local toggled = false
 
-Button.MouseButton1Click:Connect(function()
-    toggled = not toggled
-    if toggled then
+local function PressK()
+    local humanoid = Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.K, false, game)
         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.K, false, game)
     end
+end
+
+Button.MouseButton1Click:Connect(function()
+    toggled = not toggled
+    PressK()
 end)
 
 local MainTab = Window:Tab("Main", "rbxassetid://128706247346129")
