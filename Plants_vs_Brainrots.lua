@@ -589,7 +589,7 @@ local TeleportFixedButton = TeleportTab:Button({
 
 local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
 
-EventTab:Section("Auto Prison Event")
+EventTab:Section("Prison Event")
 
 getgenv().AutoTurnIn = false
 
@@ -641,6 +641,38 @@ local AutoTurnInToggle = EventTab:Toggle({
                     end
 
                     task.wait(1.5)
+                end
+            end)
+        end
+    end
+})
+
+getgenv().AutoResetRequest = false
+
+local AutoResetRequestToggle = EventTab:Toggle({
+    Title = "Auto Reset Prison",
+    Desc = "Auto Reset Prison",
+    Default = false,
+    Flag = "AutoResetRequest",
+    Callback = function(value)
+        getgenv().AutoResetRequest = value
+
+        if value then
+            task.spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local guiPath = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("WantedPosterGui"):WaitForChild("Frame"):WaitForChild("Main_Complete")
+
+                while getgenv().AutoResetRequest do
+                    task.wait(0.5)
+
+                    if guiPath.Visible then
+                        local args = { [1] = "ResetRequest" }
+                        game:GetService("ReplicatedStorage").Remotes.Events.Prison.Interact:FireServer(unpack(args))
+
+                        repeat 
+                            task.wait(0.5) 
+                        until not guiPath.Visible or not getgenv().AutoResetRequest
+                    end
                 end
             end)
         end
