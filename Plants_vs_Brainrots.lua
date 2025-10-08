@@ -686,7 +686,89 @@ local AutoResetRequestToggle = EventTab:Toggle({
 
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
-SettingTab:Section("Settings")
+SettingTab:Section("Performance")
+
+getgenv().HideNotifications = false
+
+local HideNotificationsToggle = SettingTab:Toggle({
+    Title = "Hide Notifications",
+    Desc = "Hide Notify",
+    Default = false,
+    Flag = "HideNotifications",
+    Callback = function(value)
+        getgenv().HideNotifications = value
+        local player = game:GetService("Players").LocalPlayer
+        local notifications = player:WaitForChild("PlayerGui"):WaitForChild("Notifications")
+        notifications.Enabled = not value
+    end
+})
+
+local lighting = game:GetService("Lighting")
+local terrain = workspace:FindFirstChildOfClass("Terrain")
+local settings = settings()
+
+local DefaultValues = {
+    QualityLevel = settings.Rendering.QualityLevel,
+    GlobalShadows = lighting.GlobalShadows,
+    FogEnd = lighting.FogEnd,
+    Brightness = lighting.Brightness,
+    WaterWaveSize = terrain and terrain.WaterWaveSize or nil,
+    WaterWaveSpeed = terrain and terrain.WaterWaveSpeed or nil,
+    WaterReflectance = terrain and terrain.WaterReflectance or nil,
+    WaterTransparency = terrain and terrain.WaterTransparency or nil
+}
+
+getgenv().LowGraphics = false
+
+local LowGraphicsToggle = SettingTab:Toggle({
+    Title = "Low Graphics",
+    Desc = "Reduce graphics to increase FPS",
+    Default = false,
+    Flag = "LowGraphics",
+    Callback = function(value)
+        getgenv().LowGraphics = value
+
+        if value then
+            settings.Rendering.QualityLevel = Enum.QualityLevel.Level01
+            lighting.GlobalShadows = false
+            lighting.FogEnd = 1000
+            lighting.Brightness = 1
+            if terrain then
+                terrain.WaterWaveSize = 0
+                terrain.WaterWaveSpeed = 0
+                terrain.WaterReflectance = 0
+                terrain.WaterTransparency = 1
+            end
+
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") then
+                    v.Enabled = false
+                elseif v:IsA("Decal") or v:IsA("Texture") then
+                    v.Transparency = 1
+                end
+            end
+        else
+            settings.Rendering.QualityLevel = DefaultValues.QualityLevel
+            lighting.GlobalShadows = DefaultValues.GlobalShadows
+            lighting.FogEnd = DefaultValues.FogEnd
+            lighting.Brightness = DefaultValues.Brightness
+            if terrain then
+                terrain.WaterWaveSize = DefaultValues.WaterWaveSize
+                terrain.WaterWaveSpeed = DefaultValues.WaterWaveSpeed
+                terrain.WaterReflectance = DefaultValues.WaterReflectance
+                terrain.WaterTransparency = DefaultValues.WaterTransparency
+            end
+
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") then
+                    v.Enabled = true
+                elseif v:IsA("Decal") or v:IsA("Texture") then
+                    v.Transparency = 0
+                end
+            end
+        end
+    end
+})
 
 local selectedLanguage = "English"
 
