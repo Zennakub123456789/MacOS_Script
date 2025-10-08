@@ -13,17 +13,13 @@ local iconPath = getcustomasset(imageName)
 local Window = MacUI:Window({
     Title = "Tad Hub | PvB",
     Size = UDim2.new(0, 600, 0, 400),
-    Theme = "Dark", -- "Default", "Dark", "Ocean"
+    Theme = "Dark",
     Icon = iconPath,
-    
     LoadingTitle = "MacUI",
     LoadingSubtitle = "Loading...",
-    
-    ToggleUIKeybind = "RightControl",
+    ToggleUIKeybind = "K",
     ShowText = "Menu",
-    
     NotifyFromBottom = true,
-    
     ConfigurationSaving = {
         Enabled = true,
         FileName = "MacUI_Config"
@@ -37,6 +33,74 @@ local Window = MacUI:Window({
         SaveKey = true
     }
 })
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "K"
+ScreenGui.Parent = PlayerGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 100, 0, 100)
+Frame.Position = UDim2.new(0.5, -50, 0.5, -50)
+Frame.BackgroundTransparency = 1
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+Frame.Parent = ScreenGui
+
+local Button = Instance.new("ImageButton")
+Button.Size = UDim2.new(1,0,1,0)
+Button.Position = UDim2.new(0,0,0,0)
+Button.BackgroundTransparency = 1
+Button.Image = iconPath
+Button.Parent = Frame
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = Button
+
+local dragging = false
+local dragInput, mousePos, framePos
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        mousePos = input.Position
+        framePos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if dragging and dragInput then
+        local delta = dragInput.Position - mousePos
+        local newPos = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+        Frame.Position = Frame.Position:Lerp(newPos, 0.25)
+    end
+end)
+
+local toggled = false
+
+Button.MouseButton1Click:Connect(function()
+    toggled = not toggled
+    if toggled then
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.K, false, game)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.K, false, game)
+    end
+end)
 
 local MainTab = Window:Tab("Main", "rbxassetid://128706247346129")
 
