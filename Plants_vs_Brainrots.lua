@@ -589,38 +589,13 @@ local TeleportFixedButton = TeleportTab:Button({
 
 local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
 
-EventTab:Section("Coming soon...")
-
-local List = { 
-    "Alessio",
-    "Orcalero Orcala",
-    "Bandito Bobrito",
-    "Trippi Troppi",
-    "Bombardiro Crocodilo",
-    "Brr Brr Patapim",
-    "Ballerina Cappuccina",
-    "Bananita Dolphinita",
-    "Burbaloni Lulliloli",
-    "Cappuccino Assasino",
-    "Orcalero Orcala",
-    "Svinino Bombondino",
-    "Bombini Gussini",
-    "Bandito Bobrito",
-    "Bombardiro Crocodilo",
-    "Elefanto Cocofanto",
-    "Trippi Troppi",
-    "Frigo Camelo",
-    "Bambini Crostini",
-    "Gangster Footera",
-    "Madung",
-    "Crazylone Pizaione"
-}
+EventTab:Section("Auto Prison Event")
 
 getgenv().AutoTurnIn = false
 
 local AutoTurnInToggle = EventTab:Toggle({
     Title = "Auto Turn In",
-    Desc = "Auto Turn In",
+    Desc = "Auto Event",
     Default = false,
     Flag = "AutoTurnIn",
     Callback = function(value)
@@ -629,69 +604,43 @@ local AutoTurnInToggle = EventTab:Toggle({
         if value then
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
-                local backpack = player:WaitForChild("Backpack")
-                local fileName = "ListSave.txt"
-
-                if not isfile(fileName) then
-                    writefile(fileName, "1")
-                end
-
-                local function readProgress()
-                    return tonumber(readfile(fileName)) or 1
-                end
-
-                local function saveProgress(num)
-                    writefile(fileName, tostring(num))
-                end
                 
+                local wantedItemLabel = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("WantedPosterGui"):WaitForChild("Frame"):WaitForChild("Main"):WaitForChild("WantedItem"):WaitForChild("WantedItem_Title")
+
                 while getgenv().AutoTurnIn do
-                    local index = readProgress()
-
-                    if index > #List then
-                        index = 1
-                        saveProgress(1)
-                    end
-
-                    local keyword = List[index]
-                    
-                    local matches = {}
-                    for _, tool in ipairs(backpack:GetChildren()) do
-                        if string.find(tool.Name, keyword) then
-                            table.insert(matches, tool)
-                        end
-                    end
-
+                    local keyword = wantedItemLabel.Text
                     local toolToEquip = nil
-                    if #matches > 0 then
-                        if #matches == 1 then
-                            toolToEquip = matches[1]
-                        else
-                            toolToEquip = matches[math.random(1, #matches)]
+
+                    if keyword and keyword ~= "" and keyword ~= "None" then
+                        local backpack = player:WaitForChild("Backpack")
+                        local matches = {}
+                        
+                        for _, tool in ipairs(backpack:GetChildren()) do
+                            if string.find(tool.Name, keyword) then
+                                table.insert(matches, tool)
+                            end
                         end
 
-                        if player.Character and player.Character:FindFirstChild("Humanoid") then
-                           player.Character.Humanoid:EquipTool(toolToEquip)
-                           task.wait(0.2)
+                        if #matches > 0 then
+                            if #matches == 1 then
+                                toolToEquip = matches[1]
+                            else
+                                toolToEquip = matches[math.random(1, #matches)]
+                            end
+
+                            if player.Character and player.Character:FindFirstChild("Humanoid") then
+                               player.Character.Humanoid:EquipTool(toolToEquip)
+                               task.wait(0.2)
+                            end
                         end
                     end
-                    
-                    -- ▼▼▼ ส่วนที่แก้ไขใหม่ ▼▼▼
+
                     if toolToEquip then
                         local args = { [1] = "TurnIn" }
                         game:GetService("ReplicatedStorage").Remotes.Events.Prison.Interact:FireServer(unpack(args))
-                        
-                        -- รอสักครู่ให้เซิร์ฟเวอร์ประมวลผล
-                        task.wait(1.0)
-                        
-                        -- ตรวจสอบว่าของหายไปจากกระเป๋าหรือยัง
-                        if not toolToEquip.Parent then
-                            -- ถ้าของหายไปแล้ว (ส่งสำเร็จ) ค่อยบันทึกเลขถัดไป
-                            saveProgress(index + 1)
-                        end
                     end
-                    -- ▲▲▲ จบส่วนที่แก้ไข ▲▲▲
 
-                    task.wait(0.5) -- ลด Delay ตรงนี้ลง เหลือแค่รอเช็ครอบต่อไป
+                    task.wait(1.5)
                 end
             end)
         end
