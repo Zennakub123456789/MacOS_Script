@@ -1,10 +1,20 @@
 local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
 
+local imageUrl = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png"
+local imageName = "TadHub-Icon.png"
+
+if not isfile(imageName) then
+    local imageData = game:HttpGet(imageUrl)
+    writefile(imageName, imageData)
+end
+
+local iconPath = getcustomasset(imageName)
+
 local Window = MacUI:Window({
     Title = "Tad Hub | PvB",
     Size = UDim2.new(0, 600, 0, 400),
     Theme = "Dark", -- "Default", "Dark", "Ocean"
-    Icon = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png",
+    Icon = iconPath,
     
     LoadingTitle = "MacUI",
     LoadingSubtitle = "Loading...",
