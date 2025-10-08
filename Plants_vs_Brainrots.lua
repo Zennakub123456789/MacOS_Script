@@ -594,7 +594,7 @@ EventTab:Section("Prison Event")
 getgenv().AutoTurnIn = false
 
 local AutoTurnInToggle = EventTab:Toggle({
-    Title = "Auto Turn In (From GUI - Name Only)",
+    Title = "Auto Turn In",
     Desc = "Auto Event",
     Default = false,
     Flag = "AutoTurnIn",
@@ -611,7 +611,7 @@ local AutoTurnInToggle = EventTab:Toggle({
                     local toolToEquip = nil
 
                     if keyword and keyword ~= "" and keyword ~= "None" then
-                        local backpack = player:WaitForChild("Backrac")
+                        local backpack = player:WaitForChild("Backpack")
                         local matches = {}
                         
                         for _, tool in ipairs(backpack:GetChildren()) do
