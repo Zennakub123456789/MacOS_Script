@@ -594,7 +594,7 @@ EventTab:Section("Prison Event")
 getgenv().AutoTurnIn = false
 
 local AutoTurnInToggle = EventTab:Toggle({
-    Title = "Auto Turn In",
+    Title = "Auto Turn In (From GUI - Name Only)",
     Desc = "Auto Event",
     Default = false,
     Flag = "AutoTurnIn",
@@ -604,7 +604,6 @@ local AutoTurnInToggle = EventTab:Toggle({
         if value then
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
-                
                 local wantedItemLabel = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("WantedPosterGui"):WaitForChild("Frame"):WaitForChild("Main"):WaitForChild("WantedItem"):WaitForChild("WantedItem_Title")
 
                 while getgenv().AutoTurnIn do
@@ -612,11 +611,11 @@ local AutoTurnInToggle = EventTab:Toggle({
                     local toolToEquip = nil
 
                     if keyword and keyword ~= "" and keyword ~= "None" then
-                        local backpack = player:WaitForChild("Backpack")
+                        local backpack = player:WaitForChild("Backrac")
                         local matches = {}
                         
                         for _, tool in ipairs(backpack:GetChildren()) do
-                            if string.find(tool.Name, keyword) then
+                            if tool:IsA("Tool") and string.find(tool.Name, keyword) then
                                 table.insert(matches, tool)
                             end
                         end
