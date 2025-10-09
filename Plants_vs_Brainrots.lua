@@ -981,7 +981,36 @@ local AutoTurnInToggle = EventTab:Toggle({
         if value then
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
+                local UserInputService = game:GetService("UserInputService")
                 local wantedItemLabel = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("WantedPosterGui"):WaitForChild("Frame"):WaitForChild("Main"):WaitForChild("WantedItem"):WaitForChild("WantedItem_Title")
+
+                local function isToolFavorited(tool)
+                    local playerGui = player.PlayerGui
+                    local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
+
+                    for i = 1, hotbarSlots do
+                        local slot = playerGui.BackpackGui.Backpack.Hotbar:FindFirstChild(tostring(i))
+                        local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+                        if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                            if slot:FindFirstChild("HeartIcon") then return true end
+                        end
+                    end
+
+                    local inventoryFrame = playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
+                    if inventoryFrame then
+                        for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
+                            if itemSlot:IsA("TextButton") then
+                                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                                if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                    if itemSlot:FindFirstChild("HeartIcon") then return true end
+                                end
+                            end
+                        end
+                    end
+                    
+                    return false
+                end
+
 
                 while getgenv().AutoTurnIn do
                     local keyword = wantedItemLabel.Text
@@ -992,7 +1021,7 @@ local AutoTurnInToggle = EventTab:Toggle({
                         local matches = {}
                         
                         for _, tool in ipairs(backpack:GetChildren()) do
-                            if tool:IsA("Tool") and string.find(tool.Name, keyword) then
+                            if tool:IsA("Tool") and string.find(tool.Name, keyword) and not isToolFavorited(tool) then
                                 table.insert(matches, tool)
                             end
                         end
