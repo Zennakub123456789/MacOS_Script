@@ -363,7 +363,7 @@ local ProcessItemsToggle = MainTab:Toggle({
         if value then
             if isLoopRunning then return end
             isLoopRunning = true
-            MacUI:Notify({ Title = "เริ่มต้น", Content = "เริ่มการสแกนกระเป๋าแบบต่อเนื่อง...", Duration = 3 })
+            MacUI:Notify({ Title = "Started", Content = "Start to Favorite Brainrots", Duration = 3 })
 
             task.spawn(function()
                 while isLoopRunning do
@@ -401,7 +401,7 @@ local ProcessItemsToggle = MainTab:Toggle({
                                     local inventoryFrame = playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
                                     if inventoryFrame then
                                         for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
-                                            if itemSlot:IsA("Frame") then
+                                            if itemSlot:IsA("TextButton") then
                                                 local toolNameLabel = itemSlot:FindFirstChild("ToolName")
                                                 if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
                                                     if itemSlot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
@@ -419,14 +419,12 @@ local ProcessItemsToggle = MainTab:Toggle({
                                 if uuidValue and #selectedRarities > 0 then
                                     local nestedModel = tool:FindFirstChild(brainrotValue)
                                     if nestedModel then
-                                        local attributesTable = nestedModel:GetAttribute("Attributes")
-                                        if attributesTable and type(attributesTable) == "table" then
-                                            local rarityValue = attributesTable.Rarity
-                                            if rarityValue and table_contains(selectedRarities, rarityValue) then
-                                                local args = { [1] = uuidValue }
-                                                ReplicatedStorage.Remotes.FavoriteItem:FireServer(unpack(args))
-                                                MacUI:Notify({ Title = "ดำเนินการ", Content = "ยิงรีโมทสำหรับ: " .. tool.Name, Duration = 3 })
-                                            end
+                                        local rarityValue = nestedModel:GetAttribute("Rarity")
+                                        
+                                        if rarityValue and table_contains(selectedRarities, rarityValue) then
+                                            local args = { [1] = uuidValue }
+                                            ReplicatedStorage.Remotes.FavoriteItem:FireServer(unpack(args))
+                                            MacUI:Notify({ Title = "ดำเนินการ", Content = "ยิงรีโมทสำหรับ: " .. tool.Name, Duration = 3 })
                                         end
                                     end
                                 end
@@ -442,7 +440,7 @@ local ProcessItemsToggle = MainTab:Toggle({
         else
             if isLoopRunning then
                 isLoopRunning = false
-                MacUI:Notify({ Title = "หยุดทำงาน", Content = "หยุดการสแกนแล้ว", Duration = 4 })
+                MacUI:Notify({ Title = "Stop", Content = "Stop Favorite Brainrots", Duration = 4 })
             end
         end
     end
