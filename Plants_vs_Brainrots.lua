@@ -342,7 +342,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local selectedRarities = {}
 local isLoopRunning = false
 
-local RarityOptions = {"Common", "Uncommon", "Rare", "Epic", "Legendary"}
+local RarityOptions = {"Rare", "Epic", "Legendary", "Mythic", "Godly", "Secret", "Limited"}
 
 local RarityDropdown = MainTab:Dropdown({
     Title = "Select Rarity",
