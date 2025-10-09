@@ -1212,7 +1212,6 @@ local languageScripts = {
         ItemDropdown:SetTitle("เลือกอุปกรณ์")
         AutoBuySelectedToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ที่เลือก]")
         AutoBuyGearAllToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ทั้งหมด]")
-        SellBrainrotLabel:SetTitle("1 = 1วิ / 600วิ = 10นาที")
         SellDelaySlider:SetTitle("ดีเลย์การขาย Brainrot ทั้งหมด")
         AutoSellToggle:SetTitle("ขาย Brainrot ทั้งหมดอัตโนมัติ")
         AutoSellFullToggle:SetTitle("ขาย Brainrot ทั้งหมดอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
