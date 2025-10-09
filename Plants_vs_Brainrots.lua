@@ -333,6 +333,64 @@ local AutoEquipToggle = AutoTab:Toggle({
     end
 })
 
+AutoTab:Section("Auto Open Eggs")
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local Backpack = LocalPlayer:WaitForChild("Backpack")
+
+getgenv().SelectedEggs = { "Godly Lucky Egg" }
+getgenv().AutoOpenEgg = false
+
+local EggDropdown = AutoTab:Dropdown({
+    Title = "Select Eggs to Open",
+    Options = { "Godly Lucky Egg", "Secret Lucky Egg", "Meme Lucky Egg" },
+    Default = getgenv().SelectedEggs,
+    Multi = true,
+    Callback = function(option)
+        getgenv().SelectedEggs = option
+    end
+})
+
+local AutoOpenEggToggle = AutoTab:Toggle({
+    Title = "Auto Open Egg",
+    Desc = "Equips and opens selected eggs in a loop.",
+    Default = false,
+    Flag = "AutoOpenEgg",
+    Callback = function(value)
+        getgenv().AutoOpenEgg = value
+        if value then
+            task.spawn(function()
+                while getgenv().AutoOpenEgg do
+                    for _, eggName in pairs(getgenv().SelectedEggs) do
+                        if not getgenv().AutoOpenEgg then break end
+                        local foundEgg = nil
+                        for _, tool in pairs(Backpack:GetChildren()) do
+                            if string.find(string.lower(tool.Name), string.lower(eggName)) then
+                                foundEgg = tool
+                                break
+                            end
+                        end
+
+                        if foundEgg then
+                            local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                            if humanoid then
+                                humanoid:EquipTool(foundEgg)
+                                task.wait(0.2)
+                                ReplicatedStorage.Remotes.OpenEgg:FireServer()
+                            end
+                        end
+
+                        task.wait(0.5)
+                    end
+                    task.wait(0.2)
+                end
+            end)
+        end
+    end
+})
+
 AutoTab:Section("Auto Favorite")
 
 local UserInputService = game:GetService("UserInputService")
