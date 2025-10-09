@@ -504,6 +504,122 @@ local ProcessItemsToggle = MainTab:Toggle({
     end
 })
 
+AutoTab:Section("Auto Favorite Plants")
+
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local selectedRarities = {}
+local isLoopRunning = false
+
+local RarityOptions = {"Rare", "Epic", "Legendary", "Mythic", "Godly", "Secret", "Limited"}
+
+local RarityDropdown = MainTab:Dropdown({
+    Title = "เลือก Rarity ที่ต้องการ",
+    Options = RarityOptions,
+    Multi = true,
+    Default = {},
+    Flag = "RaritySelection",
+    Callback = function(selected_options)
+        selectedRarities = selected_options
+    end
+})
+
+MainTab:Divider()
+MainTab:Section("เริ่ม/หยุด การทำงาน")
+
+local ProcessItemsToggle = MainTab:Toggle({
+    Title = "เริ่ม/หยุด การสแกนไอเท็มอัตโนมัติ",
+    Default = false,
+    Flag = "ProcessItemsToggle",
+    Callback = function(value)
+        if value then
+            if isLoopRunning then return end
+            isLoopRunning = true
+            MacUI:Notify({ Title = "เริ่มต้น", Content = "เริ่มการสแกนกระเป๋าแบบต่อเนื่อง...", Duration = 3 })
+
+            task.spawn(function()
+                while isLoopRunning do
+                    local localPlayer = Players.LocalPlayer
+                    if not localPlayer or not localPlayer.Character then break end
+
+                    local backpack = localPlayer.Backpack
+                    local playerGui = localPlayer.PlayerGui
+                    local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
+
+                    local function table_contains(tbl, val)
+                        for _, v in ipairs(tbl) do
+                            if v == val then return true end
+                        end
+                        return false
+                    end
+
+                    for _, tool in ipairs(backpack:GetChildren()) do
+                        local success, err = pcall(function()
+                            if tool and tool:IsA("Tool") then
+                                local plantValue = tool:GetAttribute("Plant")
+                                if not plantValue then return end
+
+                                local isToolFavorited = false
+                                
+                                for i = 1, hotbarSlots do
+                                    local slot = playerGui.BackpackGui.Backpack.Hotbar:FindFirstChild(tostring(i))
+                                    local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+                                    if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                        if slot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
+                                    end
+                                end
+
+                                if not isToolFavorited then
+                                    local inventoryFrame = playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
+                                    if inventoryFrame then
+                                        for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
+                                            if itemSlot:IsA("TextButton") then
+                                                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                                                if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                                    if itemSlot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                                
+                                if isToolFavorited then
+                                    return 
+                                end
+                                
+                                local uuidValue = tool:GetAttribute("ID")
+                                if uuidValue and #selectedRarities > 0 then
+                                    local nestedModel = tool:FindFirstChild(plantValue)
+                                    if nestedModel then
+                                        local rarityValue = nestedModel:GetAttribute("Rarity")
+                                        
+                                        if rarityValue and table_contains(selectedRarities, rarityValue) then
+                                            local args = { [1] = uuidValue }
+                                            ReplicatedStorage.Remotes.FavoriteItem:FireServer(unpack(args))
+                                            MacUI:Notify({ Title = "Auto Favorite", Content = "Favorite: " .. tool.Name, Duration = 3 })
+                                        end
+                                    end
+                                end
+                            end
+                        end)
+                        if not success then
+                            print("เกิด Error ขณะตรวจสอบไอเท็ม แต่ทำงานต่อได้:", err)
+                        end
+                    end
+                    task.wait(1)
+                end
+            end)
+        else
+            if isLoopRunning then
+                isLoopRunning = false
+                MacUI:Notify({ Title = "Stopped", Content = "Stop Auto Favorite Plants", Duration = 4 })
+            end
+        end
+    end
+})
+
 local ShopTab = Window:Tab("Shop", "rbxassetid://11385419674")
 
 ShopTab:Section("Auto Buy Seed")
