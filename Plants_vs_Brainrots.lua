@@ -756,7 +756,7 @@ local SellTab = Window:Tab("Sell", "rbxassetid://10698878025")
 
 SellTab:Section("Auto Sell Brainrots")
 
-local Label = SellTab:Label({
+local SellBrainrotLabel = SellTab:Label({
     Text = "1 = 1 sec / 600 = 10 min"
 })
 
@@ -769,7 +769,7 @@ getgenv().AutoSell = false
 getgenv().AutoSellFull = false
 
 local SellDelaySlider = SellTab:Slider({
-    Title = "Sell Brainrots Delay",
+    Title = "Sell Brainrots All Delay",
     Min = 1,
     Max = 600,
     Default = 1,
@@ -823,7 +823,7 @@ local AutoSellFullToggle = SellTab:Toggle({
 
 SellTab:Section("Auto Sell Plants")
 
-local Label = SellTab:Label({
+local SellPlantLabel = SellTab:Label({
     Text = "1 = 1 sec / 600 = 10 min"
 })
 
@@ -836,7 +836,7 @@ getgenv().AutoSellPlants = false
 getgenv().AutoSellPlantsFull = false
 
 local PlantSellDelaySlider = SellTab:Slider({
-    Title = "Sell Plants Delay",
+    Title = "Sell Plants All Delay",
     Min = 1,
     Max = 600,
     Default = 1,
@@ -1193,19 +1193,42 @@ local languageScripts = {
     end,
     
     ["ภาษาไทย"] = function()
-        AntiAFKToggle:SetTitle("ป้องกัน AFK")
+        AntiAFKToggle:SetTitle("ป้องกัน AFK [กันหลุดเมื่อยืนนิ่งเกิน20นาที]")
         AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
         SpeedSlider:SetTitle("ความเร็วการตี")
         AutoFarmToggle:SetTitle("ตีอัตโนมัติ")
         BestBrainrotsLabel:SetText("1 = 1วิ / 600วิ = 10นาที")
         DelaySlider:SetTitle("ดีเลย์การสวม Brainrots ที่ดีที่สุด")
-        AutoEquipToggle:SetTitle("ใส่ Brainrots ที่ดีที่สุดอัตโน")
+        AutoEquipToggle:SetTitle("ใส่ Brainrots ที่ดีที่สุดอัตโนมัติ")
+        EggDropdown:SetTitle("เลือกไข่ที่จะเปิด")
+        AutoOpenEggToggle:SetTitle("เปิดไข่อัตโนมัติ")
+        BrainrotRarityDropdown:SetTitle("เลือกความหายาก")
+        FavoriteBrainrotToggle:SetTitle("ล็อคหัวใจ Brainrots อัตโนมัติ [ตามความหายากที่เลือก]")
+        PlantRarityDropdown:SetTitle("เลือกความหายาก")
+        FavoritePlantToggle:SetTitle("ล็อคหัวใจ Plants อัตโนมัติ [ตามความหายากที่เลือก]")
         SeedDropdown:SetTitle("เลือกเมล็ดพันธุ์")
         AutoBuySeedSelectedToggle:SetTitle("ซื้อเมล็ดพันธุ์อัตโนมัติ [ที่เลือก]")
         AutoBuyAllToggle:SetTitle("ซื้อเมล็ดพันธุ์อัตโนมัติ [ทั้งหมด]")
         ItemDropdown:SetTitle("เลือกอุปกรณ์")
         AutoBuySelectedToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ที่เลือก]")
         AutoBuyGearAllToggle:SetTitle("ซื้ออุปกรณ์อัตโนมัติ [ทั้งหมด]")
+        SellBrainrotLabel:SetTitle("1 = 1วิ / 600วิ = 10นาที")
+        SellDelaySlider:SetTitle("ดีเลย์การขาย Brainrot ทั้งหมด")
+        AutoSellToggle:SetTitle("ขาย Brainrot ทั้งหมดอัตโนมัติ")
+        AutoSellFullToggle:SetTitle("ขาย Brainrot ทั้งหมดอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
+        SellPlantLabel:SetTitle("1 = 1วิ / 600วิ = 10นาที")
+        PlantSellDelaySlider:SetTitle("ดีเลย์การขาย Plant ทั้งหมด")
+        AutoSellPlantsToggle:SetTitle("ขาย Plant ทั้งหมดอัตโนมัติ")
+        AutoSellPlantsFullToggle:SetTitle("ขาย Plant ทั้งหมดอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
+        AutoSellAllFullToggle:SetTitle("ขายทั้งสองอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
+        TeleportGrassButton:SetTitle("วาปไปสวนของตัวเอง")
+        TeleportFixedButton:SetTitle("วาปไปอีเว้นคุก")
+        AutoTurnInToggle:SetTitle("ส่ง Brainrot ที่ต้องการเข้าคุกอัตโนมัติ")
+        AutoResetRequestToggle:SetTitle("รีเซ็ตหลังทำภารกิจส่ง Brainrot เสร็จอัตโนมัติ")
+        HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
+        LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
+        LanguageDropdown:SetTitle("เลือกภาษา")
+        ApplyButton:SetTitle("ยืนยันการเปลี่ยนภาษา")
     end
 }
 
