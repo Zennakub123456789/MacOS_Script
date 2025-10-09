@@ -89,33 +89,109 @@ local workspace = game:GetService("Workspace")
 local player = Players.LocalPlayer
 
 getgenv().TeleportToBrainrot = false
+local farmPart = nil
+
+local function isPlayerInFarmZone(character, zone)
+    if not character or not zone then return false end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return false end
+
+    local playerPos = hrp.Position
+    local zonePos = zone.Position
+    local zoneSize = zone.Size
+
+    local minX = zonePos.X - zoneSize.X / 2
+    local maxX = zonePos.X + zoneSize.X / 2
+    local minY = zonePos.Y - zoneSize.Y / 2
+    local maxY = zonePos.Y + zoneSize.Y / 2
+    local minZ = zonePos.Z - zoneSize.Z / 2
+    local maxZ = zonePos.Z + zoneSize.Z / 2
+
+    return (playerPos.X >= minX and playerPos.X <= maxX and
+            playerPos.Y >= minY and playerPos.Y <= maxY and
+            playerPos.Z >= minZ and playerPos.Z <= maxZ)
+end
+
+local function getAllGrassCFrames(plot)
+    local cframes = {}
+    if not plot then return cframes end
+
+    local rowsFolder = plot:FindFirstChild("Rows")
+    if not rowsFolder then return cframes end
+
+    for _, row in pairs(rowsFolder:GetChildren()) do
+        local grassFolder = row:FindFirstChild("Grass")
+        if grassFolder then
+            for _, part in pairs(grassFolder:GetChildren()) do
+                if part:IsA("BasePart") then
+                    table.insert(cframes, part.CFrame)
+                end
+            end
+        end
+    end
+
+    return cframes
+end
 
 local AutoTeleportToggle = AutoTab:Toggle({
     Title = "Auto Farm Brainrot",
     Default = false,
     Flag = "TeleportToBrainrot",
     Callback = function(value)
-        
         getgenv().TeleportToBrainrot = value
 
         if value then
+            local myPlot
+            for i = 1, 6 do
+                local plot = workspace.Plots:FindFirstChild(tostring(i))
+                if plot and plot:GetAttribute("Owner") == player.Name then
+                    myPlot = plot
+                    break
+                end
+            end
+            if not myPlot then return end
+
+            local grassCFrames = getAllGrassCFrames(myPlot)
+            if #grassCFrames == 0 then return end
+
+            farmPart = Instance.new("Part")
+            farmPart.Name = "FarmZonePart"
+            farmPart.Size = Vector3.new(98, 80, 263)
+            farmPart.Anchored = true
+            farmPart.CanCollide = false
+            farmPart.Transparency = 1
+            farmPart.CastShadow = false
+            farmPart.Parent = workspace
+            
+            if grassCFrames[6] then
+                local targetGrassCFrame = grassCFrames[6]
+                farmPart.CFrame = CFrame.new(targetGrassCFrame.Position)
+            else
+                warn("Warning: Could not find grass part #6. Defaulting to the first one.")
+                farmPart.CFrame = CFrame.new(grassCFrames[1].Position)
+            end
+            
+            local performanceButton = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("Settings"):WaitForChild("Frame"):WaitForChild("ScrollingFrame"):WaitForChild("Performance"):WaitForChild("Button"):WaitForChild("DisplayName")
+            if performanceButton.Text == "Off" then
+                local args = {[1] = {["Value"] = true, ["Setting"] = "Performance"}}
+                local changeSettingRemote = game:GetService("ReplicatedStorage").Remotes.ChangeSetting
+                for i = 1, 5 do
+                    changeSettingRemote:FireServer(unpack(args))
+                    task.wait(0.1)
+                end
+                task.wait(5)
+            end
+
             task.spawn(function()
-                local plotFound = false
-                for i = 1, 6 do
-                    local plot = workspace.Plots:FindFirstChild(tostring(i))
-                    if plot and plot:GetAttribute("Owner") == player.Name then
-                        local spawner = plot:FindFirstChild("SpawnerUI", true)
-                        if spawner and spawner:IsA("BasePart") and player.Character then
-                            player.Character:MoveTo(spawner.Position)
-                            plotFound = true
-                            break
-                        end
+                local spawnerPosition = nil
+                local spawner = myPlot:FindFirstChild("SpawnerUI", true)
+                if spawner and spawner:IsA("BasePart") then
+                    spawnerPosition = spawner.Position
+                    if player.Character then
+                        player.Character:MoveTo(spawnerPosition)
                     end
                 end
-                
-                if plotFound then
-                    task.wait(1.5)
-                end
+                if spawnerPosition then task.wait(1.5) end
 
                 local chosen
                 while getgenv().TeleportToBrainrot do
@@ -124,9 +200,16 @@ local AutoTeleportToggle = AutoTab:Toggle({
                         continue
                     end
 
+                    if not isPlayerInFarmZone(player.Character, farmPart) then
+                        if spawnerPosition and player.Character then
+                            player.Character:MoveTo(spawnerPosition)
+                        end
+                        task.wait(5)
+                        continue
+                    end
+
                     local brainrots = workspace:WaitForChild("ScriptedMap"):WaitForChild("Brainrots")
                     local list = brainrots:GetChildren()
-
                     if not chosen or not chosen.Parent then
                         if #list > 0 then
                             chosen = list[math.random(1, #list)]
@@ -134,14 +217,17 @@ local AutoTeleportToggle = AutoTab:Toggle({
                             chosen = nil
                         end
                     end
-
                     if chosen and chosen.Parent then
                         player.Character:MoveTo(chosen:GetPivot().Position)
                     end
-
                     task.wait(0.1)
                 end
             end)
+        else
+            if farmPart then
+                farmPart:Destroy()
+                farmPart = nil
+            end
         end
     end
 })
