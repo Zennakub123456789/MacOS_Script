@@ -918,13 +918,7 @@ ShopTab:Section("Auto Buy Seed")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
-local AllSeeds = {
-    "Skibidi Peashooter", "Skibidi Repeater", "Skibidi Sunflower", "Skibidi Chomper", "Skibidi Torchwood", "Skibidi Wallnut", "Skibidi Tall Nut", 
-    "Skibidi Apple Mortar", "Skibidi Pumpkin", "Skibidi Cactus", "Skibidi Spikeweed", "Skibidi Bowling Bulb", "Skibidi Kernel Pult", "Skibidi Sling Pea", 
-    "Skibidi Iceberg Lettuce", "Skibidi Homing Thistle", "Skibidi Snow Pea", "Skibidi Citron", "Skibidi Cherry Bomb", "Skibidi Jalapeno", "Skibidi Squash", 
-    "Skibidi Bonk Choy", "Skibidi Snapdragon", "Skibidi Lightning Reed", "Skibidi Laser Bean", "Skibidi Pea Gatling", "Skibidi Electric Peashooter", 
-    "Skibidi Fire Peashooter", "Skibidi Rotobaga", "Skibidi Goo Peashooter", "Skibidi Primal Sunflower", "Skibidi Primal Peashooter", "Skibidi Imitator"
-}
+local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed" }
 
 getgenv().SelectedSeeds = {}
 getgenv().AutoBuySeedSelected = false
@@ -991,9 +985,7 @@ ShopTab:Section("Auto Buy Gear")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
-local AllItems = {
-    "Luck Potion I", "Luck Potion II", "Luck Potion III", "Basic Shovel", "Golden Shovel", "Basic Fertiliser", "Golden Fertiliser"
-}
+local AllItems = { "Water Bucket", "Frost Grenade", "Banana Gun", "Frost Blower", "Carrot Launcher" }
 
 getgenv().SelectedBuyItems = {}
 getgenv().AutoBuySelected = false
@@ -1388,6 +1380,75 @@ local AutoResetRequestToggle = EventTab:Toggle({
 })
 
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
+
+SettingTab:Section("Config Management")
+
+local SaveConfigButton = SettingTab:Button({
+    Title = "💾 Save Config",
+    Desc = "Save all current settings",
+    Callback = function()
+        if Window.SaveConfig then
+            Window:SaveConfig()
+            MacUI:Notify({
+                Title = "Config Saved",
+                Content = "All settings have been saved!",
+                Duration = 3
+            })
+        else
+            MacUI:Notify({
+                Title = "Save Failed",
+                Content = "Config system not available",
+                Duration = 3
+            })
+        end
+    end
+})
+
+local LoadConfigButton = SettingTab:Button({
+    Title = "📂 Load Config",
+    Desc = "Load saved settings",
+    Callback = function()
+        if Window.LoadConfig then
+            Window:LoadConfig()
+            MacUI:Notify({
+                Title = "Config Loaded",
+                Content = "Settings have been restored!",
+                Duration = 3
+            })
+        else
+            MacUI:Notify({
+                Title = "Load Failed",
+                Content = "No config file found",
+                Duration = 3
+            })
+        end
+    end
+})
+
+local ResetConfigButton = SettingTab:Button({
+    Title = "🔄 Reset Config",
+    Desc = "Reset all settings to default",
+    Callback = function()
+        MacUI:Dialog({
+            Title = "Reset Config",
+            Content = "Are you sure you want to reset all settings?",
+            ConfirmText = "Yes, Reset",
+            CancelText = "Cancel",
+            Callback = function(confirmed)
+                if confirmed then
+                    if Window.ResetConfig then
+                        Window:ResetConfig()
+                    end
+                    MacUI:Notify({
+                        Title = "Config Reset",
+                        Content = "All settings reset to default!",
+                        Duration = 3
+                    })
+                end
+            end
+        })
+    end
+})
 
 SettingTab:Section("Performance")
 
