@@ -575,7 +575,7 @@ local FavoritePlantToggle = AutoTab:Toggle({
                                         for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
                                             if itemSlot:IsA("TextButton") then
                                                 local toolNameLabel = itemSlot:FindFirstChild("ToolName")
-                                                if toolNameLabel and toolNameNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                                if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
                                                     if itemSlot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
                                                 end
                                             end
