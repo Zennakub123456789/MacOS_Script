@@ -703,6 +703,195 @@ local FavoritePlantToggle = AutoTab:Toggle({
     end
 })
 
+AutoTab:Section("Auto Favorite by Mutation")
+
+local AllMutationOptions = {"Rare", "Epic", "Legendary", "Mythic", "Godly", "Secret", "Limited"}
+local selectedSharedMutations = {}
+
+local SharedMutationDropdown = AutoTab:Dropdown({
+    Title = "Select Mutation",
+    Options = AllMutationOptions,
+    Multi = true,
+    Default = {},
+    Flag = "SharedMutationSelection",
+    Callback = function(selected_options)
+        selectedSharedMutations = selected_options
+    end
+})
+
+local isFavoriteBrainrotMutationLoopRunning = false
+local FavoriteBrainrotToggle = AutoTab:Toggle({
+    Title = "Auto Favorite Brainrot By Mutation",
+    Default = false,
+    Flag = "AutoFavoriteBrainrotToggle",
+    Callback = function(value)
+        if value then
+            if isFavoriteBrainrotMutationLoopRunning then return end
+            isFavoriteBrainrotMutationLoopRunning = true
+            MacUI:Notify({ Title = "Started", Content = "Start Auto Favorite Brainrots", Duration = 3 })
+
+            task.spawn(function()
+                while isFavoriteBrainrotMutationLoopRunning do
+                    local localPlayer = Players.LocalPlayer
+                    if not localPlayer or not localPlayer.Character then break end
+                    local backpack = localPlayer.Backpack
+                    local playerGui = localPlayer.PlayerGui
+                    local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
+
+                    local function table_contains(tbl, val)
+                        for _, v in ipairs(tbl) do
+                            if v == val then return true end
+                        end
+                        return false
+                    end
+
+                    for _, tool in ipairs(backpack:GetChildren()) do
+                        pcall(function()
+                            if tool and tool:IsA("Tool") then
+                                local brainrotValue = tool:GetAttribute("Brainrot")
+                                if not brainrotValue then return end
+                                
+                                local isToolFavorited = false
+                                for i = 1, hotbarSlots do
+                                    local slot = playerGui.BackpackGui.Backpack.Hotbar:FindFirstChild(tostring(i))
+                                    local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+                                    if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                        if slot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
+                                    end
+                                end
+
+                                if not isToolFavorited then
+                                    local inventoryFrame = playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
+                                    if inventoryFrame then
+                                        for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
+                                            if itemSlot:IsA("TextButton") then
+                                                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                                                if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                                    if itemSlot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+
+                                if isToolFavorited then
+                                    tool:SetAttribute("Brainrot", nil)
+                                    return 
+                                end
+                                
+                                local uuidValue = tool:GetAttribute("ID")
+                                if uuidValue and #selectedSharedMutations > 0 then
+                                    local nestedModel = tool:FindFirstChild(brainrotValue)
+                                    if nestedModel then
+                                        local mutationValue = nestedModel:GetAttribute("Mutation")
+                                        if mutationValue and table_contains(selectedSharedMutations, mutationValue) then
+                                            local args = { [1] = uuidValue }
+                                            ReplicatedStorage.Remotes.FavoriteItem:FireServer(unpack(args))
+                                            MacUI:Notify({ Title = "Auto Favorite", Content = "Favorite: " .. tool.Name, Duration = 3 })
+                                        end
+                                    end
+                                end
+                            end
+                        end)
+                    end
+                    task.wait(1)
+                end
+            end)
+        else
+            if isFavoriteBrainrotMutationLoopRunning then
+                isFavoriteBrainrotMutationLoopRunning = false
+                MacUI:Notify({ Title = "Stopped", Content = "Stop Auto Favorite Brainrots", Duration = 4 })
+            end
+        end
+    end
+})
+
+local isFavoritePlantMutationLoopRunning = false
+local FavoritePlantToggle = AutoTab:Toggle({
+    Title = "Auto Favorite Plants By Mutation",
+    Default = false,
+    Flag = "AutoFavoritePlantToggle",
+    Callback = function(value)
+        if value then
+            if isFavoritePlantMutationLoopRunning then return end
+            isFavoritePlantMutationLoopRunning = true
+            MacUI:Notify({ Title = "Started", Content = "Start Auto Favorite Plants", Duration = 3 })
+
+            task.spawn(function()
+                while isFavoritePlantMutationLoopRunning do
+                    local localPlayer = Players.LocalPlayer
+                    if not localPlayer or not localPlayer.Character then break end
+                    local backpack = localPlayer.Backpack
+                    local playerGui = localPlayer.PlayerGui
+                    local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
+
+                    local function table_contains(tbl, val)
+                        for _, v in ipairs(tbl) do
+                            if v == val then return true end
+                        end
+                        return false
+                    end
+
+                    for _, tool in ipairs(backpack:GetChildren()) do
+                        pcall(function()
+                            if tool and tool:IsA("Tool") then
+                                local plantValue = tool:GetAttribute("Plant")
+                                if not plantValue then return end
+
+                                local isToolFavorited = false
+                                for i = 1, hotbarSlots do
+                                    local slot = playerGui.BackpackGui.Backpack.Hotbar:FindFirstChild(tostring(i))
+                                    local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+                                    if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                        if slot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
+                                    end
+                                end
+
+                                if not isToolFavorited then
+                                    local inventoryFrame = playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
+                                    if inventoryFrame then
+                                        for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
+                                            if itemSlot:IsA("TextButton") then
+                                                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                                                if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                                    if itemSlot:FindFirstChild("HeartIcon") then isToolFavorited = true; break end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                                
+                                if isToolFavorited then
+                                    return 
+                                end
+                                
+                                local uuidValue = tool:GetAttribute("ID")
+                                if uuidValue and #selectedSharedMutations > 0 then
+                                    local nestedModel = tool:FindFirstChild(plantValue)
+                                    if nestedModel then
+                                        local mutationValue = nestedModel:GetAttribute("Mutation")
+                                        if mutationValue and table_contains(selectedSharedMutations, mutationValue) then
+                                            local args = { [1] = uuidValue }
+                                            ReplicatedStorage.Remotes.FavoriteItem:FireServer(unpack(args))
+                                            MacUI:Notify({ Title = "Auto Favorite", Content = "Favorite: " .. tool.Name, Duration = 3 })
+                                        end
+                                    end
+                                end
+                            end
+                        end)
+                    end
+                    task.wait(1)
+                end
+            end)
+        else
+            if isFavoritePlantMutationLoopRunning then
+                isFavoritePlantMutationLoopRunning = false
+                MacUI:Notify({ Title = "Stopped", Content = "Stop Auto Favorite Plants", Duration = 4 })
+            end
+        end
+    end
+})
+
 local ShopTab = Window:Tab("Shop", "rbxassetid://11385419674")
 
 ShopTab:Section("Auto Buy Seed")
