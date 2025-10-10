@@ -517,7 +517,7 @@ local isFavoritePlantLoopRunning = false
 local PlantsRarityOptions = {"Rare", "Epic", "Legendary", "Mythic", "Godly", "Secret", "Limited"}
 
 local PlantRarityDropdown = AutoTab:Dropdown({
-    Title = "เลือก Rarity ที่ต้องการ",
+    Title = "Select Rarity",
     Options = PlantsRarityOptions,
     Multi = true,
     Default = {},
@@ -1192,18 +1192,16 @@ local languageScripts = {
         AntiAFKToggle:SetTitle("Anti AFK")
         AutoTeleportToggle:SetTitle("Auto Farm Brainrot")
         SpeedSlider:SetTitle("Hit Speed")
-        SpeedSlider:SetDesc("Set Speed to Auto Hit")
         AutoFarmToggle:SetTitle("Auto Hit")
         BestBrainrotsLabel:SetText("1 = 1 sec / 600 = 10 min")
         DelaySlider:SetTitle("Equip Best Brainrots Delay")
-        DelaySlider:SetDesc("Set Speed to Equip Best Brainrots")
         AutoEquipToggle:SetTitle("Auto Equip Best Brainrots")
         EggDropdown:SetTitle("Select Eggs to Open")
         AutoOpenEggToggle:SetTitle("Auto Open Egg")
         AutoOpenEggToggle:SetDesc("Equips and opens selected eggs in a loop.")
         BrainrotRarityDropdown:SetTitle("Select Rarity")
         FavoriteBrainrotToggle:SetTitle("Auto Favorite Brainrot By Rarity")
-        PlantRarityDropdown:SetTitle("เลือก Rarity ที่ต้องการ") -- ตั้งค่าตามต้นฉบับ
+        PlantRarityDropdown:SetTitle("Select Rarity")
         FavoritePlantToggle:SetTitle("Auto Favorite Plants By Rarity")
         SeedDropdown:SetTitle("Select Seeds")
         AutoBuySeedSelectedToggle:SetTitle("Auto Buy Seed [Selected]")
@@ -1265,7 +1263,9 @@ local languageScripts = {
         AutoSellPlantsFullToggle:SetTitle("ขาย Plant ทั้งหมดอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
         AutoSellAllFullToggle:SetTitle("ขายทั้งสองอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
         TeleportGrassButton:SetTitle("วาปไปสวนของตัวเอง")
+        TeleportGrassButton:SetDesc("วาปไปที่พล็อต")
         TeleportFixedButton:SetTitle("วาปไปอีเว้นคุก")
+        TeleportFixedButton:SetDesc("วาปไปอีเว้น")
         AutoTurnInToggle:SetTitle("ส่ง Brainrot ที่ต้องการเข้าคุกอัตโนมัติ")
         AutoResetRequestToggle:SetTitle("รีเซ็ตหลังทำภารกิจส่ง Brainrot เสร็จอัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
