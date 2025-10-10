@@ -916,7 +916,7 @@ local ShopTab = Window:Tab("Shop", "rbxassetid://10698878025")
 ShopTab:Section("Auto Buy Seed")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local buyRemote = ReplicatedStorage.Remotes.BuySeed
+local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
 local AllSeeds = {
     "Skibidi Peashooter", "Skibidi Repeater", "Skibidi Sunflower", "Skibidi Chomper", "Skibidi Torchwood", "Skibidi Wallnut", "Skibidi Tall Nut", 
@@ -928,7 +928,7 @@ local AllSeeds = {
 
 getgenv().SelectedSeeds = {}
 getgenv().AutoBuySeedSelected = false
-getgenv().AutoBuyAll = false
+getgenv().AutoBuyAllSeeds = false
 
 local SeedDropdown = ShopTab:Dropdown({
     Title = "Select Seeds",
@@ -954,7 +954,7 @@ local AutoBuySeedSelectedToggle = ShopTab:Toggle({
                     if #getgenv().SelectedSeeds > 0 then
                         for _, seed in ipairs(getgenv().SelectedSeeds) do
                             if not getgenv().AutoBuySeedSelected then break end
-                            buyRemote:FireServer(seed)
+                            buySeedRemote:FireServer(seed)
                             task.wait(0.5)
                         end
                     else
@@ -966,16 +966,15 @@ local AutoBuySeedSelectedToggle = ShopTab:Toggle({
     end
 })
 
-local AutoBuyAllToggle = ShopTab:Toggle({
+local AutoBuyAllSeedsToggle = ShopTab:Toggle({
     Title = "Auto Buy Seed [All]",
     Default = false,
     Flag = "AutoBuyAllSeeds",
     Callback = function(value)
-        getgenv().AutoBuyAll = value
-
+        getgenv().AutoBuyAllSeeds = value
         if value then
             task.spawn(function()
-                while getgenv().AutoBuyAll do
+                while getgenv().AutoBuyAllSeeds do
                     for _, seed in ipairs(AllSeeds) do
                         if not getgenv().AutoBuyAll then break end
                         buyRemote:FireServer(seed)
@@ -990,7 +989,7 @@ local AutoBuyAllToggle = ShopTab:Toggle({
 ShopTab:Section("Auto Buy Gear")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local buyRemote = ReplicatedStorage.Remotes.BuyGear
+local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
 local AllItems = {
     "Luck Potion I", "Luck Potion II", "Luck Potion III", "Basic Shovel", "Golden Shovel", "Basic Fertiliser", "Golden Fertiliser"
@@ -998,7 +997,7 @@ local AllItems = {
 
 getgenv().SelectedBuyItems = {}
 getgenv().AutoBuySelected = false
-getgenv().AutoBuyAll = false
+getgenv().AutoBuyAllGear = false
 
 local ItemDropdown = ShopTab:Dropdown({
     Title = "Select Gear",
@@ -1024,7 +1023,7 @@ local AutoBuySelectedToggle = ShopTab:Toggle({
                     if #getgenv().SelectedBuyItems > 0 then
                         for _, item in ipairs(getgenv().SelectedBuyItems) do
                             if not getgenv().AutoBuySelected then break end
-                            buyRemote:FireServer(item, true)
+                            buyGearRemote:FireServer(item, true)
                             task.wait(0.5)
                         end
                     else
@@ -1039,16 +1038,15 @@ local AutoBuySelectedToggle = ShopTab:Toggle({
 local AutoBuyGearAllToggle = ShopTab:Toggle({
     Title = "Auto Buy Gear [All]",
     Default = false,
-    Flag = "AutoBuyAll",
+    Flag = "AutoBuyAllGear",
     Callback = function(value)
-        getgenv().AutoBuyAll = value
-
+        getgenv().AutoBuyAllGear = value
         if value then
             task.spawn(function()
-                while getgenv().AutoBuyAll do
+                while getgenv().AutoBuyAllGear do
                     for _, item in ipairs(AllItems) do
-                        if not getgenv().AutoBuyAll then break end
-                        buyRemote:FireServer(item, true)
+                        if not getgenv().AutoBuyAllGear then break end
+                        buyGearRemote:FireServer(item, true)
                         task.wait(0.5)
                     end
                 end
