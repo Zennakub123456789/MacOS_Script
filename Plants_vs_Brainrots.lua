@@ -1377,36 +1377,60 @@ local HideNotificationsToggle = SettingTab:Toggle({
     end
 })
 
-local lighting = game:GetService("Lighting")
-local terrain = workspace:FindFirstChildOfClass("Terrain")
-local settings = settings()
-
-local DefaultValues = {
-    QualityLevel = settings.Rendering.QualityLevel,
-    GlobalShadows = lighting.GlobalShadows,
-    FogEnd = lighting.FogEnd,
-    Brightness = lighting.Brightness,
-    WaterWaveSize = terrain and terrain.WaterWaveSize or nil,
-    WaterWaveSpeed = terrain and terrain.WaterWaveSpeed or nil,
-    WaterReflectance = terrain and terrain.WaterReflectance or nil,
-    WaterTransparency = terrain and terrain.WaterTransparency or nil
-}
-
-getgenv().LowGraphics = false
-
 local LowGraphicsToggle = SettingTab:Toggle({
     Title = "Low Graphics",
     Desc = "Reduce graphics to increase FPS",
+    Icon = "monitor-down",
+    Type = "Checkbox",
     Default = false,
-    Flag = "LowGraphics",
-    Callback = function(value)
-        getgenv().LowGraphics = value
+    Callback = function(state)
+        local lighting = game:GetService("Lighting")
+        local terrain = workspace:FindFirstChildOfClass("Terrain")
+        local settings = settings()
+        local Players = game:GetService("Players")
 
-        if value then
+        local function safeGetWorkspaceRadius()
+            local ok, result = pcall(function()
+                return workspace.StreamingTargetRadius
+            end)
+            return ok and result or 1000
+        end
+
+        local function safeSetWorkspaceRadius(value)
+            pcall(function()
+                if workspace.StreamingEnabled then
+                    workspace.StreamingTargetRadius = value
+                end
+            end)
+        end
+
+        local DefaultValues = {
+            QualityLevel = settings.Rendering.QualityLevel,
+            GlobalShadows = lighting.GlobalShadows,
+            FogEnd = lighting.FogEnd,
+            Brightness = lighting.Brightness,
+            Ambient = lighting.Ambient,
+            OutdoorAmbient = lighting.OutdoorAmbient,
+            WaterWaveSize = terrain and terrain.WaterWaveSize or nil,
+            WaterWaveSpeed = terrain and terrain.WaterWaveSpeed or nil,
+            WaterReflectance = terrain and terrain.WaterReflectance or nil,
+            WaterTransparency = terrain and terrain.WaterTransparency or nil,
+            MaxRenderDistance = safeGetWorkspaceRadius()
+        }
+
+        local ChangedObjects = {}
+        local DecalData = {}
+
+        if state then
             settings.Rendering.QualityLevel = Enum.QualityLevel.Level01
+            safeSetWorkspaceRadius(200)
+
             lighting.GlobalShadows = false
-            lighting.FogEnd = 1000
+            lighting.FogEnd = 500
             lighting.Brightness = 1
+            lighting.Ambient = Color3.new(1, 1, 1)
+            lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+
             if terrain then
                 terrain.WaterWaveSize = 0
                 terrain.WaterWaveSpeed = 0
@@ -1416,16 +1440,45 @@ local LowGraphicsToggle = SettingTab:Toggle({
 
             for _, v in pairs(workspace:GetDescendants()) do
                 if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") then
-                    v.Enabled = false
+                    if v.Enabled then
+                        ChangedObjects[v] = true
+                        v.Enabled = false
+                    end
                 elseif v:IsA("Decal") or v:IsA("Texture") then
-                    v.Transparency = 1
+                    if v:IsA("Decal") and v.Texture ~= "" then
+                        DecalData[v] = v.Texture
+                        v.Texture = ""
+                    elseif v:IsA("Texture") and v.Transparency < 1 then
+                        ChangedObjects[v] = v.Transparency
+                        v.Transparency = 1
+                    end
+                elseif v:IsA("PointLight") or v:IsA("SpotLight") or v:IsA("SurfaceLight") then
+                    if v.Enabled then
+                        ChangedObjects[v] = true
+                        v.Enabled = false
+                    end
                 end
             end
+
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr.Character then
+                    for _, part in pairs(plr.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CastShadow = false
+                        end
+                    end
+                end
+            end
+
         else
             settings.Rendering.QualityLevel = DefaultValues.QualityLevel
+            safeSetWorkspaceRadius(DefaultValues.MaxRenderDistance)
             lighting.GlobalShadows = DefaultValues.GlobalShadows
             lighting.FogEnd = DefaultValues.FogEnd
             lighting.Brightness = DefaultValues.Brightness
+            lighting.Ambient = DefaultValues.Ambient
+            lighting.OutdoorAmbient = DefaultValues.OutdoorAmbient
+
             if terrain then
                 terrain.WaterWaveSize = DefaultValues.WaterWaveSize
                 terrain.WaterWaveSpeed = DefaultValues.WaterWaveSpeed
@@ -1433,11 +1486,31 @@ local LowGraphicsToggle = SettingTab:Toggle({
                 terrain.WaterTransparency = DefaultValues.WaterTransparency
             end
 
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") then
-                    v.Enabled = true
-                elseif v:IsA("Decal") or v:IsA("Texture") then
-                    v.Transparency = 0
+            for v, old in pairs(ChangedObjects) do
+                if v and v.Parent then
+                    if typeof(old) == "boolean" then
+                        v.Enabled = old
+                    elseif typeof(old) == "number" then
+                        v.Transparency = old
+                    end
+                end
+            end
+            ChangedObjects = {}
+
+            for v, tex in pairs(DecalData) do
+                if v and v.Parent then
+                    v.Texture = tex
+                end
+            end
+            DecalData = {}
+
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr.Character then
+                    for _, part in pairs(plr.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CastShadow = true
+                        end
+                    end
                 end
             end
         end
