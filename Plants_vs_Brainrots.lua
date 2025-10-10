@@ -78,6 +78,91 @@ local AntiAFKToggle = MainTab:Toggle({
     end
 })
 
+local AllowedIds = {
+    4128505180,
+    8041920244,
+}
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function isAllowed()
+    if not LocalPlayer then return false end
+    for _, id in ipairs(AllowedIds) do
+        if LocalPlayer.UserId == id then
+            return true
+        end
+    end
+    return false
+end
+
+if isAllowed() then
+
+    local PlayersTab = Window:Tab("Players", "rbxassetid://117259180607823")
+
+    local function GetPlayerNames()
+        local t = {}
+        for _, p in pairs(Players:GetPlayers()) do
+            table.insert(t, p.Name)
+        end
+        return t
+    end
+
+    local function findCharacterRoot(character)
+        if not character then return nil end
+        return character:FindFirstChild("HumanoidRootPart")
+            or character:FindFirstChild("LowerTorso")
+            or character:FindFirstChild("Torso")
+    end
+
+    getgenv().SelectedPlayer = nil
+
+    local PlayerDropdown = PlayersTab:Dropdown({
+        Title = "Select Player",
+        Options = GetPlayerNames(),
+        Default = nil,
+        Flag = "SelectedPlayer",
+        Callback = function(selected)
+            getgenv().SelectedPlayer = selected
+        end
+    })
+
+    local function updatePlayerList()
+        if PlayerDropdown and PlayerDropdown.SetOptions then
+            PlayerDropdown:SetOptions(GetPlayerNames())
+        end
+    end
+    Players.PlayerAdded:Connect(updatePlayerList)
+    Players.PlayerRemoving:Connect(updatePlayerList)
+
+    local TeleportButton = PlayersTab:Button({
+        Title = "Teleport to Selected Player",
+        Desc = "Goto the player selected in the Dropdown.",
+        Callback = function()
+            local selected = getgenv().SelectedPlayer
+            
+            if not selected or selected == "" then
+                return
+            end
+
+            local targetPlayer = Players:FindFirstChild(selected)
+
+            if not targetPlayer then return end
+            if targetPlayer == LocalPlayer then return end
+
+            local targetRoot = findCharacterRoot(targetPlayer.Character)
+            if not targetRoot then return end
+
+            local myChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local myRoot = findCharacterRoot(myChar)
+            if not myRoot then return end
+
+            pcall(function()
+                myRoot.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0)
+            end)
+        end
+    })
+end
+
 local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
 
 AutoTab:Section("Auto Fram Brainrots")
