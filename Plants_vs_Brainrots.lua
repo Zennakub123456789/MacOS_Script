@@ -705,7 +705,7 @@ local FavoritePlantToggle = AutoTab:Toggle({
 
 AutoTab:Section("Auto Favorite by Mutation")
 
-local AllMutationOptions = {"Rare", "Epic", "Legendary", "Mythic", "Godly", "Secret", "Limited"}
+local AllMutationOptions = {"Gold", "Diamond", "Neon", "Frozen", "UpsideDown", "Rainbow", "Galactic", "Magma", "Underworld"}
 local selectedSharedMutations = {}
 
 local SharedMutationDropdown = AutoTab:Dropdown({
