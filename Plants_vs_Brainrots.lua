@@ -1380,10 +1380,9 @@ local HideNotificationsToggle = SettingTab:Toggle({
 local LowGraphicsToggle = SettingTab:Toggle({
     Title = "Low Graphics",
     Desc = "Reduce graphics to increase FPS",
-    Icon = "monitor-down",
-    Type = "Checkbox",
     Default = false,
-    Callback = function(state)
+    Flag = "LowGraphics",
+    Callback = function(value)
         local lighting = game:GetService("Lighting")
         local terrain = workspace:FindFirstChildOfClass("Terrain")
         local settings = settings()
@@ -1396,15 +1395,15 @@ local LowGraphicsToggle = SettingTab:Toggle({
             return ok and result or 1000
         end
 
-        local function safeSetWorkspaceRadius(value)
+        local function safeSetWorkspaceRadius(radius)
             pcall(function()
                 if workspace.StreamingEnabled then
-                    workspace.StreamingTargetRadius = value
+                    workspace.StreamingTargetRadius = radius
                 end
             end)
         end
 
-        local DefaultValues = {
+        getgenv().LowGfxDefaultValues = getgenv().LowGfxDefaultValues or {
             QualityLevel = settings.Rendering.QualityLevel,
             GlobalShadows = lighting.GlobalShadows,
             FogEnd = lighting.FogEnd,
@@ -1417,11 +1416,14 @@ local LowGraphicsToggle = SettingTab:Toggle({
             WaterTransparency = terrain and terrain.WaterTransparency or nil,
             MaxRenderDistance = safeGetWorkspaceRadius()
         }
+        getgenv().LowGfxChangedObjects = getgenv().LowGfxChangedObjects or {}
+        getgenv().LowGfxDecalData = getgenv().LowGfxDecalData or {}
 
-        local ChangedObjects = {}
-        local DecalData = {}
+        local DefaultValues = getgenv().LowGfxDefaultValues
+        local ChangedObjects = getgenv().LowGfxChangedObjects
+        local DecalData = getgenv().LowGfxDecalData
 
-        if state then
+        if value then
             settings.Rendering.QualityLevel = Enum.QualityLevel.Level01
             safeSetWorkspaceRadius(200)
 
@@ -1479,7 +1481,7 @@ local LowGraphicsToggle = SettingTab:Toggle({
             lighting.Ambient = DefaultValues.Ambient
             lighting.OutdoorAmbient = DefaultValues.OutdoorAmbient
 
-            if terrain then
+            if terrain and DefaultValues.WaterWaveSize then
                 terrain.WaterWaveSize = DefaultValues.WaterWaveSize
                 terrain.WaterWaveSpeed = DefaultValues.WaterWaveSpeed
                 terrain.WaterReflectance = DefaultValues.WaterReflectance
@@ -1495,14 +1497,14 @@ local LowGraphicsToggle = SettingTab:Toggle({
                     end
                 end
             end
-            ChangedObjects = {}
+            getgenv().LowGfxChangedObjects = {}
 
             for v, tex in pairs(DecalData) do
                 if v and v.Parent then
                     v.Texture = tex
                 end
             end
-            DecalData = {}
+            getgenv().LowGfxDecalData = {}
 
             for _, plr in pairs(Players:GetPlayers()) do
                 if plr.Character then
