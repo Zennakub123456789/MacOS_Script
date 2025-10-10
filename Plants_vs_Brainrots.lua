@@ -1198,7 +1198,6 @@ local languageScripts = {
         AutoEquipToggle:SetTitle("Auto Equip Best Brainrots")
         EggDropdown:SetTitle("Select Eggs to Open")
         AutoOpenEggToggle:SetTitle("Auto Open Egg")
-        AutoOpenEggToggle:SetDesc("Equips and opens selected eggs in a loop.")
         BrainrotRarityDropdown:SetTitle("Select Rarity")
         FavoriteBrainrotToggle:SetTitle("Auto Favorite Brainrot By Rarity")
         PlantRarityDropdown:SetTitle("Select Rarity")
