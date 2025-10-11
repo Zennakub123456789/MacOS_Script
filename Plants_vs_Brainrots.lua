@@ -1247,12 +1247,12 @@ local isPlatformLoopRunning = false
 local eventZonePart = nil
 
 local AutoPlatformEventToggle = EventTab:Toggle({
-    Title = "Auto Platform Event",
+    Title = "Auto Daily Event",
     Desc = "Auto Card event",
     Default = false,
-    Flag = "AutoPlatformEvent",
+    Flag = "AutoDailyEvent",
     Callback = function(value)
-        getgenv().AutoPlatformEvent = value
+        getgenv().AutoDailyEvent = value
 
         if value then
             if isPlatformLoopRunning then return end
