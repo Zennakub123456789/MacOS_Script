@@ -1240,49 +1240,41 @@ local TeleportFixedButton = TeleportTab:Button({
 
 local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
 
+getgenv().ActionLock = false
+
 EventTab:Section("Card Event")
 
-getgenv().AutoPlatformEvent = false
-local isPlatformLoopRunning = false
-local eventZonePart = nil
+getgenv().AutoDailyEvent = false
+local isDailyLoopRunning = false
+local dailyEventZonePart = nil
 
-local AutoPlatformEventToggle = EventTab:Toggle({
+local AutoDailyEventToggle = EventTab:Toggle({
     Title = "Auto Daily Event",
     Desc = "Auto Card event",
     Default = false,
     Flag = "AutoDailyEvent",
     Callback = function(value)
         getgenv().AutoDailyEvent = value
-
         if value then
-            if isPlatformLoopRunning then return end
-            isPlatformLoopRunning = true
-
-            eventZonePart = Instance.new("Part")
-            eventZonePart.Name = "PlatformEventZone"
-            eventZonePart.Size = Vector3.new(172, 66, 169)
-            eventZonePart.Position = Vector3.new(-176.95, 11.56, 976.97)
-            eventZonePart.Anchored = true
-            eventZonePart.Transparency = 1
-            eventZonePart.CanCollide = false
-            eventZonePart.CastShadow = false
-            eventZonePart.Parent = workspace
-
+            if isDailyLoopRunning then return end
+            isDailyLoopRunning = true
+            dailyEventZonePart = Instance.new("Part"); dailyEventZonePart.Name = "EventZone"; dailyEventZonePart.Size = Vector3.new(172, 66, 169); dailyEventZonePart.Position = Vector3.new(-176.95, 11.56, 976.97); dailyEventZonePart.Anchored = true; dailyEventZonePart.Transparency = 1; dailyEventZonePart.CanCollide = false; dailyEventZonePart.CastShadow = false; dailyEventZonePart.Parent = workspace
             MacUI:Notify({ Title = "Started", Content = "Start Auto Event", Duration = 3 })
-
             task.spawn(function()
-                while isPlatformLoopRunning do
+                while isDailyLoopRunning do
+                    if getgenv().ActionLock then
+                        task.wait(1)
+                        goto continueDailyLoop
+                    end
                     local player = game:GetService("Players").LocalPlayer
                     if not player or not player.Character then break end
                     local UserInputService = game:GetService("UserInputService")
-
                     local teleportPositions = {
                         ["-1"] = CFrame.new(-218.65, 13.68, 963.75),
                         ["-2"] = CFrame.new(-218.81, 13.68, 973.73),
                         ["-3"] = CFrame.new(-218.61, 13.68, 983.85),
                         ["-4"] = CFrame.new(-218.10, 13.56, 993.87)
                     }
-
                     local function isToolFavorited(tool)
                         local playerGui = player.PlayerGui
                         if not playerGui then return false end
@@ -1310,7 +1302,6 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                         end
                         return false
                     end
-                    
                     local function isPlayerInZone(character, zone)
                         if not character or not zone then return false end
                         local hrp = character:FindFirstChild("HumanoidRootPart")
@@ -1321,7 +1312,6 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                         local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
                         return (playerPos.X >= minX and playerPos.X <= maxX and playerPos.Y >= minY and playerPos.Y <= maxY and playerPos.Z >= minZ and playerPos.Z <= maxZ)
                     end
-
                     local myPlot
                     for i = 1, 6 do
                         local plot = workspace.Plots:FindFirstChild(tostring(i))
@@ -1330,7 +1320,6 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                             break
                         end
                     end
-
                     if myPlot then
                         for i = -1, -4, -1 do
                             local platform = myPlot.EventPlatforms:FindFirstChild(tostring(i))
@@ -1344,13 +1333,11 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                                             local backpack = player:WaitForChild("Backpack")
                                             local character = player.Character
                                             local matches = {}
-
                                             for _, tool in ipairs(backpack:GetChildren()) do
                                                 if tool:IsA("Tool") and string.find(tool.Name, targetBrainrotName) and not isToolFavorited(tool) then
                                                     table.insert(matches, tool)
                                                 end
                                             end
-
                                             if character then
                                                 for _, tool in ipairs(character:GetChildren()) do
                                                     if tool:IsA("Tool") and string.find(tool.Name, targetBrainrotName) and not isToolFavorited(tool) then
@@ -1358,23 +1345,20 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                                                     end
                                                 end
                                             end
-                                            
                                             if #matches > 0 then
+                                                getgenv().ActionLock = true
                                                 local toolToEquip = matches[math.random(1, #matches)]
                                                 local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                                                
                                                 local targetPosition = teleportPositions[tostring(i)]
                                                 if humanoidRootPart and targetPosition then
                                                     humanoidRootPart.CFrame = targetPosition
                                                     task.wait(0.5)
                                                 end
-
                                                 if player.Character and player.Character:FindFirstChild("Humanoid") then
                                                    player.Character.Humanoid:EquipTool(toolToEquip)
                                                    MacUI:Notify({ Title = "Platform Event", Content = "Equipped: " .. toolToEquip.Name, Duration = 2 })
                                                    task.wait(0.5)
-
-                                                   if isPlayerInZone(player.Character, eventZonePart) then
+                                                   if isPlayerInZone(player.Character, dailyEventZonePart) then
                                                        local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                                                         if rootPart then
                                                             for _, instance in ipairs(workspace:GetDescendants()) do
@@ -1396,6 +1380,7 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                                                         end
                                                    end
                                                 end
+                                                getgenv().ActionLock = false
                                                 break 
                                             end
                                         end
@@ -1404,17 +1389,147 @@ local AutoPlatformEventToggle = EventTab:Toggle({
                             end
                         end
                     end
+                    ::continueDailyLoop::
                     task.wait(1.5)
                 end
             end)
         else
-            if isPlatformLoopRunning then
-                isPlatformLoopRunning = false
-                if eventZonePart then
-                    eventZonePart:Destroy()
-                    eventZonePart = nil
-                end
+            if isDailyLoopRunning then
+                isDailyLoopRunning = false
+                if dailyEventZonePart then dailyEventZonePart:Destroy(); dailyEventZonePart = nil end
                 MacUI:Notify({ Title = "Stopped", Content = "Stop Auto Event", Duration = 4 })
+            end
+        end
+    end
+})
+
+local isTomatoEventRunning = false
+local savedPosition = nil
+
+local AutoTomatoEventToggle = EventTab:Toggle({
+    Title = "Auto Tomade Torelli Event",
+    Desc = "Auto Event",
+    Default = false,
+    Flag = "AutoTomatoEvent",
+    Callback = function(value)
+        if value then
+            if isTomatoEventRunning then return end
+            isTomatoEventRunning = true
+            MacUI:Notify({ Title = "Tomato Event", Content = "เริ่มตรวจสอบ Event...", Duration = 3 })
+
+            task.spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart and not getgenv().ActionLock then
+                    local actionTextLabel = player.PlayerGui:FindFirstChild("ProximityPrompts", true) and player.PlayerGui.ProximityPrompts.Default.PromptFrame:FindFirstChild("ActionText")
+                    if actionTextLabel and actionTextLabel.Text == "Talk" then
+                        getgenv().ActionLock = true
+                        local initialPosition = humanoidRootPart.Position
+                        humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
+                        task.wait(1)
+                        for _, p in ipairs(workspace:GetDescendants()) do if p:IsA("ProximityPrompt") then local dist=(p.Parent.Position-humanoidRootPart.Position).Magnitude; if dist<=p.MaxActivationDistance then p:InputHoldBegin();task.wait(p.HoldDuration);p:InputHoldEnd();break;end end end
+                        task.wait(0.5)
+                        humanoidRootPart.CFrame = CFrame.new(initialPosition)
+                        getgenv().ActionLock = false
+                    end
+                end
+
+                while isTomatoEventRunning do
+                    if getgenv().ActionLock then
+                        task.wait(1)
+                        goto continueTomatoLoop
+                    end
+                    
+                    local character = player.Character
+                    humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+                    local checkmark = workspace:FindFirstChild("ScriptedMap", true) and workspace.ScriptedMap.Event:FindFirstChild("TomadeFloor", true) and workspace.ScriptedMap.Event.TomadeFloor:FindFirstChild("GuiAttachment", true) and workspace.ScriptedMap.Event.TomadeFloor.GuiAttachment.Billboard:FindFirstChild("Checkmark")
+
+                    if checkmark and checkmark.Visible == true then
+                        if humanoidRootPart then
+                            getgenv().ActionLock = true
+                            savedPosition = humanoidRootPart.Position
+                            humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
+                            task.wait(1)
+                            
+                            local function isPlayerInZone(character, zone)
+                                if not character or not zone then return false end
+                                local hrp = character:FindFirstChild("HumanoidRootPart")
+                                if not hrp then return false end
+                                local playerPos = hrp.Position; local zonePos = zone.Position; local zoneSize = zone.Size
+                                local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
+                                local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
+                                local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
+                                return (playerPos.X >= minX and playerPos.X <= maxX and playerPos.Y >= minY and playerPos.Y <= maxY and playerPos.Z >= minZ and playerPos.Z <= maxZ)
+                            end
+
+                            if isPlayerInZone(player.Character, eventZonePart) then
+                                local promptFrame = player.PlayerGui:WaitForChild("ProximityPrompts", 5) and player.PlayerGui.ProximityPrompts:WaitForChild("Default", 5) and player.PlayerGui.ProximityPrompts.Default:WaitForChild("PromptFrame", 5)
+                                local actionTextLabel = promptFrame and promptFrame:WaitForChild("ActionText", 5)
+                                if actionTextLabel and actionTextLabel.Text == "Claim" then
+                                    local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                                    if rootPart then
+                                        local promptPressed = false
+                                        for _, instance in ipairs(workspace:GetDescendants()) do
+                                            if instance:IsA("ProximityPrompt") then
+                                                local prompt = instance
+                                                local targetPart = prompt.Parent
+                                                if targetPart and targetPart:IsA("BasePart") then
+                                                    local distance = (targetPart.Position - rootPart.Position).Magnitude
+                                                    if distance <= prompt.MaxActivationDistance then
+                                                        prompt:InputHoldBegin()
+                                                        task.wait(prompt.HoldDuration)
+                                                        prompt:InputHoldEnd()
+                                                        MacUI:Notify({ Title = "Tomato Event", Content = "Claimed!", Duration = 2 })
+                                                        promptPressed = true
+                                                        break 
+                                                    end
+                                                end
+                                            end
+                                        end
+                                        if promptPressed then
+                                            task.wait(1)
+                                            if actionTextLabel.Text == "Talk" then
+                                                for _, instance in ipairs(workspace:GetDescendants()) do
+                                                    if instance:IsA("ProximityPrompt") then
+                                                        local prompt = instance
+                                                        local targetPart = prompt.Parent
+                                                        if targetPart and targetPart:IsA("BasePart") then
+                                                            local distance = (targetPart.Position - rootPart.Position).Magnitude
+                                                            if distance <= prompt.MaxActivationDistance then
+                                                                prompt:InputHoldBegin()
+                                                                task.wait(prompt.HoldDuration)
+                                                                prompt:InputHoldEnd()
+                                                                MacUI:Notify({ Title = "Tomato Event", Content = "Talked!", Duration = 2 })
+                                                                break
+                                                            end
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                            task.wait(0.5)
+                                            humanoidRootPart.CFrame = CFrame.new(savedPosition)
+                                            MacUI:Notify({ Title = "Tomato Event", Content = "เทเลพอร์ตกลับที่เดิม", Duration = 3 })
+                                            savedPosition = nil
+                                        end
+                                    end
+                                end
+                            end
+                            getgenv().ActionLock = false
+                        end
+                    end
+                    ::continueTomatoLoop::
+                    task.wait(1)
+                end
+            end)
+        else
+            if isTomatoEventRunning then
+                isTomatoEventRunning = false
+                MacUI:Notify({ Title = "Tomato Event", Content = "หยุดตรวจสอบ Event", Duration = 3 })
+                if savedPosition then
+                    local player = game:GetService("Players").LocalPlayer; local char = player.Character; local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if hrp then hrp.CFrame = CFrame.new(savedPosition) end
+                    savedPosition = nil
+                end
             end
         end
     end
