@@ -349,20 +349,42 @@ local AutoFarmToggle = AutoTab:Toggle({
         
         if value then
             task.spawn(function()
-                while getgenv().AutoFarm do
-                    local bat = player.Backpack:FindFirstChild("Basic Bat") 
-                                or (player.Character and player.Character:FindFirstChild("Basic Bat"))
-                    
-                    if bat and player.Character and player.Character:FindFirstChild("Humanoid") then
-                        local humanoid = player.Character.Humanoid
-                        
-                        if not player.Character:FindFirstChild("Basic Bat") then
-                            humanoid:EquipTool(bat)
-                            task.wait(0.1)
-                        end
+                local player = game:GetService("Players").LocalPlayer
 
-                        if player.Character:FindFirstChild("Basic Bat") then
-                            bat:Activate()
+                local function isPlayerInZone(character, zone)
+                    if not character or not zone then return false end
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if not hrp then return false end
+                    local playerPos = hrp.Position; local zonePos = zone.Position; local zoneSize = zone.Size
+                    local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
+                    local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
+                    local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
+                    return (playerPos.X >= minX and playerPos.X <= maxX and playerPos.Y >= minY and playerPos.Y <= maxY and playerPos.Z >= minZ and playerPos.Z <= maxZ)
+                end
+
+                while getgenv().AutoFarm do
+                    local character = player.Character
+                    local humanoid = character and character:FindFirstChild("Humanoid")
+                    
+                    if humanoid then
+                        local eventZone = workspace:FindFirstChild("EventZone")
+
+                        if eventZone and isPlayerInZone(character, eventZone) then
+                            humanoid:UnequipTools()
+                        else
+                            local bat = player.Backpack:FindFirstChild("Basic Bat") 
+                                        or (character and character:FindFirstChild("Basic Bat"))
+                            
+                            if bat then
+                                if not character:FindFirstChild("Basic Bat") then
+                                    humanoid:EquipTool(bat)
+                                    task.wait(0.1)
+                                end
+        
+                                if character:FindFirstChild("Basic Bat") then
+                                    bat:Activate()
+                                end
+                            end
                         end
                     end
                     
