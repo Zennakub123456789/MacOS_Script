@@ -1880,7 +1880,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Settings panel is ready.",
+    Content = "Tad Hub PvB | 1.3.1",
     Duration = 3
 })
 
