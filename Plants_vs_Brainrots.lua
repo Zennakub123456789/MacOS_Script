@@ -40,7 +40,7 @@ local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 infoTab:Section("Discord")
 
 local DiscordLabel = infoTab:Label({
-    Text = "เจอ error หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา"
+    Text = "เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา"
 })
 
 local CopyDiscordButton = infoTab:Button({
