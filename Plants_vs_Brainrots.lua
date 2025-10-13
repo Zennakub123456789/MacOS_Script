@@ -200,7 +200,7 @@ local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
 
 AutoTab:Section("Auto Fram Brainrots")
 
-AutoTab:Section("-[Use Auto Fram Brainrots on PRIVATE SERVERS Only")
+AutoTab:Section("[Use Auto Fram Brainrots on PRIVATE SERVERS Only]")
 
 local Players = game:GetService("Players")
 local workspace = game:GetService("Workspace")
@@ -208,23 +208,21 @@ local player = Players.LocalPlayer
 
 getgenv().TeleportToBrainrot = false
 local farmPart = nil
+getgenv().currentTargetName = nil
 
 local function isPlayerInFarmZone(character, zone)
     if not character or not zone then return false end
     local hrp = character:FindFirstChild("HumanoidRootPart")
     if not hrp then return false end
-
     local playerPos = hrp.Position
     local zonePos = zone.Position
     local zoneSize = zone.Size
-
     local minX = zonePos.X - zoneSize.X / 2
     local maxX = zonePos.X + zoneSize.X / 2
     local minY = zonePos.Y - zoneSize.Y / 2
     local maxY = zonePos.Y + zoneSize.Y / 2
     local minZ = zonePos.Z - zoneSize.Z / 2
     local maxZ = zonePos.Z + zoneSize.Z / 2
-
     return (playerPos.X >= minX and playerPos.X <= maxX and
             playerPos.Y >= minY and playerPos.Y <= maxY and
             playerPos.Z >= minZ and playerPos.Z <= maxZ)
@@ -233,10 +231,8 @@ end
 local function getAllGrassCFrames(plot)
     local cframes = {}
     if not plot then return cframes end
-
     local rowsFolder = plot:FindFirstChild("Rows")
     if not rowsFolder then return cframes end
-
     for _, row in pairs(rowsFolder:GetChildren()) do
         local grassFolder = row:FindFirstChild("Grass")
         if grassFolder then
@@ -247,7 +243,6 @@ local function getAllGrassCFrames(plot)
             end
         end
     end
-
     return cframes
 end
 
@@ -257,7 +252,6 @@ local AutoTeleportToggle = AutoTab:Toggle({
     Flag = "TeleportToBrainrot",
     Callback = function(value)
         getgenv().TeleportToBrainrot = value
-
         if value then
             local myPlot
             for i = 1, 6 do
@@ -268,10 +262,8 @@ local AutoTeleportToggle = AutoTab:Toggle({
                 end
             end
             if not myPlot then return end
-
             local grassCFrames = getAllGrassCFrames(myPlot)
             if #grassCFrames == 0 then return end
-
             farmPart = Instance.new("Part")
             farmPart.Name = "FarmZonePart"
             farmPart.Size = Vector3.new(98, 80, 263)
@@ -280,7 +272,6 @@ local AutoTeleportToggle = AutoTab:Toggle({
             farmPart.Transparency = 1
             farmPart.CastShadow = false
             farmPart.Parent = workspace
-            
             if grassCFrames[6] then
                 local targetGrassCFrame = grassCFrames[6]
                 farmPart.CFrame = CFrame.new(targetGrassCFrame.Position)
@@ -288,7 +279,6 @@ local AutoTeleportToggle = AutoTab:Toggle({
                 warn("Warning: Could not find grass part #6. Defaulting to the first one.")
                 farmPart.CFrame = CFrame.new(grassCFrames[1].Position)
             end
-            
             local performanceButton = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("Settings"):WaitForChild("Frame"):WaitForChild("ScrollingFrame"):WaitForChild("Performance"):WaitForChild("Button"):WaitForChild("DisplayName")
             if performanceButton.Text == "Off" then
                 local args = {[1] = {["Value"] = true, ["Setting"] = "Performance"}}
@@ -299,7 +289,6 @@ local AutoTeleportToggle = AutoTab:Toggle({
                 end
                 task.wait(5)
             end
-
             task.spawn(function()
                 local spawnerPosition = nil
                 local spawner = myPlot:FindFirstChild("SpawnerUI", true)
@@ -310,14 +299,12 @@ local AutoTeleportToggle = AutoTab:Toggle({
                     end
                 end
                 if spawnerPosition then task.wait(1.5) end
-
                 local chosen
                 while getgenv().TeleportToBrainrot do
                     if not player.Character then 
                         task.wait(1) 
                         continue
                     end
-
                     if not isPlayerInFarmZone(player.Character, farmPart) then
                         if spawnerPosition and player.Character then
                             player.Character:MoveTo(spawnerPosition)
@@ -325,7 +312,6 @@ local AutoTeleportToggle = AutoTab:Toggle({
                         task.wait(5)
                         continue
                     end
-
                     local brainrots = workspace:WaitForChild("ScriptedMap"):WaitForChild("Brainrots")
                     local list = brainrots:GetChildren()
                     if not chosen or not chosen.Parent then
@@ -333,6 +319,11 @@ local AutoTeleportToggle = AutoTab:Toggle({
                             chosen = list[math.random(1, #list)]
                         else
                             chosen = nil
+                        end
+                        if chosen then
+                            getgenv().currentTargetName = chosen.Name
+                        else
+                            getgenv().currentTargetName = nil
                         end
                     end
                     if chosen and chosen.Parent then
@@ -368,6 +359,18 @@ local SpeedSlider = AutoTab:Slider({
     Flag = "AttackSpeedSlider",
     Callback = function(value)
         getgenv().AttackSpeed = value
+    end
+})
+
+getgenv().AutoHitMode = "Normal"
+
+local ModeDropdown = AutoTab:Dropdown({
+    Title = "Select Hit Mode",
+    Options = {"Normal", "Remote", "Normal + Remote"},
+    Default = "Normal",
+    Flag = "AutoHitModeFlag",
+    Callback = function(mode)
+        getgenv().AutoHitMode = mode
     end
 })
 
@@ -413,9 +416,21 @@ local AutoFarmToggle = AutoTab:Toggle({
                                     humanoid:EquipTool(bat)
                                     task.wait(0.1)
                                 end
-        
-                                if character:FindFirstChild("Basic Bat") then
-                                    bat:Activate()
+                                
+                                local currentMode = getgenv().AutoHitMode
+
+                                if currentMode == "Normal" or currentMode == "Normal + Remote" then
+                                    if character:FindFirstChild("Basic Bat") then
+                                        bat:Activate()
+                                    end
+                                end
+    
+                                if currentMode == "Remote" or currentMode == "Normal + Remote" then
+                                    local targetName = getgenv().currentTargetName
+                                    if targetName then
+                                        local args = { [1] = { [1] = targetName } }
+                                        game:GetService("ReplicatedStorage").Remotes.AttacksServer.WeaponAttack:FireServer(unpack(args))
+                                    end
                                 end
                             end
                         end
