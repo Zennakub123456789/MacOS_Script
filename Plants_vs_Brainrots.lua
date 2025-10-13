@@ -1,4 +1,4 @@
-local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS/refs/heads/main/Main.lua"))()
 
 local imageUrl = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png"
 local imageName = "TadHub-Icon.png"
@@ -18,7 +18,8 @@ local Window = MacUI:Window({
     LoadingTitle = "MacUI",
     LoadingSubtitle = "Loading...",
     ToggleUIKeybind = "K",
-    ShowText = "Menu",
+    ShowToggleButton = true,
+    ToggleIcon = iconPath,
     NotifyFromBottom = true,
     ConfigurationSaving = {
         Enabled = true,
