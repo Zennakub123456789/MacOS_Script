@@ -69,6 +69,10 @@ local CopyDiscordButton = infoTab:Button({
 
 infoTab:Section("Feedback")
 
+local FeedBackLabel = infoTab:Label({
+    Text = "Feedback / Report a bug (Don't Spam)"
+})
+
 local webhookURL = "https://discord.com/api/webhooks/1427371338032484374/o0WHwtI8Pw7GwjVQl5XdLkRa_oIGjrOOs9dSg8Z5W7lX6A_Fj25AdgO-Uqn8AJuF35Fd"
 
 local httpService = game:GetService("HttpService")
@@ -85,8 +89,8 @@ local FeedBackInput = infoTab:Input({
 })
 
 local FeedBackButton = infoTab:Button({
-    Title = "Send Feedback",
-    Desc = "Send your feedback to the team",
+    Title = "ส่งความคิดเห็น",
+    Desc = "Send your feedback to the Dev",
     Callback = function()
         local feedback = _G.UserFeedback or ""
         if feedback == "" then
