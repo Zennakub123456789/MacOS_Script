@@ -70,7 +70,7 @@ local CopyDiscordButton = infoTab:Button({
 infoTab:Section("Feedback")
 
 local FeedBackLabel = infoTab:Label({
-    Text = "Feedback / Report a bug (Don't Spam)"
+    Text = "ส่งความคิดเห็น / แจ้งบัค (ห้ามส่งรัวๆ)"
 })
 
 local webhookURL = "https://discord.com/api/webhooks/1427371338032484374/o0WHwtI8Pw7GwjVQl5XdLkRa_oIGjrOOs9dSg8Z5W7lX6A_Fj25AdgO-Uqn8AJuF35Fd"
@@ -88,6 +88,9 @@ local FeedBackInput = infoTab:Input({
     end
 })
 
+local lastSentTime = 0
+local cooldown = 300
+
 local FeedBackButton = infoTab:Button({
     Title = "ส่งความคิดเห็น",
     Desc = "Send your feedback to the Dev",
@@ -98,6 +101,19 @@ local FeedBackButton = infoTab:Button({
                 Title = "No message!",
                 Content = "Please enter your feedback before sending.",
                 Duration = 3
+            })
+            return
+        end
+
+        local now = tick()
+        if now - lastSentTime < cooldown then
+            local timeLeft = cooldown - (now - lastSentTime)
+            local minutes = math.floor(timeLeft / 60)
+            local seconds = math.floor(timeLeft % 60)
+            MacUI:Notify({
+                Title = "Please wait!",
+                Content = string.format("You are in cooldown. Please wait %d minute(s) %d second(s) before sending again.", minutes, seconds),
+                Duration = 4
             })
             return
         end
@@ -127,7 +143,7 @@ local FeedBackButton = infoTab:Button({
         }
 
         task.spawn(function()
-            pcall(function()
+            local success, err = pcall(function()
                 request({
                     Url = webhookURL,
                     Method = "POST",
@@ -137,6 +153,10 @@ local FeedBackButton = infoTab:Button({
                     Body = httpService:JSONEncode(data)
                 })
             end)
+
+            if success then
+                lastSentTime = tick()
+            end
         end)
 
         MacUI:Notify({
