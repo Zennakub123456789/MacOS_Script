@@ -2007,7 +2007,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.3.1",
+    Content = "Tad Hub PvB | 1.3.3",
     Duration = 3
 })
 
