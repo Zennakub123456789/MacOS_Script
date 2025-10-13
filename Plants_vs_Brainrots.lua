@@ -34,7 +34,7 @@ local Window = MacUI:Window({
     }
 })
 
-local infoTab = Window:Tab("Info", "rbxassetid://7733779610")
+local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 
 infoTab:Section("Discord")
 
