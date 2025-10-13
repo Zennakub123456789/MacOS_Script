@@ -34,6 +34,38 @@ local Window = MacUI:Window({
     }
 })
 
+local infoTab = Window:Tab("Info", "rbxassetid://7733779610")
+
+infoTab:Section("Discord")
+
+local DiscordLabel = infoTab:Label({
+    Text = "เจอ error หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา"
+})
+
+local CopyDiscordButton = infoTab:Button({
+    Title = "คัดลอกลิ้งดิสคอร์ด",
+    Desc = "กดเพื่อคัดลอกลิงก์เชิญ Discord",
+    Callback = function()
+        local link = "https://discord.gg/cQywVqjcyj"
+        if setclipboard then
+            setclipboard(link)
+            MacUI:Notify({
+                Title = "คัดลอกแล้ว!",
+                Content = "ลิงก์ Discord ถูกคัดลอกไปยังคลิปบอร์ดแล้ว",
+                Icon = "copy",
+                Duration = 3
+            })
+        else
+            MacUI:Notify({
+                Title = "ไม่รองรับการคัดลอก",
+                Content = "ตัวรันของคุณไม่รองรับฟังก์ชัน setclipboard",
+                Icon = "alert-triangle",
+                Duration = 3
+            })
+        end
+    end
+})
+
 local MainTab = Window:Tab("Main", "rbxassetid://128706247346129")
 
 MainTab:Section("Anti AFK")
