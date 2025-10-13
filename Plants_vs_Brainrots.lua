@@ -387,6 +387,16 @@ local AutoFarmToggle = AutoTab:Toggle({
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
 
+                local batPriority = {
+                    "Skeletonized Bat",
+                    "Hammer Bat",
+                    "Aluminum Bat",
+                    "Iron Core Bat",
+                    "Iron Plate Bat",
+                    "Leather Grip Bat",
+                    "Basic Bat"
+                }
+
                 local function isPlayerInZone(character, zone)
                     if not character or not zone then return false end
                     local hrp = character:FindFirstChild("HumanoidRootPart")
@@ -408,20 +418,26 @@ local AutoFarmToggle = AutoTab:Toggle({
                         if eventZone and isPlayerInZone(character, eventZone) then
                             humanoid:UnequipTools()
                         else
-                            local bat = player.Backpack:FindFirstChild("Basic Bat") 
-                                        or (character and character:FindFirstChild("Basic Bat"))
+                            local bestBatFound = nil
+                            for _, batName in ipairs(batPriority) do
+                                local foundBat = player.Backpack:FindFirstChild(batName) or (character and character:FindFirstChild(batName))
+                                if foundBat then
+                                    bestBatFound = foundBat
+                                    break 
+                                end
+                            end
                             
-                            if bat then
-                                if not character:FindFirstChild("Basic Bat") then
-                                    humanoid:EquipTool(bat)
+                            if bestBatFound then
+                                if not character:FindFirstChild(bestBatFound.Name) then
+                                    humanoid:EquipTool(bestBatFound)
                                     task.wait(0.1)
                                 end
                                 
                                 local currentMode = getgenv().AutoHitMode
 
                                 if currentMode == "Normal" or currentMode == "Normal + Remote" then
-                                    if character:FindFirstChild("Basic Bat") then
-                                        bat:Activate()
+                                    if character:FindFirstChild(bestBatFound.Name) then
+                                        bestBatFound:Activate()
                                     end
                                 end
     
@@ -431,7 +447,7 @@ local AutoFarmToggle = AutoTab:Toggle({
                                         local args = { [1] = { [1] = targetName } }
                                         game:GetService("ReplicatedStorage").Remotes.AttacksServer.WeaponAttack:FireServer(unpack(args))
                                     end
-                                end
+                                 end
                             end
                         end
                     end
