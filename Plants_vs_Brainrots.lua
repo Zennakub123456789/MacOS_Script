@@ -1749,6 +1749,9 @@ local ApplyButton = SettingTab:Button({
 
 local languageScripts = {
     ["English"] = function()
+        DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
+        CopyDiscordButton:SetTitle("Copy Discord Link")
+        CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
         AntiAFKToggle:SetTitle("Anti AFK")
         AutoTeleportToggle:SetTitle("Auto Farm Brainrot")
         SpeedSlider:SetTitle("Hit Speed")
@@ -1794,6 +1797,9 @@ local languageScripts = {
     end,
     
     ["ภาษาไทย"] = function()
+        DiscordLabel:SetText("เจอ error หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
+        CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
+        CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
         AntiAFKToggle:SetTitle("ป้องกัน AFK [กันหลุดเมื่อยืนนิ่งเกิน20นาที]")
         AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
         SpeedSlider:SetTitle("ความเร็วการตี")
