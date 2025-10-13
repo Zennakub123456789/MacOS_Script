@@ -67,6 +67,85 @@ local CopyDiscordButton = infoTab:Button({
     end
 })
 
+infoTab:Section("Feedback")
+
+local webhookURL = "https://discord.com/api/webhooks/1427371338032484374/o0WHwtI8Pw7GwjVQl5XdLkRa_oIGjrOOs9dSg8Z5W7lX6A_Fj25AdgO-Uqn8AJuF35Fd"
+
+local httpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local FeedBackInput = infoTab:Input({
+    Placeholder = "Enter your feedback...",
+    Default = "",
+    Flag = "UserFeedback",
+    Callback = function(text)
+        _G.UserFeedback = text
+    end
+})
+
+local FeedBackButton = infoTab:Button({
+    Title = "Send Feedback",
+    Desc = "Send your feedback to the team",
+    Callback = function()
+        local feedback = _G.UserFeedback or ""
+        if feedback == "" then
+            MacUI:Notify({
+                Title = "No message!",
+                Content = "Please enter your feedback before sending.",
+                Duration = 3
+            })
+            return
+        end
+
+        local data = {
+            ["embeds"] = {{
+                ["title"] = "Feedback Received",
+                ["color"] = 3447003,
+                ["fields"] = {
+                    {
+                        ["name"] = "Username",
+                        ["value"] = LocalPlayer.Name .. " (" .. LocalPlayer.UserId .. ")",
+                        ["inline"] = false
+                    },
+                    {
+                        ["name"] = "Message",
+                        ["value"] = feedback,
+                        ["inline"] = false
+                    },
+                    {
+                        ["name"] = "Time",
+                        ["value"] = os.date("%Y-%m-%d %H:%M:%S"),
+                        ["inline"] = true
+                    }
+                }
+            }}
+        }
+
+        task.spawn(function()
+            pcall(function()
+                request({
+                    Url = webhookURL,
+                    Method = "POST",
+                    Headers = {
+                        ["Content-Type"] = "application/json"
+                    },
+                    Body = httpService:JSONEncode(data)
+                })
+            end)
+        end)
+
+        MacUI:Notify({
+            Title = "Sent!",
+            Content = "Thank you for your feedback.",
+            Duration = 3
+        })
+
+        _G.UserFeedback = ""
+        FeedBackInput:SetValue("")
+    end
+})
+
 local MainTab = Window:Tab("Main", "rbxassetid://128706247346129")
 
 MainTab:Section("Anti AFK")
