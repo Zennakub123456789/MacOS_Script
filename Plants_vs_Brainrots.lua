@@ -1249,7 +1249,7 @@ local TeleportGrassButton = TeleportTab:Button({
 TeleportTab:Section("Event")
 
 local TeleportFixedButton = TeleportTab:Button({
-    Title = "Teleport to Prison Event",
+    Title = "Teleport to Event",
     Desc = "Goto Event Area",
     Callback = function()
         local player = game:GetService("Players").LocalPlayer
@@ -1795,8 +1795,8 @@ local languageScripts = {
         AutoSellAllFullToggle:SetTitle("ขายทั้งสองอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
         TeleportGrassButton:SetTitle("วาปไปสวนของตัวเอง")
         TeleportGrassButton:SetDesc("วาปไปที่พล็อต")
-        TeleportFixedButton:SetTitle("วาปไปอีเว้นคุก")
-        TeleportFixedButton:SetDesc("วาปไปอีเว้น")
+        TeleportFixedButton:SetTitle("วาปไปอีเว้น")
+        TeleportFixedButton:SetDesc("วาปไปสถานที่อีเว้น")
         AutoDailyEventToggle:SetTitle("ออโต้ทำอีเว้นรายวันอัตโนมัติ")
         AutoTomatoEventToggle:SetTitle("ออโต้รับของจาก Tomade Torelli")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
