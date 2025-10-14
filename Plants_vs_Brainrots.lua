@@ -37,6 +37,18 @@ local Window = MacUI:Window({
 
 local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 
+infoTab:Section("Update")
+
+local UpdateCode = infoTab:Code({
+    Title = "Script Update",
+    Code = [[# PvB Script Update! (v1.3.4)
+
+## What’s new:
+
+- [/] Fix Auto Tomade Torelli Event don't work
+- [+] Add Auto Save, Load ]]
+})
+
 infoTab:Section("Discord")
 
 local DiscordLabel = infoTab:Label({
@@ -1875,6 +1887,13 @@ local ApplyButton = SettingTab:Button({
 
 local languageScripts = {
     ["English"] = function()
+        UpdateCode:SetTitle("Script Update")
+        UpdateCode:SetCode([[# PvB Script Update! (v1.3.4)
+
+## What’s new:
+
+- [/] Fix Auto Tomade Torelli Event don't work 
+- [+] Add Auto Save, Load ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -1927,6 +1946,13 @@ local languageScripts = {
     end,
     
     ["ภาษาไทย"] = function()
+        UpdateCode:SetTitle("Script Update")
+        UpdateCode:SetCode([[อัปเดตสคริปต์ PvB! (v1.3.4)
+
+มีอะไรใหม่บ้าง:
+
+[/] แก้ไขปัญหา Auto Tomade Torelli Event ที่ไม่ทำงาน 
+[+] เพิ่มระบบ บันทึกอัตโนมัติ (Auto Save) และ โหลดอัตโนมัติ (Auto Load)]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
