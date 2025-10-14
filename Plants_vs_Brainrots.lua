@@ -242,7 +242,7 @@ MainTab:Toggle({
 
             if syn and syn.queue_on_teleport then
                 syn.queue_on_teleport([[
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS_Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/Tad-Hub-1/Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
                 ]])
             end
 
