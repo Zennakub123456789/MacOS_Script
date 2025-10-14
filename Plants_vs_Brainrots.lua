@@ -1598,22 +1598,27 @@ local AutoTomatoEventToggle = EventTab:Toggle({
         if value then
             if isTomatoEventRunning then return end
             isTomatoEventRunning = true
+            MacUI:Notify({ Title = "Tomato Event", Content = "เริ่มตรวจสอบ Event...", Duration = 3 })
 
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
+                
                 local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if humanoidRootPart and not getgenv().ActionLock then
+                    getgenv().ActionLock = true
+                    local initialPosition = humanoidRootPart.Position
+                    
+                    humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
+                    task.wait(1)
+                    
                     local actionTextLabel = player.PlayerGui:FindFirstChild("ProximityPrompts", true) and player.PlayerGui.ProximityPrompts.Default.PromptFrame:FindFirstChild("ActionText")
                     if actionTextLabel and actionTextLabel.Text == "Talk" then
-                        getgenv().ActionLock = true
-                        local initialPosition = humanoidRootPart.Position
-                        humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
-                        task.wait(1)
                         for _, p in ipairs(workspace:GetDescendants()) do if p:IsA("ProximityPrompt") then local dist=(p.Parent.Position-humanoidRootPart.Position).Magnitude; if dist<=p.MaxActivationDistance then p:InputHoldBegin();task.wait(p.HoldDuration);p:InputHoldEnd();break;end end end
-                        task.wait(0.5)
-                        humanoidRootPart.CFrame = CFrame.new(initialPosition)
-                        getgenv().ActionLock = false
                     end
+                    
+                    task.wait(0.5)
+                    humanoidRootPart.CFrame = CFrame.new(initialPosition)
+                    getgenv().ActionLock = false
                 end
 
                 while isTomatoEventRunning do
@@ -1694,6 +1699,7 @@ local AutoTomatoEventToggle = EventTab:Toggle({
         else
             if isTomatoEventRunning then
                 isTomatoEventRunning = false
+                MacUI:Notify({ Title = "Tomato Event", Content = "หยุดตรวจสอบ Event", Duration = 3 })
                 if savedPosition then
                     local player = game:GetService("Players").LocalPlayer; local char = player.Character; local hrp = char and char:FindFirstChild("HumanoidRootPart")
                     if hrp then hrp.CFrame = CFrame.new(savedPosition) end
@@ -1936,7 +1942,7 @@ local languageScripts = {
     end,
     
     ["ภาษาไทย"] = function()
-        DiscordLabel:SetText("เจอ error หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
+        DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
         FeedBackLabel:SetText("ส่งความคิดเห็น / แจ้งบัค (ห้ามส่งรัวๆ)")
