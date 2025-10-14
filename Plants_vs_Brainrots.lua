@@ -12,7 +12,7 @@ local iconPath = getcustomasset(imageName)
 
 local Window = MacUI:Window({
     Title = "Tad Hub | PvB",
-    Size = UDim2.new(0, 600, 0, 400),
+    Size = UDim2.new(0, 600, 0, 350),
     Theme = "Dark",
     Icon = iconPath,
     LoadingTitle = "MacUI",
@@ -237,7 +237,11 @@ local queue_on_teleport = queue_on_teleport
 if syn then queue_on_teleport = syn.queue_on_teleport end
 
 queue_on_teleport([[
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS_Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
+    if not game:IsLoaded() then
+        game.Loaded:Wait()
+    end
+    repeat task.wait() until game.Players and game.Players.LocalPlayer
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS_Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
 ]])
 
 local isTeleporting = false
