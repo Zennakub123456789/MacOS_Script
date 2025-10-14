@@ -1598,6 +1598,7 @@ local AutoTomatoEventToggle = EventTab:Toggle({
         if value then
             if isTomatoEventRunning then return end
             isTomatoEventRunning = true
+                
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
                 
