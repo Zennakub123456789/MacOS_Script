@@ -1598,8 +1598,6 @@ local AutoTomatoEventToggle = EventTab:Toggle({
         if value then
             if isTomatoEventRunning then return end
             isTomatoEventRunning = true
-            MacUI:Notify({ Title = "Tomato Event", Content = "เริ่มตรวจสอบ Event...", Duration = 3 })
-
             task.spawn(function()
                 local player = game:GetService("Players").LocalPlayer
                 
@@ -1634,58 +1632,45 @@ local AutoTomatoEventToggle = EventTab:Toggle({
                                 humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
                                 task.wait(1)
                                 
-                                local function isPlayerInZone(character, zone)
-                                    if not character or not zone then return false end
-                                    local hrp = character:FindFirstChild("HumanoidRootPart")
-                                    if not hrp then return false end
-                                    local playerPos = hrp.Position; local zonePos = zone.Position; local zoneSize = zone.Size
-                                    local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
-                                    local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
-                                    local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
-                                    return (playerPos.X >= minX and playerPos.X <= maxX and playerPos.Y >= minY and playerPos.Y <= maxY and playerPos.Z >= minZ and playerPos.Z <= maxZ)
-                                end
-
-                                if isPlayerInZone(player.Character, eventZonePart) then
-                                    local promptFrame = player.PlayerGui:WaitForChild("ProximityPrompts", 5) and player.PlayerGui.ProximityPrompts:WaitForChild("Default", 5) and player.PlayerGui.ProximityPrompts.Default:WaitForChild("PromptFrame", 5)
-                                    local actionTextLabel = promptFrame and promptFrame:WaitForChild("ActionText", 5)
-                                    if actionTextLabel and actionTextLabel.Text == "Claim" then
-                                        local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                                        if rootPart then
-                                            local promptPressed = false
-                                            for _, instance in ipairs(workspace:GetDescendants()) do
-                                                if instance:IsA("ProximityPrompt") then
-                                                    local prompt = instance
-                                                    local targetPart = prompt.Parent
-                                                    if targetPart and targetPart:IsA("BasePart") then
-                                                        local distance = (targetPart.Position - rootPart.Position).Magnitude
-                                                        if distance <= prompt.MaxActivationDistance then
-                                                            prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
-                                                            promptPressed = true; break 
-                                                        end
+                                local promptFrame = player.PlayerGui:WaitForChild("ProximityPrompts", 5) and player.PlayerGui.ProximityPrompts:WaitForChild("Default", 5) and player.PlayerGui.ProximityPrompts.Default:WaitForChild("PromptFrame", 5)
+                                local actionTextLabel = promptFrame and promptFrame:WaitForChild("ActionText", 5)
+                                if actionTextLabel and actionTextLabel.Text == "Claim" then
+                                    local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                                    if rootPart then
+                                        local promptPressed = false
+                                        for _, instance in ipairs(workspace:GetDescendants()) do
+                                            if instance:IsA("ProximityPrompt") then
+                                                local prompt = instance
+                                                local targetPart = prompt.Parent
+                                                if targetPart and targetPart:IsA("BasePart") then
+                                                    local distance = (targetPart.Position - rootPart.Position).Magnitude
+                                                    if distance <= prompt.MaxActivationDistance then
+                                                        prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
+                                                        promptPressed = true; break 
                                                     end
                                                 end
                                             end
-                                            if promptPressed then
-                                                task.wait(1)
-                                                if actionTextLabel.Text == "Talk" then
-                                                    for _, instance in ipairs(workspace:GetDescendants()) do
-                                                        if instance:IsA("ProximityPrompt") then
-                                                            local prompt = instance
-                                                            local targetPart = prompt.Parent
-                                                            if targetPart and targetPart:IsA("BasePart") then
-                                                                local distance = (targetPart.Position - rootPart.Position).Magnitude
-                                                                if distance <= prompt.MaxActivationDistance then
-                                                                    prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
-                                                                    MacUI:Notify({ Title = "Tomade Torelli Event", Content = "Auto Event!", Duration = 2 }); break
-                                                                end
+                                        end
+                                        if promptPressed then
+                                            task.wait(1)
+                                            if actionTextLabel.Text == "Talk" then
+                                                for _, instance in ipairs(workspace:GetDescendants()) do
+                                                    if instance:IsA("ProximityPrompt") then
+                                                        local prompt = instance
+                                                        local targetPart = prompt.Parent
+                                                        if targetPart and targetPart:IsA("BasePart") then
+                                                            local distance = (targetPart.Position - rootPart.Position).Magnitude
+                                                            if distance <= prompt.MaxActivationDistance then
+                                                                prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
+                                                                MacUI:Notify({ Title = "Tomade Torelli Event", Content = "Auto Event!", Duration = 2 }); break
                                                             end
                                                         end
                                                     end
                                                 end
-                                                task.wait(0.5)
-                                                humanoidRootPart.CFrame = CFrame.new(savedPosition)
-                                                savedPosition = nil
                                             end
+                                            task.wait(0.5)
+                                            humanoidRootPart.CFrame = CFrame.new(savedPosition)
+                                            savedPosition = nil
                                         end
                                     end
                                 end
@@ -1699,7 +1684,6 @@ local AutoTomatoEventToggle = EventTab:Toggle({
         else
             if isTomatoEventRunning then
                 isTomatoEventRunning = false
-                MacUI:Notify({ Title = "Tomato Event", Content = "หยุดตรวจสอบ Event", Duration = 3 })
                 if savedPosition then
                     local player = game:GetService("Players").LocalPlayer; local char = player.Character; local hrp = char and char:FindFirstChild("HumanoidRootPart")
                     if hrp then hrp.CFrame = CFrame.new(savedPosition) end
