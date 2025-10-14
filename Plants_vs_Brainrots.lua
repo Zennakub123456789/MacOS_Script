@@ -1946,7 +1946,7 @@ local languageScripts = {
     end,
     
     ["ภาษาไทย"] = function()
-        UpdateCode:SetTitle("Script Update")
+        UpdateCode:SetTitle("อัพเดทสคริป")
         UpdateCode:SetCode([[อัปเดตสคริปต์ PvB! (v1.3.4)
 
 มีอะไรใหม่บ้าง:
