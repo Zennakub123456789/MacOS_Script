@@ -225,55 +225,67 @@ local AntiAFKToggle = MainTab:Toggle({
     end
 })
 
-MainTab:Section("Anti Reconnect")
+MainTab:Section("Auto Reconnect")
 
+repeat wait() until game.Players.LocalPlayer
 local plr = game.Players.LocalPlayer
-local isTeleporting = false
-local errorPromptConnection = nil
-local errorMessageConnection = nil
 
-MainTab:Toggle({
+if not getgenv().tvk then getgenv().tvk = {} end
+for k, v in pairs(getgenv().tvk) do v.On = false end
+
+local queue_on_teleport = queue_on_teleport
+if syn then queue_on_teleport = syn.queue_on_teleport end
+
+queue_on_teleport([[
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS_Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
+]])
+
+local isTeleporting = false
+local reconnectTask = nil
+local enabled = false
+
+local function startReconnectWatcher()
+    reconnectTask = task.spawn(function()
+        repeat wait() until game.CoreGui:FindFirstChild("RobloxPromptGui")
+        local promptOverlay = game.CoreGui.RobloxPromptGui.promptOverlay
+        promptOverlay.ChildAdded:Connect(function(child)
+            if child.Name == "ErrorPrompt" and not isTeleporting then
+                isTeleporting = true
+                repeat
+                    game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+                    wait(2)
+                until false
+            end
+        end)
+    end)
+
+    game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorMessage)
+        if errorMessage and errorMessage ~= "" and not isTeleporting then
+            isTeleporting = true
+            game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+        end
+    end)
+end
+
+local function stopReconnectWatcher()
+    if reconnectTask then
+        task.cancel(reconnectTask)
+        reconnectTask = nil
+    end
+    isTeleporting = false
+end
+
+local ReconnectToggle = MainTab:Toggle({
     Title = "Auto Reconnect",
     Default = false,
-    Flag = "AutoRejoinOnError",
-    Callback = function(value)
-        if value then
-            isTeleporting = false
-
-            if syn and syn.queue_on_teleport then
-                syn.queue_on_teleport([[
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/Tad-Hub-1/Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
-                ]])
-            end
-
-            task.spawn(function()
-                local RobloxPromptGui = game.CoreGui:WaitForChild("RobloxPromptGui")
-                local promptOverlay = RobloxPromptGui:WaitForChild("promptOverlay")
-                
-                errorPromptConnection = promptOverlay.ChildAdded:Connect(function(child)
-                    if child.Name == "ErrorPrompt" and not isTeleporting then
-                        isTeleporting = true
-                        game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
-                    end
-                end)
-            end)
-
-            errorMessageConnection = game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorMessage)
-                if errorMessage and errorMessage ~= "" and not isTeleporting then
-                    isTeleporting = true
-                    game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
-                end
-            end)
-
+    Callback = function(state)
+        enabled = state
+        if enabled then
+            startReconnectWatcher()
+            print(".")
         else
-            if errorPromptConnection then
-                errorPromptConnection:Disconnect()
-                errorPromptConnection = nil
-            end
-            if errorMessageConnection then
-                errorMessageConnection:Disconnect()
-                errorMessageConnection = nil
-            end
+            stopReconnectWatcher()
+            print(".")
         end
     end
 })
@@ -1953,6 +1965,7 @@ local languageScripts = {
         FeedBackButton:SetTitle("Send Feedback")
         FeedBackButton:SetDesc("Send your feedback to the Dev")
         AntiAFKToggle:SetTitle("Anti AFK")
+        ReconnectToggle:SetTitle("Auto Reconnect")
         AutoTeleportToggle:SetTitle("Auto Farm Brainrot")
         SpeedSlider:SetTitle("Hit Speed")
         AutoFarmToggle:SetTitle("Auto Hit")
@@ -2011,6 +2024,7 @@ local languageScripts = {
         FeedBackButton:SetTitle("ส่งความคิดเห็น")
         FeedBackButton:SetDesc("ส่งความคิดเห็นไปที่นักพัฒนา")
         AntiAFKToggle:SetTitle("ป้องกัน AFK [กันหลุดเมื่อยืนนิ่งเกิน20นาที]")
+        ReconnectToggle:SetTitle("เข้าแมพใหม่เมื่อหลุด (กลับเข้าเกมและรันสคริปต์ให้อัตโนมัติ)")
         AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
         SpeedSlider:SetTitle("ความเร็วการตี")
         AutoFarmToggle:SetTitle("ตีอัตโนมัติ")
