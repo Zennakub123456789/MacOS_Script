@@ -41,23 +41,22 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.3.4)
+    Code = [[# PvB Script Update! (v1.4.4)
 
 ## What’s new:
 
-- [/] Fix Auto Tomade Torelli Event don't work
-- [+] Add Auto Save, Load ]]
+- [+] Add Auto Reconnect ]]
 })
 
 infoTab:Section("Discord")
 
 local DiscordLabel = infoTab:Label({
-    Text = "เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา"
+    Text = "If you Found a bug or want to create a different map script, please let us know on Discord. We listen to all your problems."
 })
 
 local CopyDiscordButton = infoTab:Button({
-    Title = "คัดลอกลิ้งดิสคอร์ด",
-    Desc = "กดเพื่อคัดลอกลิงก์เชิญ Discord",
+    Title = "Copy Discord Link",
+    Desc = "Click to copy the Discord invite link.",
     Callback = function()
         local link = "https://discord.gg/cQywVqjcyj"
         if setclipboard then
@@ -82,7 +81,7 @@ local CopyDiscordButton = infoTab:Button({
 infoTab:Section("Feedback")
 
 local FeedBackLabel = infoTab:Label({
-    Text = "ส่งความคิดเห็น / แจ้งบัค (ห้ามส่งรัวๆ)"
+    Text = "Send Feedback / Report Bug (Don't Spam)"
 })
 
 local webhookURL = "https://discord.com/api/webhooks/1427371338032484374/o0WHwtI8Pw7GwjVQl5XdLkRa_oIGjrOOs9dSg8Z5W7lX6A_Fj25AdgO-Uqn8AJuF35Fd"
@@ -104,7 +103,7 @@ local lastSentTime = 0
 local cooldown = 300
 
 local FeedBackButton = infoTab:Button({
-    Title = "ส่งความคิดเห็น",
+    Title = "Send Feedback",
     Desc = "Send your feedback to the Dev",
     Callback = function()
         local feedback = _G.UserFeedback or ""
@@ -221,6 +220,59 @@ local AntiAFKToggle = MainTab:Toggle({
             if idledConnection then
                 idledConnection:Disconnect()
                 idledConnection = nil
+            end
+        end
+    end
+})
+
+MainTab:Section("Anti Reconnect")
+
+local plr = game.Players.LocalPlayer
+local isTeleporting = false
+local errorPromptConnection = nil
+local errorMessageConnection = nil
+
+MainTab:Toggle({
+    Title = "Auto Reconnect",
+    Default = false,
+    Flag = "AutoRejoinOnError",
+    Callback = function(value)
+        if value then
+            isTeleporting = false
+
+            if syn and syn.queue_on_teleport then
+                syn.queue_on_teleport([[
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS_Script/refs/heads/main/Plants_vs_Brainrots.lua"))()
+                ]])
+            end
+
+            task.spawn(function()
+                local RobloxPromptGui = game.CoreGui:WaitForChild("RobloxPromptGui")
+                local promptOverlay = RobloxPromptGui:WaitForChild("promptOverlay")
+                
+                errorPromptConnection = promptOverlay.ChildAdded:Connect(function(child)
+                    if child.Name == "ErrorPrompt" and not isTeleporting then
+                        isTeleporting = true
+                        game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+                    end
+                end)
+            end)
+
+            errorMessageConnection = game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorMessage)
+                if errorMessage and errorMessage ~= "" and not isTeleporting then
+                    isTeleporting = true
+                    game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+                end
+            end)
+
+        else
+            if errorPromptConnection then
+                errorPromptConnection:Disconnect()
+                errorPromptConnection = nil
+            end
+            if errorMessageConnection then
+                errorMessageConnection:Disconnect()
+                errorMessageConnection = nil
             end
         end
     end
@@ -1888,12 +1940,11 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.3.4)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.4.4)
 
 ## What’s new:
-
-- [/] Fix Auto Tomade Torelli Event don't work 
-- [+] Add Auto Save, Load ]])
+ 
+- [+] Add Auto Reconnect ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -1947,12 +1998,11 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[อัปเดตสคริปต์ PvB! (v1.3.4)
+        UpdateCode:SetCode([[อัปเดตสคริปต์ PvB! (v1.4.4)
 
 มีอะไรใหม่บ้าง:
-
-[/] แก้ไขปัญหา Auto Tomade Torelli Event ที่ไม่ทำงาน 
-[+] เพิ่มระบบ บันทึกอัตโนมัติ (Auto Save) และ โหลดอัตโนมัติ (Auto Load)]])
+ 
+[+] เพิ่มระบบ เข้าแมพใหม่เมื่อหลุด (กลับเข้าเกมและรันสคริปต์ให้อัตโนมัติ)]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2024,7 +2074,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.3.4",
+    Content = "Tad Hub PvB | 1.4.4",
     Duration = 3
 })
 
