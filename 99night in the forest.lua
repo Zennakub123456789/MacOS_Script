@@ -89,3 +89,80 @@ local AutoCollectToggle = AutoTab:Toggle({
     end
 })
 
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local CurrentCamera = workspace.CurrentCamera
+
+local AutoPickFlowerToggle = AutoTab:Toggle({
+    Title = "Auto Pick Flower",
+    Default = false,
+    Flag = "AutoPickFlower",
+    Callback = function(state)
+        getgenv().AutoPickFlower = state
+        
+        if state then
+            local fixedCameraCFrame = CFrame.new(14.583221, 18.645473, 28.576258) * CFrame.fromOrientation(-1.384744, -1.639596, 0.000000)
+            CurrentCamera.CFrame = fixedCameraCFrame
+
+            task.spawn(function()
+                while getgenv().AutoPickFlower do
+                    local landmarks = workspace.Map:WaitForChild("Landmarks", 60)
+                    
+                    if not landmarks then
+                        warn("หาโฟลเดอร์ Landmarks ไม่เจอ!")
+                        break
+                    end
+
+                    local flowers = {}
+                    
+                    for _, landmarkItem in ipairs(landmarks:GetChildren()) do
+                        if landmarkItem.Name == "Flower" and landmarkItem:IsA("Model") then
+                            table.insert(flowers, landmarkItem)
+                        
+                        elseif landmarkItem.Name == "FlowerRing1" and landmarkItem:IsA("Model") then
+                            for _, nestedItem in ipairs(landmarkItem:GetChildren()) do
+                                if nestedItem.Name == "Flower" and nestedItem:IsA("Model") then
+                                    table.insert(flowers, nestedItem)
+                                end
+                            end
+
+                        elseif landmarkItem.Name == "Fairy House" and landmarkItem:IsA("Model") then
+                            local flowersFolder = landmarkItem:FindFirstChild("Flowers")
+                            if flowersFolder then
+                                for _, flower in ipairs(flowersFolder:GetChildren()) do
+                                    if flower.Name == "Flower" and flower:IsA("Model") then
+                                        table.insert(flowers, flower)
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    for _, flower in ipairs(flowers) do
+                        if not getgenv().AutoPickFlower then break end
+                        
+                        local playerCharacter = game.Players.LocalPlayer.Character
+                        if flower and flower.PrimaryPart and playerCharacter and playerCharacter:FindFirstChild("HumanoidRootPart") then
+                            local hrp = playerCharacter.HumanoidRootPart
+                            hrp.CFrame = flower:GetPrimaryPartCFrame() + Vector3.new(0, 3, 0)
+                            
+                            task.wait(0.2)
+
+                            CurrentCamera.CFrame = fixedCameraCFrame
+
+                            local viewportSize = CurrentCamera.ViewportSize
+                            local centerScreenPosition = Vector2.new(viewportSize.X * 0.5, viewportSize.Y * 0.5)
+                            
+                            VirtualInputManager:SendMouseButtonEvent(centerScreenPosition.X, centerScreenPosition.Y, 0, true, game, 1)
+                            task.wait(0.05)
+                            VirtualInputManager:SendMouseButtonEvent(centerScreenPosition.X, centerScreenPosition.Y, 0, false, game, 1)
+                            
+                            task.wait()
+                        end
+                    end
+
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end
+})
