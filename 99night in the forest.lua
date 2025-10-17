@@ -222,7 +222,7 @@ local function bringSelectedItemsToFire()
             local angle = math.rad(offsetIndex * 45)
             local xOffset = math.cos(angle) * spacing
             local zOffset = math.sin(angle) * spacing
-            local targetCFrame = CFrame.new(firePosition.X + xOffset, firePosition.Y + 20, firePosition.Z + zOffset)
+            local targetCFrame = CFrame.new(firePosition.X + xOffset, firePosition.Y + 50, firePosition.Z + zOffset)
             
             item:SetPrimaryPartCFrame(targetCFrame)
 
@@ -232,7 +232,7 @@ local function bringSelectedItemsToFire()
             
             task.wait(0.1) 
             
-            local expectedHeight = firePosition.Y + 20
+            local expectedHeight = firePosition.Y + 50
             if math.abs(primaryPart.Position.Y - expectedHeight) < 0.5 then
                 if primaryPart.Anchored then
                     primaryPart.Anchored = false
