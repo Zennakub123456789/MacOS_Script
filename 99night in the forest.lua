@@ -152,7 +152,7 @@ local AutoPickFlowerToggle = AutoTab:Toggle({
                             CurrentCamera.CFrame = fixedCameraCFrame
 
                             local viewportSize = CurrentCamera.ViewportSize
-                            local centerScreenPosition = Vector2.new(viewportSize.X * 0.5, viewportSize.Y * 0.5)
+                            local centerScreenPosition = Vector2.new(viewportSize.X * 0.55, viewportSize.Y * 0.5)
                             
                             VirtualInputManager:SendMouseButtonEvent(centerScreenPosition.X, centerScreenPosition.Y, 0, true, game, 1)
                             task.wait(0.05)
@@ -246,7 +246,7 @@ local function bringSelectedItemsToFire()
 end
 
 local ItemSelector = AutoTab:Dropdown({
-    Title = "Select Items to Bring",
+    Title = "Fuel Select",
     Options = {"Log", "Fuel Canister", "Coal", "AnotherItem1", "AnotherItem2", "AnotherItem3", "AnotherItem4"}, 
     Multi = true,
     Default = {"Log"},
@@ -258,7 +258,7 @@ local ItemSelector = AutoTab:Dropdown({
 getgenv().ItemsToBring = ItemSelector:Get()
 
 local FireThresholdSlider = AutoTab:Slider({
-    Title = "Fire Progress Threshold",
+    Title = "Start Fuel when (Fire HP)",
     Min = 1,
     Max = 100,
     Default = 50,
@@ -271,7 +271,7 @@ getgenv().FireThreshold = FireThresholdSlider:Get()
 
 local CheckFireToggle
 CheckFireToggle = AutoTab:Toggle({
-    Title = "Auto Bring Items",
+    Title = "Auto Fill Campfire",
     Default = false,
     Flag = "AutoBringItems",
     Callback = function(state)
