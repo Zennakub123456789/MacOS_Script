@@ -181,11 +181,11 @@ local StartDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChil
 local StopDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StopDraggingItem")
 
 local function bringSelectedItemsToFire()
-    local mainFireCheck = workspace.Map.Campground:WaitForChild("MainFire")
-    if not mainFireCheck or not mainFireCheck.PrimaryPart then
+    local mainFire = workspace.Map.Campground:WaitForChild("MainFire")
+    if not mainFire or not mainFire.PrimaryPart then
         return
     end
-    local firePosition = mainFireCheck.PrimaryPart.Position
+    local firePosition = mainFire.PrimaryPart.Position
 
     local itemsFolder = workspace:FindFirstChild("Items")
     if not itemsFolder then
@@ -233,21 +233,21 @@ local function bringSelectedItemsToFire()
                 task.wait(0.5)
             end
 
-            task.wait(0.5)
             local args = {item}
             StartDragging:FireServer(unpack(args))
-            task.wait(0.5)
-            StopDragging:FireServer(unpack(args))
-            
-            task.wait(0.1) 
             
             local expectedHeight = firePosition.Y + 50
-            if math.abs(primaryPart.Position.Y - expectedHeight) < 0.5 then
-                if primaryPart.Anchored then
-                    primaryPart.Anchored = false
-                end
+            if math.abs(primaryPart.Position.Y - expectedHeight) > 0.5 then
+                item:SetPrimaryPartCFrame(targetCFrame)
+                task.wait(0.5)
             end
-
+            
+            if primaryPart.Anchored then
+                primaryPart.Anchored = false
+            end
+            
+            StopDragging:FireServer(unpack(args))
+            
             offsetIndex = offsetIndex + 1
             task.wait(0.3)
         end
@@ -289,6 +289,12 @@ CheckFireToggle = AutoTab:Toggle({
         if state then
             task.spawn(function()
                 while getgenv().AutoBringItems do
+                    while not workspace.Map.Campground:FindFirstChild("MainFire") and getgenv().AutoBringItems do
+                        task.wait(1)
+                    end
+
+                    if not getgenv().AutoBringItems then break end
+
                     local mainFire = workspace.Map.Campground:FindFirstChild("MainFire")
                     local textLabel = mainFire and mainFire:FindFirstChild("Center") and mainFire.Center:FindFirstChild("BillboardGui") and mainFire.Center.BillboardGui:FindFirstChild("Frame") and mainFire.Center.BillboardGui.Frame:FindFirstChild("TextLabel")
                     local currentProgress = nil
