@@ -107,7 +107,7 @@ local AutoPickFlowerToggle = AutoTab:Toggle({
 
             task.spawn(function()
                 while getgenv().AutoPickFlower do
-                    local landmarks = workspace.Map:WaitForChild("Landmarks", 60)
+                    local landmarks = workspace.Map:FindFirstChild("Landmarks", 60)
                     
                     if not landmarks then
                         warn("หาโฟลเดอร์ Landmarks ไม่เจอ!")
@@ -139,26 +139,27 @@ local AutoPickFlowerToggle = AutoTab:Toggle({
                         end
                     end
 
-                    for _, flower in ipairs(flowers) do
+                                        for _, flower in ipairs(flowers) do
                         if not getgenv().AutoPickFlower then break end
                         
                         local playerCharacter = game.Players.LocalPlayer.Character
                         if flower and flower.PrimaryPart and playerCharacter and playerCharacter:FindFirstChild("HumanoidRootPart") then
                             local hrp = playerCharacter.HumanoidRootPart
+                            
                             hrp.CFrame = flower:GetPrimaryPartCFrame() + Vector3.new(0, 3, 0)
                             
-                            task.wait(0.2)
+                            task.wait(0.5) 
 
                             CurrentCamera.CFrame = fixedCameraCFrame
+                            task.wait(0.1)
 
                             local viewportSize = CurrentCamera.ViewportSize
                             local centerScreenPosition = Vector2.new(viewportSize.X * 0.55, viewportSize.Y * 0.5)
-                            
                             VirtualInputManager:SendMouseButtonEvent(centerScreenPosition.X, centerScreenPosition.Y, 0, true, game, 1)
                             task.wait(0.05)
                             VirtualInputManager:SendMouseButtonEvent(centerScreenPosition.X, centerScreenPosition.Y, 0, false, game, 1)
                             
-                            task.wait()
+                            task.wait(0.2)
                         end
                     end
 
