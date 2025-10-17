@@ -828,7 +828,6 @@ local FavoriteBrainrotToggle = AutoTab:Toggle({
                                 end
                                 
                                 if isToolFavorited then
-                                    tool:SetAttribute("Brainrot", nil)
                                     return 
                                 end
                                 
@@ -850,6 +849,7 @@ local FavoriteBrainrotToggle = AutoTab:Toggle({
                         if not success then
                             print("เกิด Error ขณะตรวจสอบไอเท็ม แต่ทำงานต่อได้:", err)
                         end
+                        task.wait()
                     end
                     task.wait(1)
                 end
