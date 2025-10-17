@@ -181,11 +181,11 @@ local StartDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChil
 local StopDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StopDraggingItem")
 
 local function bringSelectedItemsToFire()
-    local mainFire = workspace.Map.Campground:WaitForChild("MainFire")
-    if not mainFire or not mainFire.PrimaryPart then
+    local mainFireCheck = workspace.Map.Campground:WaitForChild("MainFire")
+    if not mainFireCheck or not mainFireCheck.PrimaryPart then
         return
     end
-    local firePosition = mainFire.PrimaryPart.Position
+    local firePosition = mainFireCheck.PrimaryPart.Position
 
     local itemsFolder = workspace:FindFirstChild("Items")
     if not itemsFolder then
@@ -227,8 +227,16 @@ local function bringSelectedItemsToFire()
             
             item:SetPrimaryPartCFrame(targetCFrame)
 
+            task.wait(1)
+
+            while not (workspace.Map.Campground:FindFirstChild("MainFire") and workspace.Map.Campground.MainFire.PrimaryPart) do
+                task.wait(0.5)
+            end
+
+            task.wait(0.5)
             local args = {item}
             StartDragging:FireServer(unpack(args))
+            task.wait(0.5)
             StopDragging:FireServer(unpack(args))
             
             task.wait(0.1) 
