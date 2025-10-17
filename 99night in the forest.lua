@@ -37,6 +37,8 @@ local Window = MacUI:Window({
 
 local AutoTab = Window:Tab("Auto", "rbxassetid://7733779610")
 
+AutoTab:Section("Auto Correct")
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local HRP = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
@@ -161,6 +163,148 @@ local AutoPickFlowerToggle = AutoTab:Toggle({
                     end
 
                     task.wait(0.1)
+                end
+            end)
+        end
+    end
+})
+
+AutoTab:Section("Auto Campfire")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = game:GetService("Players").LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+
+local StartDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("RequestStartDraggingItem")
+local StopDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StopDraggingItem")
+
+local function bringSelectedItemsToFire()
+    local mainFire = workspace.Map.Campground:WaitForChild("MainFire")
+    if not mainFire or not mainFire.PrimaryPart then
+        return
+    end
+    local firePosition = mainFire.PrimaryPart.Position
+
+    local itemsFolder = workspace:FindFirstChild("Items")
+    if not itemsFolder then
+        return
+    end
+    
+    if not getgenv().ItemsToBring or #getgenv().ItemsToBring == 0 then
+        return
+    end
+
+    local spacing = 3
+    local offsetIndex = 0
+
+    for _, item in ipairs(itemsFolder:GetChildren()) do
+        if not getgenv().AutoBringItems then
+            break
+        end
+
+        if item:IsA("Model") and table.find(getgenv().ItemsToBring, item.Name) then
+            local primaryPart = item.PrimaryPart
+            if not primaryPart then
+                primaryPart = Instance.new("Part")
+                primaryPart.Name = "PrimaryPartForBring"
+                primaryPart.Size = Vector3.new(1, 1, 1)
+                primaryPart.Anchored = true
+                primaryPart.Transparency = 1
+                primaryPart.CanCollide = false
+                primaryPart.CFrame = item:GetModelCFrame() or CFrame.new(firePosition)
+                primaryPart.Parent = item
+                item.PrimaryPart = primaryPart
+            end
+
+            primaryPart.Anchored = true
+            
+            local angle = math.rad(offsetIndex * 45)
+            local xOffset = math.cos(angle) * spacing
+            local zOffset = math.sin(angle) * spacing
+            local targetCFrame = CFrame.new(firePosition.X + xOffset, firePosition.Y + 20, firePosition.Z + zOffset)
+            
+            item:SetPrimaryPartCFrame(targetCFrame)
+
+            local args = {item}
+            StartDragging:FireServer(unpack(args))
+            StopDragging:FireServer(unpack(args))
+            
+            task.wait(0.1) 
+            
+            local expectedHeight = firePosition.Y + 20
+            if math.abs(primaryPart.Position.Y - expectedHeight) < 0.5 then
+                if primaryPart.Anchored then
+                    primaryPart.Anchored = false
+                end
+            end
+
+            offsetIndex = offsetIndex + 1
+            task.wait(0.3)
+        end
+    end
+end
+
+local ItemSelector = AutoTab:Dropdown({
+    Title = "Select Items to Bring",
+    Options = {"Log", "Fuel Canister", "Coal", "AnotherItem1", "AnotherItem2", "AnotherItem3", "AnotherItem4"}, 
+    Multi = true,
+    Default = {"Log"},
+    Flag = "SelectedItems",
+    Callback = function(selectedItems)
+        getgenv().ItemsToBring = selectedItems
+    end
+})
+getgenv().ItemsToBring = ItemSelector:Get()
+
+local FireThresholdSlider = AutoTab:Slider({
+    Title = "Fire Progress Threshold",
+    Min = 1,
+    Max = 100,
+    Default = 50,
+    Flag = "FireThreshold",
+    Callback = function(value)
+        getgenv().FireThreshold = value
+    end
+})
+getgenv().FireThreshold = FireThresholdSlider:Get()
+
+local CheckFireToggle
+CheckFireToggle = AutoTab:Toggle({
+    Title = "Auto Bring Items",
+    Default = false,
+    Flag = "AutoBringItems",
+    Callback = function(state)
+        getgenv().AutoBringItems = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().AutoBringItems do
+                    local mainFire = workspace.Map.Campground:FindFirstChild("MainFire")
+                    local textLabel = mainFire and mainFire:FindFirstChild("Center") and mainFire.Center:FindFirstChild("BillboardGui") and mainFire.Center.BillboardGui:FindFirstChild("Frame") and mainFire.Center.BillboardGui.Frame:FindFirstChild("TextLabel")
+                    local currentProgress = nil
+
+                    local progressText = textLabel and string.match(textLabel.Text, "(%d+/%d+)")
+
+                    if progressText then
+                        local parts = string.split(progressText, "/")
+                        currentProgress = tonumber(parts[1])
+                    elseif mainFire then
+                        local fuelRemaining = mainFire:GetAttribute("FuelRemaining")
+                        local fuelTarget = mainFire:GetAttribute("FuelTarget")
+
+                        if fuelRemaining and fuelTarget and fuelTarget > 0 then
+                            currentProgress = math.floor((fuelRemaining / fuelTarget) * 100)
+                        end
+                    end
+
+                    if currentProgress and getgenv().FireThreshold then
+                        if currentProgress < getgenv().FireThreshold then
+                            bringSelectedItemsToFire()
+                        end
+                    end
+                    
+                    task.wait(1)
                 end
             end)
         end
