@@ -1,4 +1,4 @@
-local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/Apple-Library/refs/heads/main/Main.lua"))()
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/Apple-Library/refs/heads/main/Main_Fixed(2).lua"))()
 
 local imageUrl = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png"
 local imageName = "TadHub-Icon.png"
@@ -12,7 +12,7 @@ local iconPath = getcustomasset(imageName)
 
 local Window = MacUI:Window({
     Title = "Tad Hub | 99 Night In The Forest",
-    Size = UDim2.new(0, 600, 0, 350),
+    Size = UDim2.new(0, 475, 0, 325),
     Theme = "Dark",
     Icon = iconPath,
     LoadingTitle = "MacUI",
