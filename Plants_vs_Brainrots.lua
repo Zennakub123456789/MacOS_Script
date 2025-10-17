@@ -37,19 +37,25 @@ local Window = MacUI:Window({
 
 local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 
-local Comingabel = infoTab:Label({
+local Comingabel1 = infoTab:Label({
     Text = "สคริปแมพ 99คืนในป่า กับ แมพขโมย กำลังจะมา!"
+})
+local Comingabel2 = infoTab:Label({
+    Text = "สคริปแมพ 99คืนในป่าจะมาก่อน โปรดรอ ตอนนี้เรากำลังเพิ่มฟีเจอร์ต่างๆ"
 })
 
 infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.4.4)
+    Code = [[# PvB Script Update! (v1.5.4)
 
 ## What’s new:
 
-- [+] Add Auto Reconnect ]]
+- [/]  Fix Auto Favorite Brainrot By Rarity Don't Work
+- [/] Fix Auto Favorite Plants By Rarity Don't Work
+- [/] Fix Auto Favorite Brainrot by Mutation Don't Work 
+- [/] Fix Auto Favorite Plants By Mutation Don't Work ]]
 })
 
 infoTab:Section("Discord")
@@ -384,6 +390,10 @@ if isAllowed() then
 end
 
 local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
+
+local TysmLebel = MainTab:Label({
+    Text = "ออโต้ล็อคหัวใจ ได้ผลแล้ว ขอบคุณทุกคนที่คอยซัพพอร์ต ด้วยนะค้าบ"
+})
 
 AutoTab:Section("Auto Fram Brainrots")
 
@@ -2012,11 +2022,14 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.4.4)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.5.4)
 
 ## What’s new:
- 
-- [+] Add Auto Reconnect ]])
+
+- [/]  Fix Auto Favorite Brainrot By Rarity Don't Work
+- [/] Fix Auto Favorite Plants By Rarity Don't Work
+- [/] Fix Auto Favorite Brainrot by Mutation Don't Work 
+- [/] Fix Auto Favorite Plants By Mutation Don't Work ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2071,11 +2084,14 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[อัปเดตสคริปต์ PvB! (v1.4.4)
+        UpdateCode:SetCode([[# แมพพืชปะทะเบรนร็อต สคริปอัพเดท! (v1.5.4)
 
-มีอะไรใหม่บ้าง:
- 
-[+] เพิ่มระบบ เข้าแมพใหม่เมื่อหลุด (กลับเข้าเกมและรันสคริปต์ให้อัตโนมัติ)]])
+## มีอะไรใหม่บ้าง:
+
+- [/] แก้ไข ออโต้ล็อคหัวใจเบรนร็อตโดยความหายากไม่ทำงาน
+- [/] แก้ไข ออโต้ล็อคหัวใจพืชโดยความหายากไม่ทำงาน
+- [/] แก้ไข ออโต้ล็อคหัวใจเบรนร็อตโดยการกลายพันธุ์ไม่ทำงาน
+- [/] แก้ไข ออโต้ล็อคหัวใจพืชโดยการกลายพันธุ์ไม่ทำงาน ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2148,7 +2164,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.4.4",
-    Duration = 3
+    Content = "Tad Hub PvB | 1.5.4",
+    Duration = 10
 })
 
