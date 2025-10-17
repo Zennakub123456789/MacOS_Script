@@ -391,7 +391,7 @@ end
 
 local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
 
-local TysmLebel = MainTab:Label({
+local TysmLebel = AutoTab:Label({
     Text = "ออโต้ล็อคหัวใจ ได้ผลแล้ว ขอบคุณทุกคนที่คอยซัพพอร์ต ด้วยนะค้าบ"
 })
 
