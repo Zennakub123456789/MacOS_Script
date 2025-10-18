@@ -325,3 +325,126 @@ CheckFireToggle = AutoTab:Toggle({
         end
     end
 })
+
+AutoTab:Section("Auto Open Chest And Bring")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = game:GetService("Players").LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+local RequestOpenItemChest = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("RequestOpenItemChest")
+
+local StartDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("RequestStartDraggingItem")
+local StopDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StopDraggingItem")
+
+local chestNamesToOpen = {
+    "Item Chest",
+    "Item Chest2",
+    "Item Chest3",
+    "Item Chest4",
+    "Item Chest5",
+    "Snow Chest1",
+    "Snow Chest2"
+}
+
+local function bringItemToPlayer(item)
+    local character = player.Character or player.CharacterAdded:Wait()
+    if not character then return end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    if item and item:IsA("Model") then
+        local primaryPart = item.PrimaryPart
+        if not primaryPart then
+            primaryPart = Instance.new("Part")
+            primaryPart.Name = "PrimaryPartForBring"
+            primaryPart.Size = Vector3.new(1, 1, 1)
+            primaryPart.Anchored = true
+            primaryPart.Transparency = 1
+            primaryPart.CanCollide = false
+            primaryPart.CFrame = item:GetModelCFrame() or hrp.CFrame
+            primaryPart.Parent = item
+            item.PrimaryPart = primaryPart
+        end
+
+        primaryPart.Anchored = true
+        local targetCFrame = hrp.CFrame * CFrame.new(0, 5, 0)
+        item:SetPrimaryPartCFrame(targetCFrame)
+
+        local args = {item}
+        pcall(function() StartDragging:FireServer(unpack(args)) end)
+        
+        if primaryPart.Anchored then
+            primaryPart.Anchored = false
+        end
+        
+        pcall(function() StopDragging:FireServer(unpack(args)) end)
+    end
+end
+
+local CheckChestToggle
+CheckChestToggle = AutoTab:Toggle({
+    Title = "Auto Open Item Chests",
+    Default = false,
+    Flag = "AutoOpenChests",
+    Callback = function(state)
+        getgenv().AutoOpenChests = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().AutoOpenChests do
+                    local itemsFolder = workspace:FindFirstChild("Items")
+                    if itemsFolder then
+                        
+                        local chestsToProcess = {}
+                        for _, item in ipairs(itemsFolder:GetChildren()) do
+                            if item:IsA("Model") and table.find(chestNamesToOpen, item.Name) then
+                                table.insert(chestsToProcess, item)
+                            end
+                        end
+
+                        if #chestsToProcess > 0 then
+                            for _, chest in ipairs(chestsToProcess) do
+                                if not getgenv().AutoOpenChests then break end
+
+                                local itemDropPart = chest:FindFirstChild("ItemDrop")
+                                
+                                if not itemDropPart then
+                                    continue
+                                end
+
+                                local isAlreadyOpened = chest:GetAttribute("LocalOpened")
+
+                                if isAlreadyOpened ~= true then
+                                    local args = {[1] = chest}
+                                    pcall(function() RequestOpenItemChest:FireServer(unpack(args)) end)
+                                    task.wait(1.5)
+                                end
+
+                                local dropPosition = itemDropPart.Position
+                                local checkRadius = 15
+                                
+                                for _, item in ipairs(itemsFolder:GetChildren()) do
+                                    if item:IsA("Model") and item ~= chest then
+                                        local itemPart = item.PrimaryPart or item:FindFirstChildWhichIsA("BasePart")
+                                        if itemPart then
+                                            local distance = (itemPart.Position - dropPosition).Magnitude
+                                            
+                                            if distance <= checkRadius then
+                                                bringItemToPlayer(item)
+                                                task.wait(0.1)
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        
+                    end
+                    
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+})
