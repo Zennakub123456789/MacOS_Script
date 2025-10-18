@@ -859,7 +859,6 @@ local FavoriteBrainrotToggle = AutoTab:Toggle({
                         if not success then
                             print("เกิด Error ขณะตรวจสอบไอเท็ม แต่ทำงานต่อได้:", err)
                         end
-                        task.wait()
                     end
                     task.wait(1)
                 end
@@ -1000,7 +999,6 @@ local FavoritePlantToggle = AutoTab:Toggle({
                                     end
                                 end
                             end)
-                            task.wait()
                         end
                     end
 
@@ -1107,13 +1105,11 @@ local FavoriteBrainrotToggle = AutoTab:Toggle({
 
                     for _, tool in ipairs(backpack:GetChildren()) do
                         pcall(processTool, tool)
-                        task.wait()
                     end
 
                     if character then
                         for _, tool in ipairs(character:GetChildren()) do
                             pcall(processTool, tool)
-                            task.wait()
                         end
                     end
                     
@@ -1205,13 +1201,11 @@ local FavoritePlantToggle = AutoTab:Toggle({
 
                     for _, tool in ipairs(backpack:GetChildren()) do
                         pcall(processTool, tool)
-                        task.wait()
                     end
 
                     if character then
                         for _, tool in ipairs(character:GetChildren()) do
                             pcall(processTool, tool)
-                            task.wait()
                         end
                     end
 
