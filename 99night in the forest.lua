@@ -344,7 +344,9 @@ local chestNamesToOpen = {
     "Item Chest4",
     "Item Chest5",
     "Snow Chest1",
-    "Snow Chest2"
+    "Snow Chest2",
+    "Volcanic Chest1",
+    "Volcanic Chest2"
 }
 
 local function bringItemToPlayer(item)
