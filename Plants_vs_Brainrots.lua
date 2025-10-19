@@ -1726,114 +1726,160 @@ local AutoDailyEventToggle = EventTab:Toggle({
     end
 })
 
-local isTomatoEventRunning = false
-local savedPosition = nil
+EventTab:Section("Invasion Event")
 
-local AutoTomatoEventToggle = EventTab:Toggle({
-    Title = "Auto Tomade Torelli Event",
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local workspace = game:GetService("Workspace")
+
+local isAutoInvasionRunning = false
+local isTeleportingToMission = false 
+local remoteFireLoopActive = false
+
+local AutoStartInvasionToggle = InvasionTab:Toggle({
+    Title = "Auto Farm Mission Brainrot",
     Desc = "Auto Event",
     Default = false,
-    Flag = "AutoTomatoEvent",
+    Flag = "AutoStartInvasion",
     Callback = function(value)
         if value then
-            if isTomatoEventRunning then return end
-            isTomatoEventRunning = true
-                
+            if isAutoInvasionRunning then return end
+            isAutoInvasionRunning = true
+            isTeleportingToMission = false 
+            remoteFireLoopActive = false
+            MacUI:Notify({ Title = "Auto Invasion", Content = "เริ่มตรวจสอบ Timer...", Duration = 3 })
+
             task.spawn(function()
-                local player = game:GetService("Players").LocalPlayer
+                local chosenMissionBrainrot = nil 
+                local spawnerPosition = nil 
+
+                local function isPlayerInFarmZone(character, zone)
+                    if not character or not zone then return false end
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if not hrp then return false end
+                    local playerPos = hrp.Position; local zonePos = zone.Position; local zoneSize = zone.Size
+                    local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
+                    local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
+                    local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
+                    return (playerPos.X >= minX and playerPos.X <= maxX and playerPos.Y >= minY and playerPos.Y <= maxY and playerPos.Z >= minZ and playerPos.Z <= maxZ)
+                end
                 
-                local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                if humanoidRootPart and not getgenv().ActionLock then
-                    getgenv().ActionLock = true
-                    local initialPosition = humanoidRootPart.Position
-                    
-                    humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
-                    task.wait(1)
-                    
-                    local actionTextLabel = player.PlayerGui:FindFirstChild("ProximityPrompts", true) and player.PlayerGui.ProximityPrompts.Default.PromptFrame:FindFirstChild("ActionText")
-                    if actionTextLabel and actionTextLabel.Text == "Talk" then
-                        for _, p in ipairs(workspace:GetDescendants()) do if p:IsA("ProximityPrompt") then local dist=(p.Parent.Position-humanoidRootPart.Position).Magnitude; if dist<=p.MaxActivationDistance then p:InputHoldBegin();task.wait(p.HoldDuration);p:InputHoldEnd();break;end end end
+                local batPriority = {
+                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
+                    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+                }
+
+                while isAutoInvasionRunning do
+                    local player = Players.LocalPlayer
+                    if not player or not player.Character then 
+                        isAutoInvasionRunning = false 
+                        break 
                     end
                     
-                    task.wait(0.5)
-                    humanoidRootPart.CFrame = CFrame.new(initialPosition)
-                    getgenv().ActionLock = false
-                end
-
-                while isTomatoEventRunning do
-                    if not getgenv().ActionLock then
-                        local character = player.Character
-                        humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
-                        local checkmark = workspace:FindFirstChild("ScriptedMap", true) and workspace.ScriptedMap.Event:FindFirstChild("TomadeFloor", true) and workspace.ScriptedMap.Event.TomadeFloor:FindFirstChild("GuiAttachment", true) and workspace.ScriptedMap.Event.TomadeFloor.GuiAttachment.Billboard:FindFirstChild("Checkmark")
-
-                        if checkmark and checkmark.Visible == true then
-                            if humanoidRootPart then
-                                getgenv().ActionLock = true
-                                savedPosition = humanoidRootPart.Position
-                                humanoidRootPart.CFrame = CFrame.new(-162.08, 13.56, 1019.39)
-                                task.wait(1)
+                    if not isTeleportingToMission then 
+                        local timerFrame = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Right") and player.PlayerGui.Main.Right:FindFirstChild("ImminentAttackTimer")
+                        if timerFrame and timerFrame.Visible then
+                            local timeLabel = timerFrame:FindFirstChild("Main", true) and timerFrame.Main:FindFirstChild("Time")
+                            if timeLabel and timeLabel.Text == "READY!" then
+                                MacUI:Notify({ Title = "Auto Invasion", Content = "Invasion is Ready! Starting...", Duration = 3 })
+                                pcall(function() ReplicatedStorage.Remotes.MissionServicesRemotes.RequestStartInvasion:FireServer() end)
+                                task.wait(1) 
+                                isTeleportingToMission = true 
                                 
-                                local promptFrame = player.PlayerGui:WaitForChild("ProximityPrompts", 5) and player.PlayerGui.ProximityPrompts:WaitForChild("Default", 5) and player.PlayerGui.ProximityPrompts.Default:WaitForChild("PromptFrame", 5)
-                                local actionTextLabel = promptFrame and promptFrame:WaitForChild("ActionText", 5)
-                                if actionTextLabel and actionTextLabel.Text == "Claim" then
-                                    local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                                    if rootPart then
-                                        local promptPressed = false
-                                        for _, instance in ipairs(workspace:GetDescendants()) do
-                                            if instance:IsA("ProximityPrompt") then
-                                                local prompt = instance
-                                                local targetPart = prompt.Parent
-                                                if targetPart and targetPart:IsA("BasePart") then
-                                                    local distance = (targetPart.Position - rootPart.Position).Magnitude
-                                                    if distance <= prompt.MaxActivationDistance then
-                                                        prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
-                                                        promptPressed = true; break 
-                                                    end
-                                                end
-                                            end
-                                        end
-                                        if promptPressed then
-                                            task.wait(1)
-                                            if actionTextLabel.Text == "Talk" then
-                                                for _, instance in ipairs(workspace:GetDescendants()) do
-                                                    if instance:IsA("ProximityPrompt") then
-                                                        local prompt = instance
-                                                        local targetPart = prompt.Parent
-                                                        if targetPart and targetPart:IsA("BasePart") then
-                                                            local distance = (targetPart.Position - rootPart.Position).Magnitude
-                                                            if distance <= prompt.MaxActivationDistance then
-                                                                prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
-                                                                MacUI:Notify({ Title = "Tomade Torelli Event", Content = "Auto Event!", Duration = 2 }); break
+                                if not remoteFireLoopActive then
+                                    remoteFireLoopActive = true
+                                    task.spawn(function()
+                                        while isAutoInvasionRunning and isTeleportingToMission do
+                                            local missionBrainrotsFolder = workspace:FindFirstChild("ScriptedMap", true) and workspace.ScriptedMap:FindFirstChild("MissionBrainrots")
+                                            if missionBrainrotsFolder then
+                                                local brainrotList = missionBrainrotsFolder:GetChildren()
+                                                if #brainrotList > 0 then
+                                                    for _, brainrotModel in ipairs(brainrotList) do
+                                                        if not isAutoInvasionRunning or not isTeleportingToMission then break end
+                                                        if brainrotModel and brainrotModel.Parent then 
+                                                            local id = brainrotModel:GetAttribute("ID")
+                                                            if id then
+                                                                local args = {[1] = {["NormalBrainrots"] = {}, ["MissionBrainrots"] = { id }}}
+                                                                ReplicatedStorage.Remotes.AttacksServer.WeaponAttack:FireServer(unpack(args))
+                                                                task.wait(0.1) 
                                                             end
                                                         end
                                                     end
+                                                else
+                                                    task.wait(0.5)
+                                                end
+                                            else
+                                                task.wait(0.5)
+                                            end
+                                        end
+                                        remoteFireLoopActive = false
+                                    end)
+                                end
+                            end
+                        end
+                        task.wait(0.5)
+                    else 
+                        local victoryScreen = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Victory_Screen")
+                        if victoryScreen and victoryScreen.Visible then
+                            MacUI:Notify({ Title = "Auto Invasion", Content = "Invasion Complete! Returning to wait mode...", Duration = 4 })
+                            isTeleportingToMission = false 
+                            chosenMissionBrainrot = nil 
+                            task.wait(0.5) 
+                        else
+                            local myPlot
+                            for i = 1, 6 do
+                                local plot = workspace.Plots:FindFirstChild(tostring(i))
+                                if plot and plot:GetAttribute("Owner") == player.Name then myPlot = plot; break end
+                            end
+
+                            if myPlot and player.Character then
+                                if not spawnerPosition then
+                                    local spawner = myPlot:FindFirstChild("SpawnerUI", true); if spawner and spawner:IsA("BasePart") then spawnerPosition = spawner.Position end
+                                end
+
+                                local farmZone = workspace:FindFirstChild("FarmZonePart") 
+                                if farmZone and not isPlayerInFarmZone(player.Character, farmZone) then
+                                    if spawnerPosition then player.Character:MoveTo(spawnerPosition); task.wait(1) end
+                                else
+                                    local missionBrainrotsFolder = workspace:FindFirstChild("ScriptedMap", true) and workspace.ScriptedMap:FindFirstChild("MissionBrainrots")
+                                    if missionBrainrotsFolder then
+                                        local list = missionBrainrotsFolder:GetChildren()
+                                        if not chosenMissionBrainrot or not chosenMissionBrainrot.Parent then
+                                            if #list > 0 then chosenMissionBrainrot = list[math.random(1, #list)] else chosenMissionBrainrot = nil end
+                                        end
+                                        
+                                        if chosenMissionBrainrot and chosenMissionBrainrot.Parent then
+                                            player.Character:MoveTo(chosenMissionBrainrot:GetPivot().Position)
+                                            
+                                            local character = player.Character; local humanoid = character and character:FindFirstChild("Humanoid")
+                                            if humanoid then
+                                                local bestBatFound = nil
+                                                for _, batName in ipairs(batPriority) do local foundBat = player.Backpack:FindFirstChild(batName) or (character and character:FindFirstChild(batName)); if foundBat then bestBatFound = foundBat; break end end
+                                                if bestBatFound then
+                                                    if not character:FindFirstChild(bestBatFound.Name) then humanoid:EquipTool(bestBatFound); task.wait(0.1) end
+                                                    if character:FindFirstChild(bestBatFound.Name) then bestBatFound:Activate() end
                                                 end
                                             end
-                                            task.wait(0.5)
-                                            humanoidRootPart.CFrame = CFrame.new(savedPosition)
-                                            savedPosition = nil
                                         end
                                     end
                                 end
-                                getgenv().ActionLock = false
                             end
+                            task.wait(0.1)
                         end
                     end
-                    task.wait(1)
+                end
+                
+                if not isAutoInvasionRunning then
+                     isTeleportingToMission = false
                 end
             end)
         else
-            if isTomatoEventRunning then
-                isTomatoEventRunning = false
-                if savedPosition then
-                    local player = game:GetService("Players").LocalPlayer; local char = player.Character; local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    if hrp then hrp.CFrame = CFrame.new(savedPosition) end
-                    savedPosition = nil
-                end
-            end
+            isAutoInvasionRunning = false 
         end
     end
 })
+
+
 
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
