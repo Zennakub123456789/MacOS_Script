@@ -1886,7 +1886,7 @@ _G.AutoStartInvasion = false
 
 local AutoStartInvasion = EventTab:Toggle({
     Title = "Auto Start Invasion",
-    Desc = "รอจนกว่า Invasion จะ 'READY!' แล้วกดเริ่มให้",
+    Desc = "Auo Start Event",
     Default = false,
     Flag = "AutoStartInvasion",
     Callback = function(value)
@@ -1930,6 +1930,106 @@ local AutoStartInvasion = EventTab:Toggle({
             end)
         else
             -- Stop
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local workspace = game:GetService("Workspace")
+
+local isKillAuraRunning = false
+
+local MissionBrainrotKillAuraToggle = EventTab:Toggle({
+    Title = "Mission Brainrot kill Aura",
+    Desc = "Continuously fires attack remote for all mission brainrots",
+    Default = false,
+    Flag = "AutoRemoteAttack",
+    Callback = function(value)
+        if value then
+            if isKillAuraRunning then return end
+            isKillAuraRunning = true
+            MacUI:Notify({ Title = "Mission Brainrot kill Aura", Content = "Started", Duration = 3 })
+
+            task.spawn(function()
+                local batPriority = {
+                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
+                    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+                }
+
+                while isKillAuraRunning do
+                    local player = Players.LocalPlayer
+                    local character = player.Character
+                    local humanoid = character and character:FindFirstChild("Humanoid")
+
+                    if not player or not character or not humanoid then
+                        isKillAuraRunning = false
+                        break
+                    end
+
+                    local missionBrainrotsFolder = workspace:FindFirstChild("ScriptedMap", true) and workspace.ScriptedMap:FindFirstChild("MissionBrainrots")
+                    if missionBrainrotsFolder then
+                        local brainrotList = missionBrainrotsFolder:GetChildren()
+
+                        if #brainrotList > 0 then
+                            local bestBatFound = nil
+                            for _, batName in ipairs(batPriority) do
+                                local foundBat = player.Backpack:FindFirstChild(batName) or (character and character:FindFirstChild(batName))
+                                if foundBat then
+                                    bestBatFound = foundBat
+                                    break
+                                end
+                            end
+
+                            if bestBatFound then
+                                if not character:FindFirstChild(bestBatFound.Name) then
+                                    humanoid:EquipTool(bestBatFound)
+                                    task.wait(0.1)
+                                end
+                            end
+
+                            for _, brainrotModel in ipairs(brainrotList) do
+                                if not isKillAuraRunning then break end
+
+                                if brainrotModel and brainrotModel.Parent then
+                                    local id = brainrotModel:GetAttribute("ID")
+                                    if id then
+                                        local args = {
+                                            [1] = {
+                                                ["NormalBrainrots"] = {},
+                                                ["MissionBrainrots"] = {
+                                                    [1] = id
+                                                }
+                                            }
+                                        }
+                                        pcall(function()
+                                            ReplicatedStorage.Remotes.AttacksServer.WeaponAttack:FireServer(unpack(args))
+                                        end)
+                                    end
+                                end
+                            end
+                            task.wait(0.1)
+                        else
+                            humanoid:UnequipTools()
+                            task.wait(0.5)
+                        end
+                    else
+                        humanoid:UnequipTools()
+                        task.wait(0.5)
+                    end
+                end
+
+                if not isKillAuraRunning then
+                    if humanoid then humanoid:UnequipTools() end
+                    MacUI:Notify({ Title = "Mission Brainrot kill Aura", Content = "Stopped", Duration = 3 })
+                end
+            end)
+        else
+            isKillAuraRunning = false
+            local player = Players.LocalPlayer
+            local character = player.Character
+            local humanoid = character and character:FindFirstChild("Humanoid")
+            if humanoid then humanoid:UnequipTools() end
         end
     end
 })
