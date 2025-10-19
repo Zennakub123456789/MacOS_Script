@@ -1736,7 +1736,7 @@ local isAutoInvasionRunning = false
 local isTeleportingToMission = false 
 local remoteFireLoopActive = false
 
-local AutoStartInvasionToggle = InvasionTab:Toggle({
+local AutoStartInvasionToggle = EventTab:Toggle({
     Title = "Auto Farm Mission Brainrot",
     Desc = "Auto Event",
     Default = false,
@@ -1879,7 +1879,61 @@ local AutoStartInvasionToggle = InvasionTab:Toggle({
     end
 })
 
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local workspace = game:GetService("Workspace")
 
+_G.AutoStartInvasion = false
+
+local AutoStartInvasion = EventTab:Toggle({
+    Title = "Auto Start Invasion",
+    Desc = "รอจนกว่า Invasion จะ 'READY!' แล้วกดเริ่มให้",
+    Default = false,
+    Flag = "AutoStartInvasion",
+    Callback = function(value)
+        _G.AutoStartInvasion = value
+        
+        if value then
+            task.spawn(function()
+                local isWaitingForVictory = false
+                
+                while _G.AutoStartInvasion do
+                    local player = Players.LocalPlayer
+                    if not player or not player.Character then 
+                        _G.AutoStartInvasion = false
+                        break 
+                    end
+                    
+                    if not isWaitingForVictory then 
+                        local timerFrame = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Right") and player.PlayerGui.Main.Right:FindFirstChild("ImminentAttackTimer")
+                        if timerFrame and timerFrame.Visible then
+                            local timeLabel = timerFrame:FindFirstChild("Main", true) and timerFrame.Main:FindFirstChild("Time")
+                            if timeLabel and timeLabel.Text == "READY!" then
+                                
+                                pcall(function() ReplicatedStorage.Remotes.MissionServicesRemotes.RequestStartInvasion:FireServer() end)
+                                
+                                task.wait(1) 
+                                isWaitingForVictory = true
+                            end
+                        end
+                        task.wait(0.5)
+                    
+                    else 
+                        local victoryScreen = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Victory_Screen")
+                        if victoryScreen and victoryScreen.Visible then
+                            isWaitingForVictory = false
+                            task.wait(2)
+                        else
+                            task.wait(1)
+                        end
+                    end
+                end
+            end)
+        else
+            -- Stop
+        end
+    end
+})
 
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
