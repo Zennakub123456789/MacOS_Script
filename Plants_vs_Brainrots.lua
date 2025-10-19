@@ -48,14 +48,13 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.5.4)
+    Code = [[# PvB Script Update! (v1.6.4)
 
 ## What’s new:
 
-- [/]  Fix Auto Favorite Brainrot By Rarity Don't Work
-- [/] Fix Auto Favorite Plants By Rarity Don't Work
-- [/] Fix Auto Favorite Brainrot by Mutation Don't Work 
-- [/] Fix Auto Favorite Plants By Mutation Don't Work ]]
+- [-] Remove Auto Tomato Event 
+- [+] Add Auto Mission Brainrot 
+- [+] Add Auto Start Invasion Event ]]
 })
 
 infoTab:Section("Discord")
@@ -2116,14 +2115,13 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.5.4)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.6.4)
 
 ## What’s new:
 
-- [/]  Fix Auto Favorite Brainrot By Rarity Don't Work
-- [/] Fix Auto Favorite Plants By Rarity Don't Work
-- [/] Fix Auto Favorite Brainrot by Mutation Don't Work 
-- [/] Fix Auto Favorite Plants By Mutation Don't Work ]])
+- [-] Remove Auto Tomato Event 
+- [+] Add Auto Mission Brainrot 
+- [+] Add Auto Start Invasion Event ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2178,14 +2176,13 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพพืชปะทะเบรนร็อต สคริปอัพเดท! (v1.5.4)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.6.4)
 
-## มีอะไรใหม่บ้าง:
+## มีอะไรใหม่:
 
-- [/] แก้ไข ออโต้ล็อคหัวใจเบรนร็อตโดยความหายากไม่ทำงาน
-- [/] แก้ไข ออโต้ล็อคหัวใจพืชโดยความหายากไม่ทำงาน
-- [/] แก้ไข ออโต้ล็อคหัวใจเบรนร็อตโดยการกลายพันธุ์ไม่ทำงาน
-- [/] แก้ไข ออโต้ล็อคหัวใจพืชโดยการกลายพันธุ์ไม่ทำงาน ]])
+- [-] ลบ ออโต้ทำภารกิจของมะเขือเทศอัตโนมัติ 
+- [+] เพิ่ม ออโต้ภารกิจ Brainrots อัตโนมัติ
+- [+] เพิ่ม ออโต้เหตุการณ์การบุกรุกจะเริ่มให้อัตโนมัติ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2257,7 +2254,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.5.4",
+    Content = "Tad Hub PvB | 1.6.4",
     Duration = 10
 })
 
