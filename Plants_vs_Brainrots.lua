@@ -2230,7 +2230,6 @@ local languageScripts = {
         TeleportFixedButton:SetTitle("วาปไปอีเว้น")
         TeleportFixedButton:SetDesc("วาปไปสถานที่อีเว้น")
         AutoDailyEventToggle:SetTitle("ออโต้ทำอีเว้นรายวันอัตโนมัติ")
-        AutoTomatoEventToggle:SetTitle("ออโต้รับของจาก Tomade Torelli")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
