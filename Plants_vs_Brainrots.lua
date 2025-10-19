@@ -1730,22 +1730,23 @@ EventTab:Section("Invasion Event")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService") 
 
-local isAutoInvasionRunning = false
-local isTeleportingToMission = false 
-local remoteFireLoopActive = false
+local isMissionBrainrotAutoRunning = false
+local isMissionBrainrotTeleporting = false 
+local missionBrainrotRemoteFireLoopActive = false 
 
-local AutoStartInvasionToggle = EventTab:Toggle({
+local AutoMissionBrainrotToggle = EventTab:Toggle({
     Title = "Auto Farm Mission Brainrot",
     Desc = "Auto Event",
     Default = false,
-    Flag = "AutoStartInvasion",
+    Flag = "AutoStartInvasion", 
     Callback = function(value)
         if value then
-            if isAutoInvasionRunning then return end
-            isAutoInvasionRunning = true
-            isTeleportingToMission = false 
-            remoteFireLoopActive = false
+            if isMissionBrainrotAutoRunning then return end
+            isMissionBrainrotAutoRunning = true
+            isMissionBrainrotTeleporting = false 
+            missionBrainrotRemoteFireLoopActive = false
             MacUI:Notify({ Title = "Auto Invasion", Content = "เริ่มตรวจสอบ Timer...", Duration = 3 })
 
             task.spawn(function()
@@ -1768,14 +1769,14 @@ local AutoStartInvasionToggle = EventTab:Toggle({
                     "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
                 }
 
-                while isAutoInvasionRunning do
+                while isMissionBrainrotAutoRunning do
                     local player = Players.LocalPlayer
                     if not player or not player.Character then 
-                        isAutoInvasionRunning = false 
+                        isMissionBrainrotAutoRunning = false 
                         break 
                     end
                     
-                    if not isTeleportingToMission then 
+                    if not isMissionBrainrotTeleporting then 
                         local timerFrame = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Right") and player.PlayerGui.Main.Right:FindFirstChild("ImminentAttackTimer")
                         if timerFrame and timerFrame.Visible then
                             local timeLabel = timerFrame:FindFirstChild("Main", true) and timerFrame.Main:FindFirstChild("Time")
@@ -1783,18 +1784,18 @@ local AutoStartInvasionToggle = EventTab:Toggle({
                                 MacUI:Notify({ Title = "Auto Invasion", Content = "Invasion is Ready! Starting...", Duration = 3 })
                                 pcall(function() ReplicatedStorage.Remotes.MissionServicesRemotes.RequestStartInvasion:FireServer() end)
                                 task.wait(1) 
-                                isTeleportingToMission = true 
+                                isMissionBrainrotTeleporting = true 
                                 
-                                if not remoteFireLoopActive then
-                                    remoteFireLoopActive = true
+                                if not missionBrainrotRemoteFireLoopActive then
+                                    missionBrainrotRemoteFireLoopActive = true
                                     task.spawn(function()
-                                        while isAutoInvasionRunning and isTeleportingToMission do
+                                        while isMissionBrainrotAutoRunning and isMissionBrainrotTeleporting do
                                             local missionBrainrotsFolder = workspace:FindFirstChild("ScriptedMap", true) and workspace.ScriptedMap:FindFirstChild("MissionBrainrots")
                                             if missionBrainrotsFolder then
                                                 local brainrotList = missionBrainrotsFolder:GetChildren()
                                                 if #brainrotList > 0 then
                                                     for _, brainrotModel in ipairs(brainrotList) do
-                                                        if not isAutoInvasionRunning or not isTeleportingToMission then break end
+                                                        if not isMissionBrainrotAutoRunning or not isMissionBrainrotTeleporting then break end 
                                                         if brainrotModel and brainrotModel.Parent then 
                                                             local id = brainrotModel:GetAttribute("ID")
                                                             if id then
@@ -1805,24 +1806,35 @@ local AutoStartInvasionToggle = EventTab:Toggle({
                                                         end
                                                     end
                                                 else
-                                                    task.wait(0.5)
+                                                    task.wait(0.5) 
                                                 end
                                             else
-                                                task.wait(0.5)
+                                                task.wait(0.5) 
                                             end
                                         end
-                                        remoteFireLoopActive = false
+                                        missionBrainrotRemoteFireLoopActive = false 
                                     end)
                                 end
                             end
                         end
-                        task.wait(0.5)
+                        task.wait(0.5) 
                     else 
                         local victoryScreen = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Victory_Screen")
                         if victoryScreen and victoryScreen.Visible then
-                            MacUI:Notify({ Title = "Auto Invasion", Content = "Invasion Complete! Returning to wait mode...", Duration = 4 })
-                            isTeleportingToMission = false 
+                            MacUI:Notify({ Title = "Auto Invasion", Content = "Invasion Complete! Clicking screen...", Duration = 4 })
+                            isMissionBrainrotTeleporting = false 
                             chosenMissionBrainrot = nil 
+                            
+                            for _ = 1, 3 do
+                                if not isMissionBrainrotAutoRunning then break end 
+                                local clickPosition = Vector2.new(
+                                    workspace.CurrentCamera.ViewportSize.X * 0.5, 
+                                    workspace.CurrentCamera.ViewportSize.Y * 0.8 
+                                )
+                                UserInputService:InvokeMouseButton1Click(clickPosition)
+                                task.wait(0.2) 
+                            end
+                            
                             task.wait(0.5) 
                         else
                             local myPlot
@@ -1863,17 +1875,18 @@ local AutoStartInvasionToggle = EventTab:Toggle({
                                     end
                                 end
                             end
-                            task.wait(0.1)
+                            task.wait(0.1) 
                         end
                     end
                 end
                 
-                if not isAutoInvasionRunning then
-                     isTeleportingToMission = false
+                if not isMissionBrainrotAutoRunning then
+                     isMissionBrainrotTeleporting = false 
+                     MacUI:Notify({ Title = "Auto Invasion", Content = "หยุดตรวจสอบ Timer/Teleport/Hit", Duration = 3 })
                 end
             end)
         else
-            isAutoInvasionRunning = false 
+            isMissionBrainrotAutoRunning = false 
         end
     end
 })
@@ -1884,7 +1897,7 @@ local workspace = game:GetService("Workspace")
 
 _G.AutoStartInvasion = false
 
-local AutoStartInvasion = EventTab:Toggle({
+local AutoStartInvasionToggle = EventTab:Toggle({
     Title = "Auto Start Invasion",
     Desc = "Auo Start Event",
     Default = false,
@@ -2266,8 +2279,9 @@ local languageScripts = {
         TeleportFixedButton:SetTitle("Teleport to Prison Event")
         TeleportFixedButton:SetDesc("Goto Event Area")
         AutoDailyEventToggle:SetTitle("Auto Daily Event")
-        AutoStartInvasionToggle:SetTitle("Auto Farm Mission Brainrots + Everything")
-        AutoStartInvasion:SetTitle("Auto Start Invasion Event")
+        AutoMissionBrainrotToggle:SetTitle("Auto Farm Mission Brainrots + Everything")
+        AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
+        MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2328,8 +2342,9 @@ local languageScripts = {
         TeleportFixedButton:SetTitle("วาปไปอีเว้น")
         TeleportFixedButton:SetDesc("วาปไปสถานที่อีเว้น")
         AutoDailyEventToggle:SetTitle("ออโต้ทำอีเว้นรายวันอัตโนมัติ")
-        AutoStartInvasionToggle:SetTitle("ออโต้ฟาร์มภารกิจ เบรนร็อต + ทำทุกอย่างในอีเว้น")
-        AutoStartInvasion:SetTitle("เริ่มการบุกอัตโนมัติ")
+        AutoMissionBrainrotToggle:SetTitle("ออโต้ฟาร์มภารกิจ เบรนร็อต + ทำทุกอย่างในอีเว้น")
+        AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
+        MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
