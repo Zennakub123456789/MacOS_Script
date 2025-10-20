@@ -612,7 +612,7 @@ local function bringSaplingsToFireCircle()
 end
 
 local CircleRadiusSlider = AutoTab:Slider({
-    Title = "Size",
+    Title = "Build Size",
     Desc = "Radius for Circle, Size for Square",
     Min = 5,
     Max = 25,
@@ -625,7 +625,7 @@ local CircleRadiusSlider = AutoTab:Slider({
 getgenv().CircleRadius = CircleRadiusSlider:Get()
 
 local ModeDropdown = AutoTab:Dropdown({
-    Title = "Bring Mode",
+    Title = "Building Mode",
     Options = {"Circle", "Square"},
     Default = "Circle",
     Flag = "BringMode",
@@ -636,16 +636,16 @@ local ModeDropdown = AutoTab:Dropdown({
 getgenv().BringMode = ModeDropdown:Get()
 
 local BringSaplingsButton = AutoTab:Button({
-    Title = "Bring Saplings to Fire",
-    Desc = "Brings saplings. (Obeys Mode, Size, and Wait Toggle)",
+    Title = "Bring Saplings",
+    Desc = "Bring Sapling",
     Callback = function()
         task.spawn(bringSaplingsToFireCircle)
     end
 })
 
 local AutoPlantButton = AutoTab:Button({
-    Title = "Auto Plant Brought Saplings",
-    Desc = "Plants ONLY the saplings that were brought by the button above.",
+    Title = "Plant Saplings",
+    Desc = "Auto Plant Sapling",
     Callback = function()
         task.spawn(function()
             local saplingsToPlant = getgenv().BroughtSaplings
@@ -691,7 +691,7 @@ local AutoPlantButton = AutoTab:Button({
 })
 
 local WaitForFullToggle = AutoTab:Toggle({
-    Title = "Wait For Full Shape",
+    Title = "Wait until the Sapling is full before Bring",
     Desc = "If ON, 'Bring' button will wait until you have enough saplings.",
     Default = false,
     Flag = "WaitForFull",
@@ -702,7 +702,7 @@ local WaitForFullToggle = AutoTab:Toggle({
 getgenv().WaitForFull = WaitForFullToggle:Get()
 
 local PreviewToggle = AutoTab:Toggle({
-    Title = "Preview Bring Shape",
+    Title = "Preview Build",
     Desc = "Shows a preview based on Mode and Size.",
     Default = false,
     Flag = "PreviewTreeToggle",
