@@ -432,10 +432,9 @@ CheckChestToggle = AutoTab:Toggle({
                                         if itemPart then
                                             local distance = (itemPart.Position - dropPosition).Magnitude
                                             
-                                            -- ▼▼▼ [ปรับปรุง] นำ task.wait(0.1) กลับมา ▼▼▼
                                             if distance <= checkRadius then
                                                 bringItemToPlayer(item)
-                                                task.wait(0.1) -- รอ 0.1 วินาที ก่อนไปเก็บชิ้นต่อไป
+                                                task.wait(0.1)
                                             end
                                         end
                                     end
