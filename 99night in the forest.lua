@@ -35,6 +35,123 @@ local Window = MacUI:Window({
     }
 })
 
+local MainTab = Window:Tab("Main", "rbxassetid://7733779610")
+
+AutoTab:Section("Tree Aura")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = game:GetService("Players").LocalPlayer
+local PlayerInventory = player:WaitForChild("Inventory")
+local CurrentCamera = workspace.CurrentCamera
+
+local ToolDamageObject = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject")
+
+local axeNames = {
+    "Admin Axe",
+    "Chainsaw",
+    "Strong Axe",
+    "Ice Axe",
+    "Good Axe",
+    "Old Axe"
+}
+
+local function findBestPlayerAxe()
+    for _, axeName in ipairs(axeNames) do
+        local axe = PlayerInventory:FindFirstChild(axeName)
+        if axe then
+            return axe
+        end
+    end
+    return nil
+end
+
+local treeOptions = {"Small Tree", "Small Webbed Tree"}
+
+local TreeSelectorDropdown = MainTab:Dropdown({
+    Title = "Select Trees to Hit",
+    Options = treeOptions,
+    Multi = true,
+    Default = {"Small Tree"},
+    Flag = "SelectedTreesToHit",
+    Callback = function(selected)
+        getgenv().TreesToHit = selected
+    end
+})
+getgenv().TreesToHit = TreeSelectorDropdown:Get()
+
+local HitRangeSlider = MainTab:Slider({
+    Title = "Hit Range (Studs)",
+    Min = 5,
+    Max = 2000,
+    Default = 500,
+    Flag = "AutoHitTreeRange",
+    Callback = function(value)
+        getgenv().AutoHitTreeRange = value
+    end
+})
+getgenv().AutoHitTreeRange = HitRangeSlider:Get()
+
+local AutoHitTreeToggle
+AutoHitTreeToggle = MainTab:Toggle({
+    Title = "Auto Hit Trees (Aura)",
+    Default = false,
+    Flag = "AutoHitTree",
+    Callback = function(state)
+        getgenv().AutoHitTree = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().AutoHitTree do
+                    local currentAxe = findBestPlayerAxe()
+                    local character = player.Character
+                    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                    local currentRange = getgenv().AutoHitTreeRange or 20
+                    local treesToHit = getgenv().TreesToHit
+                    
+                    if currentAxe and hrp and treesToHit and #treesToHit > 0 then
+                        local hrpPosition = hrp.Position
+
+                        for _, tree in ipairs(workspace.Map.Foliage:GetChildren()) do
+                            if tree:IsA("Model") and tree.PrimaryPart and table.find(treesToHit, tree.Name) then
+                                if (tree.PrimaryPart.Position - hrpPosition).Magnitude <= currentRange then
+                                    task.spawn(function()
+                                        local args = {
+                                            [1] = tree,
+                                            [2] = currentAxe,
+                                            [3] = "19_4128505180",
+                                            [4] = hrp.CFrame
+                                        }
+                                        pcall(function() ToolDamageObject:InvokeServer(unpack(args)) end)
+                                    end)
+                                end
+                            end
+                        end
+
+                        for _, tree in ipairs(workspace.Map.Landmarks:GetChildren()) do
+                            if tree:IsA("Model") and tree.PrimaryPart and table.find(treesToHit, tree.Name) then
+                                if (tree.PrimaryPart.Position - hrpPosition).Magnitude <= currentRange then
+                                    task.spawn(function()
+                                        local args = {
+                                            [1] = tree,
+                                            [2] = currentAxe,
+                                            [3] = "24_4128505180",
+                                            [4] = hrp.CFrame
+                                        }
+                                        pcall(function() ToolDamageObject:InvokeServer(unpack(args)) end)
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                    
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
 local AutoTab = Window:Tab("Auto", "rbxassetid://7733779610")
 
 AutoTab:Section("Auto Correct")
