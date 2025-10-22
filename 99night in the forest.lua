@@ -231,6 +231,101 @@ AutoHitTreeToggle = AutoTab:Toggle({
     end
 })
 
+MainTab:Section("Kill Aura")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = game:GetService("Players").LocalPlayer
+local PlayerInventory = player:WaitForChild("Inventory")
+local CurrentCamera = workspace.CurrentCamera
+
+local ToolDamageObject = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject")
+
+local axeNames = {
+    "Admin Axe", "Chainsaw", "Strong Axe", "Ice Axe", "Good Axe", "Old Axe"
+}
+local meleeWeaponNames = {
+    "Spear", "Morningstar", "Katana", "Laser Sword", "Ice Sword",
+    "Trident", "Poison Spear", "Infernal Sword", "Cultist King Mace", "Obsidiron Hammer"
+}
+
+local function findCurrentWeapon()
+    local character = player.Character
+    if character then
+        for _, weaponName in ipairs(meleeWeaponNames) do
+            local heldWeapon = character:FindFirstChild(weaponName)
+            if heldWeapon and heldWeapon:IsA("Tool") then
+                return heldWeapon
+            end
+        end
+    end
+
+    for _, axeName in ipairs(axeNames) do
+        local axe = PlayerInventory:FindFirstChild(axeName)
+        if axe then
+            return axe
+        end
+    end
+    
+    return nil
+end
+
+local AttackRangeSlider = MainTab:Slider({
+    Title = "Kill Aura Range",
+    Min = 5,
+    Max = 500,
+    Default = 50,
+    Flag = "AutoAttackRange",
+    Callback = function(value)
+        getgenv().AutoAttackRange = value
+    end
+})
+getgenv().AutoAttackRange = AttackRangeSlider:Get()
+
+local AutoAttackToggle
+AutoAttackToggle = MainTab:Toggle({
+    Title = "Kill Aura",
+    Default = false,
+    Flag = "AutoAttackAll",
+    Callback = function(state)
+        getgenv().AutoAttackAll = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().AutoAttackAll do
+                    local currentWeapon = findCurrentWeapon() 
+                    local character = player.Character
+                    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                    local currentRange = getgenv().AutoAttackRange or 15
+                    local charactersFolder = workspace:FindFirstChild("Characters")
+
+                    if currentWeapon and hrp and charactersFolder then
+                        local hrpPosition = hrp.Position
+
+                        for _, target in ipairs(charactersFolder:GetChildren()) do
+                            if target:IsA("Model") and target.PrimaryPart then
+                                if (target.PrimaryPart.Position - hrpPosition).Magnitude <= currentRange then
+                                    task.spawn(function()
+                                        local args = {
+                                            [1] = target,
+                                            [2] = currentWeapon,
+                                            [3] = "3_4128505180", 
+                                            [4] = hrp.CFrame
+                                        }
+                                        pcall(function() ToolDamageObject:InvokeServer(unpack(args)) end)
+                                    end)
+                                end
+                            end
+                        end
+                    end
+
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end
+})
+
 local AutoTab = Window:Tab("Auto", "rbxassetid://7733779610")
 
 AutoTab:Section("Auto Correct")
