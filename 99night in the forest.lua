@@ -125,7 +125,7 @@ end
 
 local treeOptions = {"Small Tree", "Small Webbed Tree", "Snowy Small Tree", "Big Tree"}
 
-local TreeSelectorDropdown = AutoTab:Dropdown({
+local TreeSelectorDropdown = MainTab:Dropdown({
     Title = "Select Trees to Hit",
     Options = treeOptions,
     Multi = true,
@@ -137,7 +137,7 @@ local TreeSelectorDropdown = AutoTab:Dropdown({
 })
 getgenv().TreesToHit = TreeSelectorDropdown:Get()
 
-local HitRangeSlider = AutoTab:Slider({
+local HitRangeSlider = MainTab:Slider({
     Title = "Hit Range (Studs)",
     Min = 5,
     Max = 250,
@@ -150,7 +150,7 @@ local HitRangeSlider = AutoTab:Slider({
 getgenv().AutoHitTreeRange = HitRangeSlider:Get()
 
 local AutoHitTreeToggle
-AutoHitTreeToggle = AutoTab:Toggle({
+AutoHitTreeToggle = MainTab:Toggle({
     Title = "Auto Hit Trees (Aura)",
     Default = false,
     Flag = "AutoHitTree",
