@@ -37,7 +37,7 @@ local Window = MacUI:Window({
 
 local MainTab = Window:Tab("Main", "rbxassetid://7733779610")
 
-AutoTab:Section("Tree Aura")
+MainTab:Section("Tree Aura")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualInputManager = game:GetService("VirtualInputManager")
