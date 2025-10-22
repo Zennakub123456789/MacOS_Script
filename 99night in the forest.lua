@@ -56,6 +56,13 @@ local axeNames = {
     "Old Axe"
 }
 
+local strongAxes = {"Admin Axe", "Chainsaw", "Strong Axe"}
+
+local bigTreeModelNames = {
+    "TreeBig1", "TreeBig2", "TreeBig3",
+    "WebbedTreeBig1", "WebbedTreeBig2", "WebbedTreeBig3"
+}
+
 local function findBestPlayerAxe()
     for _, axeName in ipairs(axeNames) do
         local axe = PlayerInventory:FindFirstChild(axeName)
@@ -66,9 +73,59 @@ local function findBestPlayerAxe()
     return nil
 end
 
-local treeOptions = {"Small Tree", "Small Webbed Tree"}
+local function updateHealthBillboard(treeModel)
+    local trunk = treeModel:FindFirstChild("Trunk")
+    if not trunk then return end
 
-local TreeSelectorDropdown = MainTab:Dropdown({
+    local health = treeModel:GetAttribute("Health")
+    local maxHealth = treeModel:GetAttribute("MaxHealth")
+    
+    if not health or not maxHealth or maxHealth <= 0 then return end
+
+    local healthPercent = math.clamp(health / maxHealth, 0, 1)
+
+    local billboardGui = trunk:FindFirstChild("HealthBillboard")
+    if not billboardGui then
+        billboardGui = Instance.new("BillboardGui")
+        billboardGui.Name = "HealthBillboard"
+        billboardGui.Adornee = trunk
+        billboardGui.Size = UDim2.new(0, 100, 0, 10)
+        billboardGui.StudsOffset = Vector3.new(0, 5, 0)
+        billboardGui.AlwaysOnTop = true
+        billboardGui.Parent = trunk
+
+        local background = Instance.new("Frame")
+        background.Name = "Background"
+        background.Size = UDim2.new(1, 0, 1, 0)
+        background.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        background.BorderSizePixel = 0
+        background.Parent = billboardGui
+
+        local bar = Instance.new("Frame")
+        bar.Name = "Bar"
+        bar.Size = UDim2.new(healthPercent, 0, 1, 0)
+        bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        bar.BorderSizePixel = 0
+        bar.Parent = background
+    else
+        local background = billboardGui:FindFirstChild("Background")
+        local bar = background and background:FindFirstChild("Bar")
+        if bar then
+            bar.Size = UDim2.new(healthPercent, 0, 1, 0)
+            if healthPercent < 0.3 then
+                bar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            elseif healthPercent < 0.6 then
+                bar.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+            else
+                bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            end
+        end
+    end
+end
+
+local treeOptions = {"Small Tree", "Small Webbed Tree", "Snowy Small Tree", "Big Tree"}
+
+local TreeSelectorDropdown = AutoTab:Dropdown({
     Title = "Select Trees to Hit",
     Options = treeOptions,
     Multi = true,
@@ -80,11 +137,11 @@ local TreeSelectorDropdown = MainTab:Dropdown({
 })
 getgenv().TreesToHit = TreeSelectorDropdown:Get()
 
-local HitRangeSlider = MainTab:Slider({
+local HitRangeSlider = AutoTab:Slider({
     Title = "Hit Range (Studs)",
     Min = 5,
-    Max = 2000,
-    Default = 500,
+    Max = 250,
+    Default = 150,
     Flag = "AutoHitTreeRange",
     Callback = function(value)
         getgenv().AutoHitTreeRange = value
@@ -93,7 +150,7 @@ local HitRangeSlider = MainTab:Slider({
 getgenv().AutoHitTreeRange = HitRangeSlider:Get()
 
 local AutoHitTreeToggle
-AutoHitTreeToggle = MainTab:Toggle({
+AutoHitTreeToggle = AutoTab:Toggle({
     Title = "Auto Hit Trees (Aura)",
     Default = false,
     Flag = "AutoHitTree",
@@ -111,41 +168,63 @@ AutoHitTreeToggle = MainTab:Toggle({
                     
                     if currentAxe and hrp and treesToHit and #treesToHit > 0 then
                         local hrpPosition = hrp.Position
+                        
+                        local hitBigTreeSelected = table.find(treesToHit, "Big Tree")
+                        local canHitBigTree = hitBigTreeSelected and table.find(strongAxes, currentAxe.Name)
 
-                        for _, tree in ipairs(workspace.Map.Foliage:GetChildren()) do
-                            if tree:IsA("Model") and tree.PrimaryPart and table.find(treesToHit, tree.Name) then
+                        local otherTreesToHit = {}
+                        for _, treeName in ipairs(treesToHit) do
+                            if treeName ~= "Big Tree" then
+                                table.insert(otherTreesToHit, treeName)
+                            end
+                        end
+
+                        local function fireRemote(tree, axe, idString)
+                             task.spawn(function()
+                                local args = {
+                                    [1] = tree,
+                                    [2] = axe,
+                                    [3] = idString,
+                                    [4] = hrp.CFrame
+                                }
+                                pcall(function() ToolDamageObject:InvokeServer(unpack(args)) end)
+                            end)                           
+                        end
+
+                        local function processNormalTree(tree, folderIdString)
+                            if tree:IsA("Model") and tree.PrimaryPart and table.find(otherTreesToHit, tree.Name) then
                                 if (tree.PrimaryPart.Position - hrpPosition).Magnitude <= currentRange then
-                                    task.spawn(function()
-                                        local args = {
-                                            [1] = tree,
-                                            [2] = currentAxe,
-                                            [3] = "19_4128505180",
-                                            [4] = hrp.CFrame
-                                        }
-                                        pcall(function() ToolDamageObject:InvokeServer(unpack(args)) end)
-                                    end)
+                                    updateHealthBillboard(tree)
+                                    fireRemote(tree, currentAxe, folderIdString)
                                 end
                             end
+                        end
+
+                        local function processBigTree(tree, folderIdString)
+                             if tree:IsA("Model") and tree.PrimaryPart and table.find(bigTreeModelNames, tree.Name) then
+                                if (tree.PrimaryPart.Position - hrpPosition).Magnitude <= currentRange then
+                                    updateHealthBillboard(tree)
+                                    fireRemote(tree, currentAxe, folderIdString)
+                                end
+                            end                           
+                        end
+
+                        for _, tree in ipairs(workspace.Map.Foliage:GetChildren()) do
+                            if canHitBigTree then
+                                processBigTree(tree, "19_4128505180")
+                            end
+                            processNormalTree(tree, "19_4128505180")
                         end
 
                         for _, tree in ipairs(workspace.Map.Landmarks:GetChildren()) do
-                            if tree:IsA("Model") and tree.PrimaryPart and table.find(treesToHit, tree.Name) then
-                                if (tree.PrimaryPart.Position - hrpPosition).Magnitude <= currentRange then
-                                    task.spawn(function()
-                                        local args = {
-                                            [1] = tree,
-                                            [2] = currentAxe,
-                                            [3] = "24_4128505180",
-                                            [4] = hrp.CFrame
-                                        }
-                                        pcall(function() ToolDamageObject:InvokeServer(unpack(args)) end)
-                                    end)
-                                end
+                            if canHitBigTree then
+                                processBigTree(tree, "24_4128505180")
                             end
+                           processNormalTree(tree, "24_4128505180")
                         end
                     end
                     
-                    task.wait()
+                    task.wait(0.2)
                 end
             end)
         end
