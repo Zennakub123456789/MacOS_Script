@@ -35,18 +35,18 @@ local Window = MacUI:Window({
     }
 })
 
-local Tab = Window:Tab("Main", 79927907097265)
+local MainTab = Window:Tab("Main", 79927907097265)
 
-local Section = Tab:Section("How to use Auto Farm")
+local Section = MainTab:Section("How to use Auto Farm")
 
-local Label = Tab:Paragraph({
+local Label = MainTab:Paragraph({
     Text = "1. Open Auto Revive and Auto Respawn"
 })
-local Label = Tab:Paragraph({
+local Label = MainTab:Paragraph({
     Text = "2. Open Auto Farm Money and Done✅"
 })
 
-local Section = Tab:Section("Auto Farm")
+local Section = MainTab:Section("Auto Farm")
 
 local ToggleAutoFarm = false
 local autoFarmThread = nil
@@ -64,7 +64,7 @@ if not safePart then
     safePart.Parent = workspace
 end
 
-local Toggle = Tab:Toggle({
+local Toggle = MainTab:Toggle({
     Title = "Auto Farm Money🤑",
     Default = false,
     Flag = "AutoFarm_Downed",
@@ -134,7 +134,7 @@ local Toggle = Tab:Toggle({
     end
 })
 
-local Section = Tab:Section("Auto Carry")
+local Section = MainTab:Section("Auto Carry")
 
 local player = game.Players.LocalPlayer
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -167,7 +167,7 @@ local function carryNearbyPlayer()
     end
 end
 
-local Toggle = Tab:Toggle({
+local Toggle = MainTab:Toggle({
     Title = "Auto Carry",
     Default = false,
     Flag = "Toggle_CarryNearby",
@@ -184,7 +184,7 @@ local Toggle = Tab:Toggle({
     end,
 })
 
-local Toggle = Tab:Toggle({
+local Toggle = MainTab:Toggle({
     Title = "Auto Carry Button gui",
     Default = false,
     Flag = "ToggleCreateAutoCarryGUI",
@@ -290,9 +290,9 @@ end)
     end,
 })
 
-local Section2 = Tab:Section("Auto Revive")
+local Section2 = MainTab:Section("Auto Revive")
 
-local Toggle = Tab:Toggle({
+local Toggle = MainTab:Toggle({
     Title = "Auto Revive",  
     Default = false,  
     Flag = "Toggle_AutoReviveFallen10m", 
