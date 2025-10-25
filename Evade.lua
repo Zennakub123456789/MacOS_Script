@@ -957,55 +957,86 @@ local NextbotDistanceToggle = espTab:Toggle({
    end,
 })
 
-local Toggle_BringVisual = espTab:Toggle({
-    Title = "Auto Bring ALL 'Visual' Models",
+local returnPosition = nil
+local tpLoopThread = nil
+local player = game.Players.LocalPlayer
+
+local Toggle_TPVisualReturn = espTab:Toggle({
+    Title = "TP To 'Visual' (Return if missing)",
     Default = false,
-    Flag = "Toggle_BringAllVisuals",
+    Flag = "Toggle_TPToVisualReturn",
     Callback = function(Value)
-        getgenv().AutoBringAllVisuals = Value
+        getgenv().AutoTPToVisual = Value
 
         if Value then
-            task.spawn(function()
-                while getgenv().AutoBringAllVisuals do
-                    local player = game.Players.LocalPlayer
-                    local char = player.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local char = player.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
 
-                    -- ค้นหา 'Tickets'
+            if not hrp then
+                MacUI:Notify({
+                    Title = "Error",
+                    Content = "Cannot start: Player character not found.",
+                    Duration = 3
+                })
+                return 
+            end
+            
+            returnPosition = hrp.CFrame
+            
+            tpLoopThread = task.spawn(function()
+                while getgenv().AutoTPToVisual do
+                    
+                    local currentChar = player.Character
+                    local currentHRP = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+
+                    if not currentHRP then
+                        player.CharacterAdded:Wait()
+                        
+                        if not getgenv().AutoTPToVisual then break end
+                        currentHRP = player.Character:WaitForChild("HumanoidRootPart")
+                    end
+                    
                     local ticketsObject = workspace:FindFirstChild("Game")
+                    if ticketsObject then ticketsObject = ticketsObject:FindFirstChild("Effects") end
+                    if ticketsObject then ticketsObject = ticketsObject:FindFirstChild("Tickets") end
+
+                    local targetVisual = nil
                     if ticketsObject then
-                        ticketsObject = ticketsObject:FindFirstChild("Effects")
-                    end
-                    if ticketsObject then
-                        ticketsObject = ticketsObject:FindFirstChild("Tickets")
+                        targetVisual = ticketsObject:FindFirstChild("Visual", true)
                     end
 
-                    -- ถ้าเจอทั้งตัวเราและ object 'Tickets'
-                    if hrp and ticketsObject then
+                    if targetVisual then
+                        local targetCFrame = nil
                         
-                        -- ใช้ :GetDescendants() เพื่อค้นหาลูกหลานทั้งหมดที่อยู่ข้างใน "Tickets"
-                        local descendants = ticketsObject:GetDescendants()
-                        
-                        -- วนลูปเช็คทุกอันที่หาเจอ
-                        for _, descendant in ipairs(descendants) do
-                            
-                            -- ถ้าอันไหนชื่อ "Visual"
-                            if descendant.Name == "Visual" then
-                                
-                                -- ย้าย "Visual" (ตัวมันเอง) มาหาเรา
-                                if descendant:IsA("Model") and descendant.PrimaryPart then
-                                    descendant:SetPrimaryPartCFrame(hrp.CFrame)
-                                
-                                elseif descendant:IsA("BasePart") then
-                                    descendant.CFrame = hrp.CFrame
-                                end
-                            end
+                        if targetVisual:IsA("Model") and targetVisual.PrimaryPart then
+                            targetCFrame = targetVisual.PrimaryPart.CFrame
+                        elseif targetVisual:IsA("BasePart") then
+                            targetCFrame = targetVisual.CFrame
+                        end
+
+                        if targetCFrame then
+                            currentHRP.CFrame = targetCFrame + Vector3.new(0, 3, 0)
+                        end
+                    else
+                        if returnPosition then
+                            currentHRP.CFrame = returnPosition
                         end
                     end
                     
-                    task.wait(0.1) -- รอสักครู่ก่อนวนรอบใหม่
+                    task.wait(0.1)
                 end
             end)
+            
+        else
+            if tpLoopThread then
+                task.cancel(tpLoopThread)
+                tpLoopThread = nil
+            end
+            
+            local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if returnPosition and hrp then
+                hrp.CFrame = returnPosition
+            end
         end
     end,
 })
