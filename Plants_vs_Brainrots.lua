@@ -48,13 +48,12 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.6.4)
+    Code = [[# PvB Script Update! (v1.7.4)
 
 ## What’s new:
 
-- [-] Remove Auto Tomato Event 
-- [+] Add Auto Mission Brainrot 
-- [+] Add Auto Start Invasion Event ]]
+- [/] Fixed various Bugs  
+- [+] Add Auto Deliver Brainrots ]]
 })
 
 infoTab:Section("Discord")
@@ -2047,6 +2046,140 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
     end
 })
 
+EventTab:Section("Artist Frenzy Event")
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService") 
+local ReplicatedStorage = game:GetService("ReplicatedStorage") 
+local isWantedFinderRunning = false
+
+local WantedItemFinderToggle = EventTab:Toggle({
+    Title = "Auto Deliver Brainrot", 
+    Desc = "Finds, equips, turns in items & resets (ignores favorites)",
+    Default = false,
+    Flag = "WantedItemFinder",
+    Callback = function(value)
+        if value then
+            if isWantedFinderRunning then return end
+            isWantedFinderRunning = true
+            MacUI:Notify({ Title = "Artist Event", Content = "เริ่มทำงาน...", Duration = 3 })
+
+            task.spawn(function()
+                local function isToolFavorited(tool)
+                    local player = Players.LocalPlayer 
+                    local playerGui = player.PlayerGui
+                    if not playerGui then return false end
+                    local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
+                    local hotbar = playerGui:FindFirstChild("BackpackGui", true) and playerGui.BackpackGui.Backpack:FindFirstChild("Hotbar")
+                    if hotbar then
+                        for i = 1, hotbarSlots do
+                            local slot = hotbar:FindFirstChild(tostring(i))
+                            local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+                            if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                if slot:FindFirstChild("HeartIcon") then return true end
+                            end
+                        end
+                    end
+                    local inventoryFrame = playerGui:FindFirstChild("BackpackGui", true) and playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
+                    if inventoryFrame then
+                        for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
+                            if itemSlot:IsA("TextButton") then
+                                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                                if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
+                                    if itemSlot:FindFirstChild("HeartIcon") then return true end
+                                end
+                            end
+                        end
+                    end
+                    return false
+                end
+
+                while isWantedFinderRunning do
+                    local player = Players.LocalPlayer
+                    if not player or not player.Character then
+                        isWantedFinderRunning = false
+                        break
+                    end
+                    
+                    local posterGui = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("PosterGui", true)
+                    
+                    if posterGui then
+                        local completeFrame = posterGui:FindFirstChild("Frame", true) and posterGui.Frame:FindFirstChild("Main_Complete")
+                        
+                        if completeFrame and completeFrame.Visible then
+                            MacUI:Notify({ Title = "Artist Event", Content = "ตรวจพบหน้าจอสำเร็จ กำลังรีเซ็ต...", Duration = 2 })
+                            local args = { [1] = "ResetRequest" }
+                            pcall(function()
+                                ReplicatedStorage.Remotes.Events.Artist.Interact:FireServer(unpack(args))
+                            end)
+                            task.wait(0.5) 
+                        else
+                            local wantedItemLabel = posterGui:FindFirstChild("Frame", true)
+                                                 and posterGui.Frame:FindFirstChild("Main", true)
+                                                 and posterGui.Frame.Main:FindFirstChild("WantedItem", true)
+                                                 and posterGui.Frame.Main.WantedItem:FindFirstChild("WantedItem_Title")
+
+                            local keyword = nil
+                            if wantedItemLabel then
+                                keyword = wantedItemLabel.Text
+                            end
+
+                            if keyword and keyword ~= "" and keyword ~= "None" then
+                                local backpack = player:WaitForChild("Backpack")
+                                local character = player.Character 
+                                local nonFavoriteMatches = {} 
+
+                                for _, tool in ipairs(backpack:GetChildren()) do
+                                    if tool:IsA("Tool") and string.find(string.lower(tool.Name), string.lower(keyword)) and not isToolFavorited(tool) then
+                                        table.insert(nonFavoriteMatches, tool)
+                                    end
+                                end
+                                if character then
+                                     for _, tool in ipairs(character:GetChildren()) do
+                                        if tool:IsA("Tool") and string.find(string.lower(tool.Name), string.lower(keyword)) and not isToolFavorited(tool) then
+                                            table.insert(nonFavoriteMatches, tool)
+                                        end
+                                    end
+                                end
+
+                                local toolToEquip = nil
+                                if #nonFavoriteMatches > 0 then
+                                    if #nonFavoriteMatches == 1 then
+                                        toolToEquip = nonFavoriteMatches[1] 
+                                    else
+                                        toolToEquip = nonFavoriteMatches[math.random(1, #nonFavoriteMatches)] 
+                                    end
+
+                                    local humanoid = character and character:FindFirstChild("Humanoid")
+                                    if humanoid and toolToEquip then
+                                        humanoid:EquipTool(toolToEquip)
+                                        MacUI:Notify({ Title = "Artist Event", Content = "สวมใส่: " .. toolToEquip.Name, Duration = 2 })
+                                        
+                                        task.wait(0.2) 
+                                        local args = { [1] = "TurnIn" }
+                                        pcall(function() 
+                                            ReplicatedStorage.Remotes.Events.Artist.Interact:FireServer(unpack(args))
+                                            MacUI:Notify({ Title = "Artist Event", Content = "ส่งไอเท็มแล้ว!", Duration = 2 })
+                                        end)
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    task.wait(1) 
+                end
+
+                if not isWantedFinderRunning then
+                    MacUI:Notify({ Title = "Artist Event", Content = "หยุดทำงาน", Duration = 3 })
+                end
+            end)
+        else
+            isWantedFinderRunning = false
+        end
+    end
+})
+
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
 SettingTab:Section("Performance")
@@ -2228,13 +2361,12 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.6.4)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.7.4)
 
 ## What’s new:
 
-- [-] Remove Auto Tomato Event 
-- [+] Add Auto Mission Brainrot 
-- [+] Add Auto Start Invasion Event ]])
+- [/] Fixed various Bugs  
+- [+] Add Auto Deliver Brainrots ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2282,6 +2414,7 @@ local languageScripts = {
         AutoMissionBrainrotToggle:SetTitle("Auto Farm Mission Brainrots + Everything")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
+        WantedItemFinderToggle:SetTitle("Auto Deliver Brainrot")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2291,13 +2424,12 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.6.4)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.7.4)
 
 ## มีอะไรใหม่:
 
-- [-] ลบ ออโต้ทำภารกิจของมะเขือเทศอัตโนมัติ 
-- [+] เพิ่ม ออโต้ภารกิจ Brainrots อัตโนมัติ
-- [+] เพิ่ม ออโต้เหตุการณ์การบุกรุกจะเริ่มให้อัตโนมัติ ]])
+- [/] แก้ไขบัคต่างๆ
+- [+] เพิ่ม ออโต้ส่งมอบเบรนร็อตอัตโนมัติ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2345,6 +2477,7 @@ local languageScripts = {
         AutoMissionBrainrotToggle:SetTitle("ออโต้ฟาร์มภารกิจ เบรนร็อต + ทำทุกอย่างในอีเว้น")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        WantedItemFinderToggle:SetTitle("ออโต้ส่งมอบ เบรนร็อต อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
@@ -2372,7 +2505,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.6.4",
+    Content = "Tad Hub PvB | 1.7.4",
     Duration = 10
 })
 
