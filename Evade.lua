@@ -1,41 +1,38 @@
-local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/Apple-Library/refs/heads/main/Main_Fixed_WithWhiteBorder.lua"))()
 
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
-local replicatedStorage = game:GetService("ReplicatedStorage")
+local imageUrl = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png"
+local imageName = "TadHub-Icon.png"
+
+if not isfile(imageName) then
+    local imageData = game:HttpGet(imageUrl)
+    writefile(imageName, imageData)
+end
+
+local iconPath = getcustomasset(imageName)
 
 local Window = MacUI:Window({
-   Title = "Tad Hub | Evade",
-   Icon = 0,
-   LoadingTitle = "Version : Beta",
-   LoadingSubtitle = "Loading...",
-   Theme = "Default",
-
-   ToggleUIKeybind = "RightControl",
-   ShowText = "Menu",
-
-   ConfigurationSaving = {
-      Enabled = true,
-      FileName = "TadHub_Evade_Config"
-   },
-
-   Discord = {
-      Enabled = true,
-      Invite = "abcs299",
-      RememberJoins = false
-   },
-
-   KeySystem = true,
-   KeySettings = {
-      Title = "Evade",
-      Subtitle = "TadHub Key System",
-      Note = "Copy",
-      FileName = "Evade_TadHub_Key",
-      SaveKey = true,
-      Key = {"Tad102838338ajdbedbh8829hAvdkC1Hub"},
-      KeyLink = "https://discord.gg/abcs299"
-   }
+    Title = "Tad Hub | Evade",
+    Size = UDim2.new(0, 600, 0, 350),
+    Theme = "Dark",
+    Icon = iconPath,
+    LoadingTitle = "MacUI",
+    LoadingSubtitle = "Loading...",
+    ToggleUIKeybind = "K",
+    ShowToggleButton = true,
+    ToggleIcon = iconPath,
+    NotifyFromBottom = true,
+    ConfigurationSaving = {
+        Enabled = true,
+        FileName = "MacUI_Config"
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "Enter Key",
+        Subtitle = "Join Discord for key",
+        Key = {"TestKey123", "Premium456"},
+        KeyLink = "https://discord.gg/yourserver",
+        SaveKey = true
+    }
 })
 
 local Tab = Window:Tab("Main", 79927907097265)
