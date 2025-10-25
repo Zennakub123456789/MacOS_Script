@@ -37,16 +37,16 @@ local Window = MacUI:Window({
 
 local MainTab = Window:Tab("Main", 79927907097265)
 
-local Section = MainTab:Section("How to use Auto Farm")
+local TeachSection = MainTab:Section("How to use Auto Farm")
 
-local Label = MainTab:Paragraph({
+local Teach1Label = MainTab:Paragraph({
     Text = "1. Open Auto Revive and Auto Respawn"
 })
-local Label = MainTab:Paragraph({
+local Teach2Label = MainTab:Paragraph({
     Text = "2. Open Auto Farm Money and Done✅"
 })
 
-local Section = MainTab:Section("Auto Farm")
+local AutoFarmSection = MainTab:Section("Auto Farm")
 
 local ToggleAutoFarm = false
 local autoFarmThread = nil
@@ -64,7 +64,7 @@ if not safePart then
     safePart.Parent = workspace
 end
 
-local Toggle = MainTab:Toggle({
+local AutoFarmMoneyToggle = MainTab:Toggle({
     Title = "Auto Farm Money🤑",
     Default = false,
     Flag = "AutoFarm_Downed",
@@ -134,7 +134,7 @@ local Toggle = MainTab:Toggle({
     end
 })
 
-local Section = MainTab:Section("Auto Carry")
+local CarrySection = MainTab:Section("Auto Carry")
 
 local player = game.Players.LocalPlayer
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -167,7 +167,7 @@ local function carryNearbyPlayer()
     end
 end
 
-local Toggle = MainTab:Toggle({
+local AutoCarryToggle = MainTab:Toggle({
     Title = "Auto Carry",
     Default = false,
     Flag = "Toggle_CarryNearby",
@@ -184,7 +184,7 @@ local Toggle = MainTab:Toggle({
     end,
 })
 
-local Toggle = MainTab:Toggle({
+local AutoCarryguiToggle = MainTab:Toggle({
     Title = "Auto Carry Button gui",
     Default = false,
     Flag = "ToggleCreateAutoCarryGUI",
@@ -290,9 +290,9 @@ end)
     end,
 })
 
-local Section2 = MainTab:Section("Auto Revive")
+local AutoReviveSection = MainTab:Section("Auto Revive")
 
-local Toggle = MainTab:Toggle({
+local AutoReviveToggle = MainTab:Toggle({
     Title = "Auto Revive",  
     Default = false,  
     Flag = "Toggle_AutoReviveFallen10m", 
@@ -327,9 +327,9 @@ local Toggle = MainTab:Toggle({
     end,
 })
 
-local Section2 = Tab:Section("Auto Respawn")
+local AutorespawnSection = Tab:Section("Auto Respawn")
 
-local Toggle = Tab:Toggle({
+local AutoRespawnToggle = Tab:Toggle({
    Title = "Auto Respawn",  
    Default = false,       
    Flag = "Toggle_AutoRespawn", 
@@ -374,10 +374,11 @@ local Toggle = Tab:Toggle({
    end,
 })
 
-local Tab2 = Window:Tab("ESP", 6523858394)
-local Section2 = Tab2:Section("Drowned Esp")
+local espTab = Window:Tab("ESP", 6523858394)
 
-local Toggle = Tab2:Toggle({
+local DrownedEspSection = espTab:Section("Drowned Esp")
+
+local DrownedHighlightToggle = espTab:Toggle({
     Title = "Highlight Downed Players",  
     Default = false,       
     Flag = "Toggle_KnockedESP", 
@@ -426,7 +427,7 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Toggle = Tab2:Toggle({
+local DownedNameToggle = espTab:Toggle({
     Title = "Name Downed Players",  
     Default = false,       
     Flag = "Toggle_KnockedNameESP", 
@@ -486,7 +487,7 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Toggle = Tab2:Toggle({
+local DownedDistanceToggle = espTab:Toggle({
     Title = "Downed Distance Players",
     Default = false,
     Flag = "Toggle_KnockedDistanceESP",
@@ -554,7 +555,7 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Toggle = Tab2:Toggle({
+local DownedLineToggle = espTab:Toggle({
     Title = "Line Downed Players",
     Default = false,
     Flag = "Toggle_KnockedLineESP",
@@ -609,9 +610,9 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Section2 = Tab2:Section("Players Esp")
+local PlayerEspSection = espTab:Section("Players Esp")
 
-local Toggle = Tab2:Toggle({
+local PlayerHighlightToggle = espTab:Toggle({
     Title = "Players Highlight",
     Default = false,
     Flag = "Toggle_PlayersHighlight",
@@ -660,7 +661,7 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Toggle = Tab2:Toggle({
+local PlayerNameToggle = espTab:Toggle({
     Title = "Players Name ESP",
     Default = false,
     Flag = "Toggle_PlayersNameESP",
@@ -719,7 +720,7 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Toggle = Tab2:Toggle({
+local PlayerDistanceToggle = espTab:Toggle({
     Title = "Players Distance ESP",
     Default = false,
     Flag = "Toggle_PlayersDistanceESP",
@@ -787,7 +788,7 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Toggle = Tab2:Toggle({
+local PlayerLineToggle = espTab:Toggle({
     Title = "Players Line ESP",
     Default = false,
     Flag = "Toggle_PlayersLineESP",
@@ -844,9 +845,9 @@ local Toggle = Tab2:Toggle({
     end,
 })
 
-local Section2 = Tab2:Section("Nextbot Esp")
+local NextbotSection = espTab:Section("Nextbot Esp")
 
-local Toggle = Tab2:Toggle({
+local NextbotNameToggle = espTab:Toggle({
    Title = "Nextbot Name ESP",
    Default = false,
    Flag = "Toggle_NextbotNameESP",
@@ -899,7 +900,7 @@ local Toggle = Tab2:Toggle({
    end,
 })
 
-local Toggle = Tab2:Toggle({
+local NextbotDistanceToggle = espTab:Toggle({
    Title = "Nextbot Distance ESP",
    Default = false,
    Flag = "Toggle_NextbotDistanceESP",
@@ -954,41 +955,4 @@ local Toggle = Tab2:Toggle({
            end
        end
    end,
-})
-
-local Tab3 = Window:Tab("Players", 117259180607823)
-local Section3 = Tab3:Section("Lock Camera")
-
-local Players = game:GetService("Players")
-local ContextActionService = game:GetService("ContextActionService")
-
-local player = Players.LocalPlayer
-local camera = workspace.CurrentCamera
-local UserInputService = game:GetService("UserInputService")
-
-local locked = false
-
-local Toggle = Tab3:Toggle({
-    Title = "Lock Camera",
-    Default = false,
-    Flag = "Toggle_LockCameraSpin",
-    Callback = function(Value)
-        locked = Value
-
-        if locked then
-            ContextActionService:BindAction("BlockMouseLook", function() return Enum.ContextActionResult.Sink end, false,
-                Enum.UserInputType.MouseMovement,
-                Enum.UserInputType.Touch
-            )
-
-            local controlModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls()
-            controlModule:Disable()
-            controlModule:Enable(true, false, true)
-        else
-            ContextActionService:UnbindAction("BlockMouseLook")
-
-            local controlModule = require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls()
-            controlModule:Enable(true, true, true)
-        end
-    end,
 })
