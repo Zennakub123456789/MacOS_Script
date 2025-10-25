@@ -956,3 +956,57 @@ local NextbotDistanceToggle = espTab:Toggle({
        end
    end,
 })
+
+local Toggle_BringVisual = espTab:Toggle({
+    Title = "Auto Bring ALL 'Visual' Models",
+    Default = false,
+    Flag = "Toggle_BringAllVisuals",
+    Callback = function(Value)
+        getgenv().AutoBringAllVisuals = Value
+
+        if Value then
+            task.spawn(function()
+                while getgenv().AutoBringAllVisuals do
+                    local player = game.Players.LocalPlayer
+                    local char = player.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+                    -- ค้นหา 'Tickets'
+                    local ticketsObject = workspace:FindFirstChild("Game")
+                    if ticketsObject then
+                        ticketsObject = ticketsObject:FindFirstChild("Effects")
+                    end
+                    if ticketsObject then
+                        ticketsObject = ticketsObject:FindFirstChild("Tickets")
+                    end
+
+                    -- ถ้าเจอทั้งตัวเราและ object 'Tickets'
+                    if hrp and ticketsObject then
+                        
+                        -- ใช้ :GetDescendants() เพื่อค้นหาลูกหลานทั้งหมดที่อยู่ข้างใน "Tickets"
+                        local descendants = ticketsObject:GetDescendants()
+                        
+                        -- วนลูปเช็คทุกอันที่หาเจอ
+                        for _, descendant in ipairs(descendants) do
+                            
+                            -- ถ้าอันไหนชื่อ "Visual"
+                            if descendant.Name == "Visual" then
+                                
+                                -- ย้าย "Visual" (ตัวมันเอง) มาหาเรา
+                                if descendant:IsA("Model") and descendant.PrimaryPart then
+                                    descendant:SetPrimaryPartCFrame(hrp.CFrame)
+                                
+                                elseif descendant:IsA("BasePart") then
+                                    descendant.CFrame = hrp.CFrame
+                                end
+                            end
+                        end
+                    end
+                    
+                    task.wait(0.1) -- รอสักครู่ก่อนวนรอบใหม่
+                end
+            end)
+        end
+    end,
+})
+
