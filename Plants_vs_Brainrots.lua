@@ -389,54 +389,51 @@ end
 
 local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
 
-local TysmLebel = AutoTab:Label({
-    Text = "ออโต้ล็อคหัวใจ ได้ผลแล้ว ขอบคุณทุกคนที่คอยซัพพอร์ต ด้วยนะค้าบ"
-})
-
 AutoTab:Section("Auto Fram Brainrots")
 
 AutoTab:Section("[Use Auto Fram Brainrots on PRIVATE SERVERS Only]")
 
 local Players = game:GetService("Players")
 local workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 
 getgenv().TeleportToBrainrot = false
 local farmPart = nil
-getgenv().currentTargetName = nil
+getgenv().currentTargetInfo = nil
 
 local function isPlayerInFarmZone(character, zone)
     if not character or not zone then return false end
     local hrp = character:FindFirstChild("HumanoidRootPart")
     if not hrp then return false end
-    local playerPos = hrp.Position
-    local zonePos = zone.Position
-    local zoneSize = zone.Size
-    local minX = zonePos.X - zoneSize.X / 2
-    local maxX = zonePos.X + zoneSize.X / 2
-    local minY = zonePos.Y - zoneSize.Y / 2
-    local maxY = zonePos.Y + zoneSize.Y / 2
-    local minZ = zonePos.Z - zoneSize.Z / 2
-    local maxZ = zonePos.Z + zoneSize.Z / 2
+    local playerPos = hrp.Position; local zonePos = zone.Position; local zoneSize = zone.Size
+    local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
+    local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
+    local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
     return (playerPos.X >= minX and playerPos.X <= maxX and
             playerPos.Y >= minY and playerPos.Y <= maxY and
             playerPos.Z >= minZ and playerPos.Z <= maxZ)
 end
 
+local function isPartInZone(partToCheck, zone)
+    if not partToCheck or not zone then return false end
+    local partPos = partToCheck:GetPivot().Position
+    local zonePos = zone.Position
+    local zoneSize = zone.Size
+    local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
+    local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
+    local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
+    return (partPos.X >= minX and partPos.X <= maxX and
+            partPos.Y >= minY and partPos.Y <= maxY and
+            partPos.Z >= minZ and partPos.Z <= maxZ)
+end
+
 local function getAllGrassCFrames(plot)
-    local cframes = {}
-    if not plot then return cframes end
-    local rowsFolder = plot:FindFirstChild("Rows")
-    if not rowsFolder then return cframes end
+    local cframes = {}; if not plot then return cframes end
+    local rowsFolder = plot:FindFirstChild("Rows"); if not rowsFolder then return cframes end
     for _, row in pairs(rowsFolder:GetChildren()) do
         local grassFolder = row:FindFirstChild("Grass")
-        if grassFolder then
-            for _, part in pairs(grassFolder:GetChildren()) do
-                if part:IsA("BasePart") then
-                    table.insert(cframes, part.CFrame)
-                end
-            end
-        end
+        if grassFolder then for _, part in pairs(grassFolder:GetChildren()) do if part:IsA("BasePart") then table.insert(cframes, part.CFrame) end end end
     end
     return cframes
 end
@@ -448,79 +445,76 @@ local AutoTeleportToggle = AutoTab:Toggle({
     Callback = function(value)
         getgenv().TeleportToBrainrot = value
         if value then
-            local myPlot
-            for i = 1, 6 do
-                local plot = workspace.Plots:FindFirstChild(tostring(i))
-                if plot and plot:GetAttribute("Owner") == player.Name then
-                    myPlot = plot
-                    break
-                end
-            end
-            if not myPlot then return end
+            local myPlot; for i = 1, 6 do local plot = workspace.Plots:FindFirstChild(tostring(i)); if plot and plot:GetAttribute("Owner") == player.Name then myPlot = plot; break end end
+            if not myPlot then MacUI:Notify({Title="Error", Content="Could not find your plot!", Duration=4}); getgenv().TeleportToBrainrot=false; AutoTeleportToggle:Set(false); return end
             local grassCFrames = getAllGrassCFrames(myPlot)
-            if #grassCFrames == 0 then return end
-            farmPart = Instance.new("Part")
-            farmPart.Name = "FarmZonePart"
-            farmPart.Size = Vector3.new(98, 80, 263)
-            farmPart.Anchored = true
-            farmPart.CanCollide = false
-            farmPart.Transparency = 1
-            farmPart.CastShadow = false
-            farmPart.Parent = workspace
-            if grassCFrames[6] then
-                local targetGrassCFrame = grassCFrames[6]
-                farmPart.CFrame = CFrame.new(targetGrassCFrame.Position)
-            else
-                warn("Warning: Could not find grass part #6. Defaulting to the first one.")
-                farmPart.CFrame = CFrame.new(grassCFrames[1].Position)
-            end
+            if #grassCFrames == 0 then MacUI:Notify({Title="Error", Content="Could not find grass positions!", Duration=4}); getgenv().TeleportToBrainrot=false; AutoTeleportToggle:Set(false); return end
+            farmPart = Instance.new("Part"); farmPart.Name = "FarmZonePart"; farmPart.Size = Vector3.new(98, 80, 263); farmPart.Anchored = true; farmPart.CanCollide = false; farmPart.Transparency = 1; farmPart.CastShadow = false; farmPart.Parent = workspace
+            if grassCFrames[6] then farmPart.CFrame = CFrame.new(grassCFrames[6].Position) else warn("Warning: Could not find grass part #6."); farmPart.CFrame = CFrame.new(grassCFrames[1].Position) end
+
             local performanceButton = player:WaitForChild("PlayerGui"):WaitForChild("Main"):WaitForChild("Settings"):WaitForChild("Frame"):WaitForChild("ScrollingFrame"):WaitForChild("Performance"):WaitForChild("Button"):WaitForChild("DisplayName")
             if performanceButton.Text == "Off" then
-                local args = {[1] = {["Value"] = true, ["Setting"] = "Performance"}}
-                local changeSettingRemote = game:GetService("ReplicatedStorage").Remotes.ChangeSetting
-                for i = 1, 5 do
-                    changeSettingRemote:FireServer(unpack(args))
-                    task.wait(0.1)
-                end
-                task.wait(5)
+                local args = {[1] = {["Value"] = true, ["Setting"] = "Performance"}}; local changeSettingRemote = ReplicatedStorage.Remotes.ChangeSetting
+                for i = 1, 5 do changeSettingRemote:FireServer(unpack(args)); task.wait(0.1) end; task.wait(5)
             end
+
             task.spawn(function()
                 local spawnerPosition = nil
-                local spawner = myPlot:FindFirstChild("SpawnerUI", true)
-                if spawner and spawner:IsA("BasePart") then
-                    spawnerPosition = spawner.Position
-                    if player.Character then
-                        player.Character:MoveTo(spawnerPosition)
-                    end
-                end
+                local spawner = myPlot:FindFirstChild("SpawnerUI", true); if spawner and spawner:IsA("BasePart") then spawnerPosition = spawner.Position; if player.Character then player.Character:MoveTo(spawnerPosition) end end
                 if spawnerPosition then task.wait(1.5) end
-                local chosen
+
+                local chosen = nil
+                local currentTargetSource = "Brainrots"
+
                 while getgenv().TeleportToBrainrot do
-                    if not player.Character then 
-                        task.wait(1) 
-                        continue
+                    if not player.Character then task.wait(1); continue end
+                    if farmPart and not isPlayerInFarmZone(player.Character, farmPart) then
+                        if spawnerPosition and player.Character then player.Character:MoveTo(spawnerPosition) end
+                        task.wait(5); continue
                     end
-                    if not isPlayerInFarmZone(player.Character, farmPart) then
-                        if spawnerPosition and player.Character then
-                            player.Character:MoveTo(spawnerPosition)
+
+                    local targetFolder = workspace:FindFirstChild("ScriptedMap", true)
+                    local list = {}
+                    currentTargetSource = "Brainrots"
+
+                    if targetFolder then
+                        local brainrotsFolder = targetFolder:FindFirstChild("Brainrots")
+                        if brainrotsFolder then list = brainrotsFolder:GetChildren() end
+                        if #list == 0 then
+                            local missionBrainrotsFolder = targetFolder:FindFirstChild("MissionBrainrots")
+                            if missionBrainrotsFolder then list = missionBrainrotsFolder:GetChildren(); currentTargetSource = "MissionBrainrots" end
                         end
-                        task.wait(5)
-                        continue
                     end
-                    local brainrots = workspace:WaitForChild("ScriptedMap"):WaitForChild("Brainrots")
-                    local list = brainrots:GetChildren()
+
                     if not chosen or not chosen.Parent then
                         if #list > 0 then
-                            chosen = list[math.random(1, #list)]
+                             local potentialTargets = {}
+                             for _, item in ipairs(list) do
+                                 if farmPart and isPartInZone(item, farmPart) then
+                                     table.insert(potentialTargets, item)
+                                 end
+                             end
+                             if #potentialTargets > 0 then
+                                chosen = potentialTargets[math.random(1, #potentialTargets)]
+                             else
+                                chosen = nil
+                             end
                         else
-                            chosen = nil
+                             chosen = nil
                         end
+
                         if chosen then
-                            getgenv().currentTargetName = chosen.Name
+                            local targetID = chosen:GetAttribute("ID")
+                            if targetID then
+                                getgenv().currentTargetInfo = { id = targetID, source = currentTargetSource }
+                            else
+                                getgenv().currentTargetInfo = nil
+                            end
                         else
-                            getgenv().currentTargetName = nil
+                            getgenv().currentTargetInfo = nil
                         end
                     end
+
                     if chosen and chosen.Parent then
                         player.Character:MoveTo(chosen:GetPivot().Position)
                     end
@@ -528,10 +522,7 @@ local AutoTeleportToggle = AutoTab:Toggle({
                 end
             end)
         else
-            if farmPart then
-                farmPart:Destroy()
-                farmPart = nil
-            end
+            if farmPart then farmPart:Destroy(); farmPart = nil end
         end
     end
 })
@@ -540,6 +531,7 @@ AutoTab:Section("Auto Hit")
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 getgenv().AttackSpeed = 0.25
 
@@ -583,13 +575,8 @@ local AutoFarmToggle = AutoTab:Toggle({
                 local player = game:GetService("Players").LocalPlayer
 
                 local batPriority = {
-                    "Skeletonized Bat",
-                    "Hammer Bat",
-                    "Aluminum Bat",
-                    "Iron Core Bat",
-                    "Iron Plate Bat",
-                    "Leather Grip Bat",
-                    "Basic Bat"
+                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
+                    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
                 }
 
                 local function isPlayerInZone(character, zone)
@@ -616,10 +603,7 @@ local AutoFarmToggle = AutoTab:Toggle({
                             local bestBatFound = nil
                             for _, batName in ipairs(batPriority) do
                                 local foundBat = player.Backpack:FindFirstChild(batName) or (character and character:FindFirstChild(batName))
-                                if foundBat then
-                                    bestBatFound = foundBat
-                                    break 
-                                end
+                                if foundBat then bestBatFound = foundBat; break end
                             end
                             
                             if bestBatFound then
@@ -637,10 +621,18 @@ local AutoFarmToggle = AutoTab:Toggle({
                                 end
     
                                 if currentMode == "Remote" or currentMode == "Normal + Remote" then
-                                    local targetName = getgenv().currentTargetName
-                                    if targetName then
-                                        local args = { [1] = { [1] = targetName } }
-                                        game:GetService("ReplicatedStorage").Remotes.AttacksServer.WeaponAttack:FireServer(unpack(args))
+                                    local targetInfo = getgenv().currentTargetInfo 
+                                    if targetInfo and targetInfo.id and targetInfo.source then
+                                        local args
+                                        if targetInfo.source == "Brainrots" then
+                                            args = {[1] = {["NormalBrainrots"] = {[1] = targetInfo.id}, ["MissionBrainrots"] = {}}}
+                                        elseif targetInfo.source == "MissionBrainrots" then
+                                            args = {[1] = {["NormalBrainrots"] = {}, ["MissionBrainrots"] = {[1] = targetInfo.id}}}
+                                        end
+
+                                        if args then
+                                            pcall(function() ReplicatedStorage.Remotes.AttacksServer.WeaponAttack:FireServer(unpack(args)) end)
+                                        end
                                     end
                                  end
                             end
