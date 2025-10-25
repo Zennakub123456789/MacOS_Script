@@ -327,9 +327,9 @@ local AutoReviveToggle = MainTab:Toggle({
     end,
 })
 
-local AutorespawnSection = Tab:Section("Auto Respawn")
+local AutorespawnSection = MainTab:Section("Auto Respawn")
 
-local AutoRespawnToggle = Tab:Toggle({
+local AutoRespawnToggle = MainTab:Toggle({
    Title = "Auto Respawn",  
    Default = false,       
    Flag = "Toggle_AutoRespawn", 
