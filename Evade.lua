@@ -967,6 +967,9 @@ local Toggle_TPVisualReturn = espTab:Toggle({
     Flag = "Toggle_TPToVisualReturn",
     Callback = function(Value)
         getgenv().AutoTPToVisual = Value
+        
+        -- เพิ่มตัวแปรสถานะ
+        local isAtReturnPosition = false
 
         if Value then
             local char = player.Character
@@ -994,6 +997,7 @@ local Toggle_TPVisualReturn = espTab:Toggle({
                         
                         if not getgenv().AutoTPToVisual then break end
                         currentHRP = player.Character:WaitForChild("HumanoidRootPart")
+                        isAtReturnPosition = false -- รีเซ็ตสถานะเมื่อตัวละครเกิดใหม่
                     end
                     
                     local ticketsObject = workspace:FindFirstChild("Game")
@@ -1006,6 +1010,7 @@ local Toggle_TPVisualReturn = espTab:Toggle({
                     end
 
                     if targetVisual then
+                        -- เมื่อเจอ "Visual"
                         local targetCFrame = nil
                         
                         if targetVisual:IsA("Model") and targetVisual.PrimaryPart then
@@ -1016,10 +1021,14 @@ local Toggle_TPVisualReturn = espTab:Toggle({
 
                         if targetCFrame then
                             currentHRP.CFrame = targetCFrame + Vector3.new(0, 3, 0)
+                            isAtReturnPosition = false -- รีเซ็ตสถานะ เพราะเราไม่ได้อยู่ที่จุดเซฟแล้ว
                         end
                     else
-                        if returnPosition then
+                        -- เมื่อไม่เจอ "Visual"
+                        -- ตรวจสอบว่ามีจุดเซฟ และ เรายังไม่อยู่ที่จุดเซฟใช่ไหม
+                        if returnPosition and not isAtReturnPosition then
                             currentHRP.CFrame = returnPosition
+                            isAtReturnPosition = true -- ตั้งสถานะว่าเรากลับมาที่จุดเซฟแล้ว (จะไม่วาปซ้ำ)
                         end
                     end
                     
@@ -1033,6 +1042,7 @@ local Toggle_TPVisualReturn = espTab:Toggle({
                 tpLoopThread = nil
             end
             
+            -- เมื่อปิด Toggle, วาปกลับไปที่จุดเซฟ (ถ้ามี)
             local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if returnPosition and hrp then
                 hrp.CFrame = returnPosition
