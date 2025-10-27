@@ -307,6 +307,8 @@ local LocalPlayer = Players.LocalPlayer
 
 local PlayersTab = Window:Tab("Players", "rbxassetid://117259180607823")
 
+PlayersTab:Section("Teleport To Players")
+
 local function GetPlayerNames()
     local t = {}
     for _, p in pairs(Players:GetPlayers()) do
@@ -490,7 +492,7 @@ end
 
 PlayersTab:Section("Fly")
 
-FlyToggle = PlayersTab:Toggle({
+local FlyToggle = PlayersTab:Toggle({
     Title = "Fly Toggle",
     Default = false,
     Flag = "IsFlying",
@@ -2617,6 +2619,15 @@ local languageScripts = {
         FeedBackButton:SetDesc("Send your feedback to the Dev")
         AntiAFKToggle:SetTitle("Anti AFK")
         ReconnectToggle:SetTitle("Auto Reconnect")
+        PlayerDropdown:SetTitle("Select Players")
+        TeleportButton:SetTitle("Teleport to the [selected] player.")
+        TeleportButton:SetDesc("Go to the selected player")
+        FlyToggle:SetTitle("Fly Toggle")
+        FlySpeedSlider:SetTitle("Fly Speed")
+        SpeedSlider:SetTitle("WalkSpeed Slider")
+        SpeedToggle:SetTitle("WalkSpeed Toggle")
+        JumpSlider:SetTitle("Jump Slider")
+        JumpToggle:SetTitle("Jump Toggle")
         AutoTeleportToggle:SetTitle("Auto Farm Brainrot")
         SpeedSlider:SetTitle("Hit Speed")
         AutoFarmToggle:SetTitle("Auto Hit")
@@ -2680,6 +2691,15 @@ local languageScripts = {
         FeedBackButton:SetDesc("ส่งความคิดเห็นไปที่นักพัฒนา")
         AntiAFKToggle:SetTitle("ป้องกัน AFK [กันหลุดเมื่อยืนนิ่งเกิน20นาที]")
         ReconnectToggle:SetTitle("เข้าแมพใหม่เมื่อหลุด (กลับเข้าเกมและรันสคริปต์ให้อัตโนมัติ)")
+        PlayerDropdown:SetTitle("เลือกผู้เล่น")
+        TeleportButton:SetTitle("เทเลพอร์ตไปยังผู้เล่น [ที่เลือก]")
+        TeleportButton:SetDesc("ไปหาผู้เล่นที่เลือก")
+        FlyToggle:SetTitle("บิน")
+        FlySpeedSlider:SetTitle("ปรับความเร็วการบิน")
+        SpeedSlider:SetTitle("ปรับความเร็วการเดิน")
+        SpeedToggle:SetTitle("เปิดความเร็วการเดิน")
+        JumpSlider:SetTitle("ปรับการกระโดด")
+        JumpToggle:SetTitle("เปิดการกระโดด")
         AutoTeleportToggle:SetTitle("ฟาร์ม Brainrots อัตโนมัติ")
         SpeedSlider:SetTitle("ความเร็วการตี")
         AutoFarmToggle:SetTitle("ตีอัตโนมัติ")
