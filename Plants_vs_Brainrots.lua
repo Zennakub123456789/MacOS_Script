@@ -302,90 +302,339 @@ local ReconnectToggle = MainTab:Toggle({
     end
 })
 
-local AllowedIds = {
-    4128505180,
-    8041920244,
-}
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local function isAllowed()
-    if not LocalPlayer then return false end
-    for _, id in ipairs(AllowedIds) do
-        if LocalPlayer.UserId == id then
-            return true
-        end
+local PlayersTab = Window:Tab("Players", "rbxassetid://117259180607823")
+
+local function GetPlayerNames()
+    local t = {}
+    for _, p in pairs(Players:GetPlayers()) do
+        table.insert(t, p.Name)
     end
-    return false
+    return t
 end
 
-if isAllowed() then
+local function findCharacterRoot(character)
+    if not character then return nil end
+    return character:FindFirstChild("HumanoidRootPart")
+        or character:FindFirstChild("LowerTorso")
+        or character:FindFirstChild("Torso")
+end
 
-    local PlayersTab = Window:Tab("Players", "rbxassetid://117259180607823")
+getgenv().SelectedPlayer = nil
 
-    local function GetPlayerNames()
-        local t = {}
-        for _, p in pairs(Players:GetPlayers()) do
-            table.insert(t, p.Name)
+local PlayerDropdown = PlayersTab:Dropdown({
+    Title = "Select Player",
+    Options = GetPlayerNames(),
+    Default = nil,
+    Flag = "SelectedPlayer",
+    Callback = function(selected)
+        getgenv().SelectedPlayer = selected
+    end
+})
+
+local function updatePlayerList()
+    if PlayerDropdown and PlayerDropdown.SetOptions then
+        PlayerDropdown:SetOptions(GetPlayerNames())
+    end
+end
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+
+local TeleportButton = PlayersTab:Button({
+    Title = "Teleport to Selected Player",
+    Desc = "Goto the player selected in the Dropdown.",
+    Callback = function()
+        local selected = getgenv().SelectedPlayer
+        
+        if not selected or selected == "" then
+            return
         end
-        return t
+
+        local targetPlayer = Players:FindFirstChild(selected)
+
+        if not targetPlayer then return end
+        if targetPlayer == LocalPlayer then return end
+
+        local targetRoot = findCharacterRoot(targetPlayer.Character)
+        if not targetRoot then return end
+
+        local myChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local myRoot = findCharacterRoot(myChar)
+        if not myRoot then return end
+
+        pcall(function()
+            myRoot.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0)
+        end)
+    end
+})
+
+local player = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local IsFlying = false
+local CurrentSpeed = 10
+local BodyGyro = nil
+local BodyVelocity = nil
+
+local function GetRootPart()
+    local char = player.Character
+    if not char then return nil end
+    local hum = char:FindFirstChildWhichIsA("Humanoid")
+    if not hum then return nil end
+    
+    if hum.RigType == Enum.HumanoidRigType.R6 then
+        return char:FindFirstChild("Torso")
+    else
+        return char:FindFirstChild("UpperTorso")
+    end
+end
+
+local function SetHumanoidState(hum, state, value)
+    pcall(function()
+        hum:SetStateEnabled(state, value)
+    end)
+end
+
+local function StartFlying()
+    local char = player.Character
+    local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+    local rootPart = GetRootPart()
+    
+    if IsFlying or not hum or not rootPart then return end
+    IsFlying = true
+
+    SetHumanoidState(hum, Enum.HumanoidStateType.Climbing, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.FallingDown, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Flying, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Freefall, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.GettingUp, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Jumping, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Landed, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Physics, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Ragdoll, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Running, false)
+    SetHumanoidState(hum, Enum.HumanoidStateType.Swimming, false)
+    hum:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+    hum.PlatformStand = true
+
+    local animateScript = char:FindFirstChild("Animate")
+    if animateScript then
+        animateScript.Disabled = true
+    end
+    
+    local HumAnim = char:FindFirstChildOfClass("Humanoid") or char:FindFirstChildOfClass("AnimationController")
+    if HumAnim then
+        for _, v in next, HumAnim:GetPlayingAnimationTracks() do
+            v:AdjustSpeed(0)
+        end
     end
 
-    local function findCharacterRoot(character)
-        if not character then return nil end
-        return character:FindFirstChild("HumanoidRootPart")
-            or character:FindFirstChild("LowerTorso")
-            or character:FindFirstChild("Torso")
+    BodyGyro = Instance.new("BodyGyro")
+    BodyGyro.P = 50000
+    BodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+    BodyGyro.cframe = rootPart.CFrame
+    BodyGyro.Parent = rootPart
+
+    BodyVelocity = Instance.new("BodyVelocity")
+    BodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
+    BodyVelocity.velocity = Vector3.new(0, 0, 0)
+    BodyVelocity.Parent = rootPart
+end
+
+local FlyToggle
+
+local function StopFlying()
+    local char = player.Character
+    local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+
+    if not IsFlying and not hum then 
+        local rootPart = GetRootPart()
+        if rootPart then
+            if rootPart:FindFirstChild("BodyGyro") then rootPart.BodyGyro:Destroy() end
+            if rootPart:FindFirstChild("BodyVelocity") then rootPart.BodyVelocity:Destroy() end
+        end
+    end
+    
+    if not IsFlying then return end
+    IsFlying = false
+    
+    if BodyGyro then BodyGyro:Destroy() BodyGyro = nil end
+    if BodyVelocity then BodyVelocity:Destroy() BodyVelocity = nil end
+
+    if FlyToggle then FlyToggle:Set(false) end
+
+    if hum then
+        local animateScript = char:FindFirstChild("Animate")
+        if animateScript then
+            animateScript.Disabled = false
+        end
+
+        SetHumanoidState(hum, Enum.HumanoidStateType.Climbing, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.FallingDown, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Flying, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Freefall, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.GettingUp, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Jumping, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Landed, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Physics, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Ragdoll, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Running, true)
+        SetHumanoidState(hum, Enum.HumanoidStateType.Swimming, true)
+        hum:ChangeState(Enum.HumanoidStateType.Running)
+        hum.PlatformStand = false
+    end
+end
+
+PlayersTab:Section("Fly")
+
+FlyToggle = PlayersTab:Toggle({
+    Title = "Fly Toggle",
+    Default = false,
+    Flag = "IsFlying",
+    Callback = function(value)
+        if value then
+            StartFlying()
+        else
+            StopFlying()
+        end
+    end
+})
+
+local FlySpeedSlider = PlayersTab:Slider({
+    Title = "Fly Speed",
+    Min = 1,
+    Max = 1000,
+    Default = CurrentSpeed,
+    Flag = "FlySpeed",
+    Callback = function(value)
+        CurrentSpeed = math.floor(value)
+    end
+})
+
+RunService.RenderStepped:Connect(function()
+    local char = player.Character
+    local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+
+    if not IsFlying or not BodyGyro or not BodyVelocity or not hum then 
+        return 
     end
 
-    getgenv().SelectedPlayer = nil
+    local cam = workspace.CurrentCamera
+    if not cam then return end
 
-    local PlayerDropdown = PlayersTab:Dropdown({
-        Title = "Select Player",
-        Options = GetPlayerNames(),
-        Default = nil,
-        Flag = "SelectedPlayer",
-        Callback = function(selected)
-            getgenv().SelectedPlayer = selected
-        end
-    })
+    BodyGyro.CFrame = cam.CFrame
 
-    local function updatePlayerList()
-        if PlayerDropdown and PlayerDropdown.SetOptions then
-            PlayerDropdown:SetOptions(GetPlayerNames())
-        end
+    local moveVector = Vector3.new(0, 0, 0)
+    local worldMove = hum.MoveDirection
+    local relativeMove = cam.CFrame:VectorToObjectSpace(worldMove)
+    
+    moveVector = moveVector + (cam.CFrame.LookVector * (relativeMove.Z * -1))
+    moveVector = moveVector + (cam.CFrame.RightVector * relativeMove.X)
+    
+    if moveVector.Magnitude > 0 then
+        BodyVelocity.Velocity = moveVector.Unit * CurrentSpeed
+    else
+        BodyVelocity.Velocity = Vector3.new(0, 0, 0)
     end
-    Players.PlayerAdded:Connect(updatePlayerList)
-    Players.PlayerRemoving:Connect(updatePlayerList)
+end)
 
-    local TeleportButton = PlayersTab:Button({
-        Title = "Teleport to Selected Player",
-        Desc = "Goto the player selected in the Dropdown.",
-        Callback = function()
-            local selected = getgenv().SelectedPlayer
-            
-            if not selected or selected == "" then
-                return
-            end
+player.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid")
+    StopFlying()
+end)
 
-            local targetPlayer = Players:FindFirstChild(selected)
+PlayersTab:Section("Player Settings")
 
-            if not targetPlayer then return end
-            if targetPlayer == LocalPlayer then return end
+_G.SpeedEnabled = false
+local originalSpeed = 16
+local hasSavedWalkSpeed = false
 
-            local targetRoot = findCharacterRoot(targetPlayer.Character)
-            if not targetRoot then return end
-
-            local myChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-            local myRoot = findCharacterRoot(myChar)
-            if not myRoot then return end
-
+local SpeedSlider = PlayersTab:Slider({
+    Title = "WalkSpeed",
+    Min = 1,
+    Max = 1000,
+    Default = 16,
+    Flag = "PlayerSpeed",
+    Callback = function(value)
+        if _G.SpeedEnabled == true then
             pcall(function()
-                myRoot.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0)
+                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
             end)
         end
-    })
-end
+    end
+})
+
+local SpeedToggle = PlayersTab:Toggle({
+    Title = "Speed Toggle",
+    Default = false,
+    Flag = "SpeedEnabled",
+    Callback = function(value)
+        _G.SpeedEnabled = value
+        
+        local Humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+        if not Humanoid then return end
+
+        if value == true then
+            if not hasSavedWalkSpeed then
+                originalSpeed = Humanoid.WalkSpeed
+                hasSavedWalkSpeed = true
+            end
+            
+            Humanoid.WalkSpeed = SpeedSlider:Get()
+            
+        else
+            Humanoid.WalkSpeed = originalSpeed
+        end
+    end
+})
+
+PlayersTab:Divider()
+
+_G.JumpEnabled = false
+local originalJumpPower = 50
+local hasSavedJumpPower = false
+
+local JumpSlider = PlayersTab:Slider({
+    Title = "JumpPower",
+    Min = 50,
+    Max = 150,
+    Default = 75,
+    Flag = "PlayerJump",
+    Callback = function(value)
+        if _G.JumpEnabled == true then
+            pcall(function()
+                game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+            end)
+        end
+    end
+})
+
+local JumpToggle = PlayersTab:Toggle({
+    Title = "Jump Toggle",
+    Default = false,
+    Flag = "JumpEnabled",
+    Callback = function(value)
+        _G.JumpEnabled = value
+        
+        local Humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+        if not Humanoid then return end
+
+        if value == true then
+            if not hasSavedJumpPower then
+                originalJumpPower = Humanoid.JumpPower
+                hasSavedJumpPower = true
+            end
+            
+            Humanoid.JumpPower = JumpSlider:Get()
+            
+        else
+            Humanoid.JumpPower = originalJumpPower
+        end
+    end
+})
 
 local AutoTab = Window:Tab("Auto", "rbxassetid://86084882582277")
 
