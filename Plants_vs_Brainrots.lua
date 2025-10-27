@@ -48,12 +48,14 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.7.4)
+    Code = [[# PvB Script Update! (v1.8.4)
 
 ## What’s new:
 
-- [/] Fixed various Bugs  
-- [+] Add Auto Deliver Brainrots ]]
+- [+] Add Teleport To Players
+- [+] Add Fly Toggle And Fly Silder
+- [+] Add WalkSpeed Slider And WalkSpeed Toggle
+- [+] Add Jumppower Slider And Jumppower Toggle ]]
 })
 
 infoTab:Section("Discord")
@@ -2604,12 +2606,14 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.7.4)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.8.4)
 
 ## What’s new:
 
-- [/] Fixed various Bugs  
-- [+] Add Auto Deliver Brainrots ]])
+- [+] Add Teleport To Players
+- [+] Add Fly Toggle And Fly Silder
+- [+] Add WalkSpeed Slider And WalkSpeed Toggle
+- [+] Add Jumppower Slider And Jumppower Toggle ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2676,12 +2680,14 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.7.4)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.4)
 
-## มีอะไรใหม่:
+## มีอะไรใหม่บ้าง:
 
-- [/] แก้ไขบัคต่างๆ
-- [+] เพิ่ม ออโต้ส่งมอบเบรนร็อตอัตโนมัติ ]])
+- [+] เพิ่ม การวาปไปหาผู้เล่นคนอื่น
+- [+] เพิ่ม การบิน และ การปรับความเร็วการบิน
+- [+] เพิ่ม การปรับความเร็วการเดิน และ ปุ่มเปิดปิดความเร็วการเดิน
+- [+] เพิ่ม การปรับการกระโดด และ ปุ่มเปิดปิดการกระโดด ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
