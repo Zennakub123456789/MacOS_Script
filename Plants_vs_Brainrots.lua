@@ -25,7 +25,7 @@ local Window = MacUI:Window({
         Enabled = true,
         FileName = "MacUI_Config"
     },
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
         Title = "Tad Hub | Key System",
         Subtitle = "เข้าดิสคอสต์เพื่อเอาคีย์ คีย์จะรีเซ็ตทุก24ชั่วโมง (เดี๋ยวตื่นจะมาปิดระบบคีย์ให้ ตอนนี้คนในดิสมันเงียบ55) / Join Discord to get key And Keys reset every 24 H",
