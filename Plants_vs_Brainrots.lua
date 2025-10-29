@@ -828,8 +828,8 @@ local AutoFarmToggle = AutoTab:Toggle({
                 local player = game:GetService("Players").LocalPlayer
 
                 local batPriority = {
-                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
-                    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+                    "Rifling Bat", "Spiked Bat", "Fluted Bat",
+                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat", "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
                 }
 
                 local function isPlayerInZone(character, zone)
