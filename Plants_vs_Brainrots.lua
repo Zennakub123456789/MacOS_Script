@@ -2009,8 +2009,8 @@ local AutoMissionBrainrotToggle = EventTab:Toggle({
                 end
                 
                 local batPriority = {
-                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
-                    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+                    "Rifling Bat", "Spiked Bat", "Fluted Bat",
+                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat", "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
                 }
 
                 while isMissionBrainrotAutoRunning do
@@ -2210,8 +2210,8 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
 
             task.spawn(function()
                 local batPriority = {
-                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
-                    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+                    "Rifling Bat", "Spiked Bat", "Fluted Bat",
+                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat", "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
                 }
 
                 while isKillAuraRunning do
