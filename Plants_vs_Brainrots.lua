@@ -40,9 +40,6 @@ local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 local Comingabel1 = infoTab:Label({
     Text = "สคริปแมพ 99คืนในป่า กับ แมพขโมย กำลังจะมา!"
 })
-local Comingabel2 = infoTab:Label({
-    Text = "สคริปแมพ 99คืนในป่าจะมาก่อน โปรดรอ ตอนนี้เรากำลังเพิ่มฟีเจอร์ต่างๆ"
-})
 
 infoTab:Section("Update")
 
