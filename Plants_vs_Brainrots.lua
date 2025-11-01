@@ -52,10 +52,8 @@ local UpdateCode = infoTab:Code({
 
 ## What’s new:
 
-- [+] Add Teleport To Players
-- [+] Add Fly Toggle And Fly Silder
-- [+] Add WalkSpeed Slider And WalkSpeed Toggle
-- [+] Add Jumppower Slider And Jumppower Toggle ]]
+- [/] Support other Bats
+- [+] Add Auto Continue if Victory ]]
 })
 
 infoTab:Section("Discord")
@@ -2135,6 +2133,54 @@ local AutoMissionBrainrotToggle = EventTab:Toggle({
     end
 })
 
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local AutoClickEnabled = false
+
+local AutoContinueToggle = EventTab:Toggle({
+    Title = "Auto Continue Victory ",
+    Desc = "Auto Continue",
+    Default = false,
+    Flag = "AutoVictoryClick",
+    Callback = function(state)
+        AutoClickEnabled = state
+        if state then
+            task.spawn(function()
+                while AutoClickEnabled do
+                    task.wait(0.5)
+                    local touchGui = PlayerGui:FindFirstChild("TouchGui")
+                    if touchGui and touchGui.Enabled == false then
+                        touchGui.Enabled = true
+                    end
+                    local gui = PlayerGui:FindFirstChild("Main") and PlayerGui.Main:FindFirstChild("Victory_Screen")
+                    if gui and gui.Visible then
+                        task.wait(5)
+                        while AutoClickEnabled and gui.Visible do
+                            pcall(function()
+                                local cam = workspace.CurrentCamera
+                                VirtualInputManager:SendMouseButtonEvent(
+                                    cam.ViewportSize.X * 0.5,
+                                    cam.ViewportSize.Y * 0.8,
+                                    0, true, nil, 0
+                                )
+                                VirtualInputManager:SendMouseButtonEvent(
+                                    cam.ViewportSize.X * 0.5,
+                                    cam.ViewportSize.Y * 0.8,
+                                    0, false, nil, 0
+                                )
+                            end)
+                            task.wait(0.1)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local workspace = game:GetService("Workspace")
@@ -2606,14 +2652,12 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.8.4)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.8.5)
 
 ## What’s new:
 
-- [+] Add Teleport To Players
-- [+] Add Fly Toggle And Fly Silder
-- [+] Add WalkSpeed Slider And WalkSpeed Toggle
-- [+] Add Jumppower Slider And Jumppower Toggle ]])
+- [/] Support other Bats
+- [+] Add Auto Continue if Victory ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2668,6 +2712,7 @@ local languageScripts = {
         TeleportFixedButton:SetDesc("Goto Event Area")
         AutoDailyEventToggle:SetTitle("Auto Daily Event")
         AutoMissionBrainrotToggle:SetTitle("Auto Farm Mission Brainrots + Everything")
+        AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
         WantedItemFinderToggle:SetTitle("Auto Deliver Brainrot")
@@ -2680,14 +2725,12 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.4)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.5)
 
 ## มีอะไรใหม่บ้าง:
 
-- [+] เพิ่ม การวาปไปหาผู้เล่นคนอื่น
-- [+] เพิ่ม การบิน และ การปรับความเร็วการบิน
-- [+] เพิ่ม การปรับความเร็วการเดิน และ ปุ่มเปิดปิดความเร็วการเดิน
-- [+] เพิ่ม การปรับการกระโดด และ ปุ่มเปิดปิดการกระโดด ]])
+- [/] รองรับไม้อย่างอื่น
+- [+] เพิ่มการดำเนินการต่ออัตโนมัติหากได้รับชัยชนะ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2742,6 +2785,7 @@ local languageScripts = {
         TeleportFixedButton:SetDesc("วาปไปสถานที่อีเว้น")
         AutoDailyEventToggle:SetTitle("ออโต้ทำอีเว้นรายวันอัตโนมัติ")
         AutoMissionBrainrotToggle:SetTitle("ออโต้ฟาร์มภารกิจ เบรนร็อต + ทำทุกอย่างในอีเว้น")
+        AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
         WantedItemFinderToggle:SetTitle("ออโต้ส่งมอบ เบรนร็อต อัตโนมัติ")
@@ -2772,7 +2816,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.7.4",
+    Content = "Tad Hub PvB | 1.8.5",
     Duration = 10
 })
 
