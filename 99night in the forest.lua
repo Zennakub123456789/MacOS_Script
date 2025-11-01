@@ -1130,3 +1130,409 @@ if PreviewToggle:Get() == false then
         end
     end)
 end
+
+local BringTab = Window:Tab("Main", "rbxassetid://7733779610")
+
+local player = game.Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local StartDragging = RemoteEvents:WaitForChild("RequestStartDraggingItem")
+local StopDragging = RemoteEvents:WaitForChild("StopDraggingItem")
+
+local FUEL_ITEM_OPTIONS = {
+    "Log", "Biofuel", "Oil Barrel", "Fuel Canister", "Coal", "Chair", "Alien", "Feather", "Cultist", "Crossbow Cultist"
+}
+local METEOR_ITEM_OPTIONS = {
+    "Raw Obsidian Ore", "Gold Shard", "Scalding Obsidiron Ingot", "Meteor Shard"
+}
+local CULTIST_ITEM_OPTIONS = {
+    "Cultist", "Crossbow Cultist"
+}
+local FOOD_AND_HEALING_ITEM_OPTIONS = {
+    "Apple", "Bandage", "MedKit", "Chilli", "Carrot", "Pumpkin", "Mackerel", "Salmon", "Swordfish", "Berry", "Ribs", "Stew", "Steak Dinner", "Morsel", "Steak", "Corn", "Cooked Morsel", "Cooked Steak", "Cake"
+}
+local GEARS_ITEM_OPTIONS = {
+    "Bolt", "Tyre", "Sheet Metal", "Old Radio", "Broken Fan", "Broken Microwave", "Washing Machine", "Old Car Engine", "UFO Scrap", "UFO Component", "UFO Junk", "Cultist Gem", "Gem of the Forest"
+}
+local GUNS_AND_ARMOR_ITEM_OPTIONS = {
+    "Infernal Sword", "Crossbow", "Morningstar", "Infernal Crossbow", "Laser Sword", "Raygun", "Ice Axe", "Ice Sword", "Chainsaw", "Strong Axe", "Axe Trim Kit", "Spear", "Good Axe", "Revolver", "Rifle", "Tactical Shotgun", "Revolver Ammo", "Rifle Ammo", "Alien Armour", "Frog Boots", "Leather Body", "Iron Body", "Thron Body", "Riot Shield", "Armour Trim Kit", "Obsidiron Boots"
+}
+local OTHERS_ITEM_OPTIONS = {
+    "Halloween Candle", "Candy", "Frog Key", "Feather", "Wildfire", "Sacrifice Totem", "Old Rod", "Infernal Sack", "Giant Sack", "Seed Box", "Chainsaw", "Old Flashlight", "Strong Flashlight", "Bunny Foot", "Wolf Pelt", "Bear Pelt", "Mammonth Tusk", "Alpha Wolf Pelt", "Bear Corpse", "Meteor Shard", "Gold Shard", "Raw Obsidiron Ore", "Gem of the Forest Fragment", "Diamond", "Defense Blueprint"
+}
+
+getgenv().BringLocation = "Player"
+getgenv().BringMaxItems = 10
+getgenv().BringNoLimit = false
+getgenv().BringCooldown = 0.1
+getgenv().BringPlayerHeight = 5
+
+getgenv().FuelItemsToBring = {}
+getgenv().MeteorItemsToBring = {}
+getgenv().CultistItemsToBring = {}
+getgenv().FoodAndHealingItemsToBring = {}
+getgenv().GearsItemsToBring = {}
+getgenv().GunsAndArmorItemsToBring = {}
+getgenv().OthersItemsToBring = {}
+
+BringTab:Section("Bring Settings")
+
+BringTab:Dropdown({
+    Title = "Bring Location",
+    Options = {"Player", "Campfire", "CraftingBench"},
+    Default = "Player",
+    Flag = "BringLocation",
+    Callback = function(selected)
+        getgenv().BringLocation = selected
+    end
+})
+BringTab:Input({
+    Placeholder = "",
+    Title = "Max Items",
+    Default = "100",
+    Flag = "BringMaxItems",
+    Callback = function(text)
+        local num = tonumber(text)
+        getgenv().BringMaxItems = (num and num > 0) and num or 10
+    end
+})
+BringTab:Input({
+    Placeholder = "",
+    Title = "Bring Height Offset",
+    Default = "5",
+    Flag = "BringPlayerHeight",
+    Callback = function(text)
+        local num = tonumber(text)
+        getgenv().BringPlayerHeight = (num) and num or 5
+    end
+})
+BringTab:Input({
+    Placeholder = "",
+    Title = "Button Cooldown (s)",
+    Default = "0.1",
+    Flag = "BringCooldown",
+    Callback = function(text)
+        local num = tonumber(text)
+        getgenv().BringCooldown = (num and num >= 0) and num or 0.1
+    end
+})
+BringTab:Toggle({
+    Title = "Bring No Limit",
+    Default = false,
+    Flag = "BringNoLimit",
+    Callback = function(state)
+        getgenv().BringNoLimit = state
+    end
+})
+
+local function IsInTable(tbl, value)
+    for _, v in ipairs(tbl) do
+        if v == value then return true end
+    end
+    return false
+end
+
+local function bringSelectedItems(selectedItemNames, notifyTitle)
+    local character = player.Character
+    if not character then return end
+    
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    
+    local itemsFolder = workspace:FindFirstChild("Items")
+    if not itemsFolder then
+        warn("ไม่พบโฟลเดอร์ Items!")
+        return
+    end
+    
+    if #selectedItemNames == 0 then
+        return
+    end
+
+    local location = getgenv().BringLocation
+    local maxItems = getgenv().BringMaxItems
+    local noLimit = getgenv().BringNoLimit
+    local bringHeight = getgenv().BringPlayerHeight
+    local itemsBrought = 0
+
+    local targetCFrame
+    local map = workspace:FindFirstChild("Map")
+    local campground = map and map:FindFirstChild("Campground")
+
+    if location == "Player" then
+        targetCFrame = hrp.CFrame * CFrame.new(0, bringHeight, 0)
+    elseif location == "Campfire" then
+        local campfireObj = campground and campground:FindFirstChild("MainFire")
+        if campfireObj and campfireObj:IsA("Model") and campfireObj.PrimaryPart then
+            targetCFrame = campfireObj.PrimaryPart.CFrame * CFrame.new(0, bringHeight, 0)
+        else
+            warn("หาไม่เจอ: workspace.Map.Campground.MainFire (Model) หรือไม่มี PrimaryPart")
+            return
+        end
+    elseif location == "CraftingBench" then
+        local craftingBenchObj = campground and campground:FindFirstChild("CraftingBench")
+        if craftingBenchObj and craftingBenchObj:IsA("Model") and craftingBenchObj.PrimaryPart then
+            targetCFrame = craftingBenchObj.PrimaryPart.CFrame * CFrame.new(0, bringHeight, 0)
+        else
+            warn("หาไม่เจอ: workspace.Map.Campground.CraftingBench (Model) หรือไม่มี PrimaryPart")
+            return
+        end
+    else
+        targetCFrame = hrp.CFrame * CFrame.new(0, bringHeight, 0)
+    end
+    
+    for _, item in ipairs(itemsFolder:GetChildren()) do
+        if item:IsA("Model") and IsInTable(selectedItemNames, item.Name) then
+            if noLimit or itemsBrought < maxItems then
+                itemsBrought = itemsBrought + 1
+            
+                local primaryPart = item.PrimaryPart
+                if not primaryPart then
+                    primaryPart = Instance.new("Part", item)
+                    primaryPart.Name = "PrimaryPartForBring"; primaryPart.Size = Vector3.new(1, 1, 1)
+                    primaryPart.Anchored = true; primaryPart.Transparency = 1; primaryPart.CanCollide = false
+                    primaryPart.CFrame = item:GetModelCFrame() or CFrame.new(hrp.Position)
+                    item.PrimaryPart = primaryPart
+                end
+
+                primaryPart.Anchored = true
+                item:SetPrimaryPartCFrame(targetCFrame)
+
+                local args = {item}
+                StartDragging:FireServer(unpack(args))
+                StopDragging:FireServer(unpack(args))
+                
+                primaryPart.Anchored = false
+                print("Brought " .. item.Name .. " (".. itemsBrought ..")")
+            else
+                print("Reached max item limit (".. maxItems ..")")
+                break
+            end
+        end
+    end
+    
+    if itemsBrought > 0 then
+        MacUI:Notify({ Title = "Success!", Content = "Bring " .. notifyTitle .. " เสร็จสิ้น! (" .. itemsBrought .. " ชิ้น)", Duration = 5 })
+    else
+        MacUI:Notify({ Title = "Not Found", Content = "ไม่พบ " .. notifyTitle .. " ที่เลือก", Duration = 4 })
+    end
+end
+
+BringTab:Divider()
+BringTab:Section("Fuel Selection")
+BringTab:Dropdown({
+    Title = "Select Fuel Items to Bring",
+    Options = FUEL_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedFuelBringItems",
+    Callback = function(selected)
+        getgenv().FuelItemsToBring = selected
+    end
+})
+local isFuelButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Fuel",
+    Desc = "Bring Fuel",
+    Callback = function()
+        if isFuelButtonOnCooldown then
+            return
+        end
+        isFuelButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().FuelItemsToBring, "Fuel Items")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isFuelButtonOnCooldown = false
+        end)
+    end
+})
+
+BringTab:Divider()
+BringTab:Section("Bring Meteor")
+BringTab:Dropdown({
+    Title = "Select Meteor Items to Bring",
+    Options = METEOR_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedMeteorItemsBring",
+    Callback = function(selected)
+        getgenv().MeteorItemsToBring = selected
+    end
+})
+local isMeteorItemsButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Meteor",
+    Desc = "Bring Meteor",
+    Callback = function()
+        if isMeteorItemsButtonOnCooldown then
+            return
+        end
+        isMeteorItemsButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().MeteorItemsToBring, "Meteor Items")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isMeteorItemsButtonOnCooldown = false
+        end)
+    end
+})
+
+BringTab:Divider()
+BringTab:Section("Bring Cultist")
+BringTab:Dropdown({
+    Title = "Select Cultist Items to Bring",
+    Options = CULTIST_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedCultistBringItems",
+    Callback = function(selected)
+        getgenv().CultistItemsToBring = selected
+    end
+})
+local isCultistButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Cultist",
+    Desc = "Bring Cultist",
+    Callback = function()
+        if isCultistButtonOnCooldown then
+            return
+        end
+        isCultistButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().CultistItemsToBring, "Cultist Items")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isCultistButtonOnCooldown = false
+        end)
+    end
+})
+
+BringTab:Divider()
+BringTab:Section("Bring Food and Healing")
+
+BringTab:Dropdown({
+    Title = "Select Food/Healing to Bring",
+    Options = FOOD_AND_HEALING_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedFoodAndHealingBring",
+    Callback = function(selected)
+        getgenv().FoodAndHealingItemsToBring = selected
+    end
+})
+
+local isFoodAndHealingButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Food/Healing",
+    Desc = "Bring Food And Healing",
+    Callback = function()
+        if isFoodAndHealingButtonOnCooldown then
+            return
+        end
+        isFoodAndHealingButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().FoodAndHealingItemsToBring, "Food/Healing Items")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isFoodAndHealingButtonOnCooldown = false
+        end)
+    end
+})
+
+BringTab:Divider()
+BringTab:Section("Bring Gears")
+
+BringTab:Dropdown({
+    Title = "Select Gears to Bring",
+    Options = GEARS_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedGearsBring",
+    Callback = function(selected)
+        getgenv().GearsItemsToBring = selected
+    end
+})
+
+local isGearsButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Gears",
+    Desc = "Bring Gear",
+    Callback = function()
+        if isGearsButtonOnCooldown then
+            return
+        end
+        isGearsButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().GGEarsItemsToBring, "Gears")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isGearsButtonOnCooldown = false
+        end)
+    end
+})
+
+BringTab:Divider()
+BringTab:Section("Bring Guns And Armor")
+
+BringTab:Dropdown({
+    Title = "Select Guns/Armor to Bring",
+    Options = GUNS_AND_ARMOR_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedGunsAndArmorBring",
+    Callback = function(selected)
+        getgenv().GunsAndArmorItemsToBring = selected
+    end
+})
+
+local isGunsAndArmorButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Guns/Armor",
+    Desc = "Bring Gun And Armor",
+    Callback = function()
+        if isGunsAndArmorButtonOnCooldown then
+            return
+        end
+        isGunsAndArmorButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().GunsAndArmorItemsToBring, "Guns/Armor Items")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isGunsAndArmorButtonOnCooldown = false
+        end)
+    end
+})
+
+BringTab:Divider()
+BringTab:Section("Bring Others")
+
+BringTab:Dropdown({
+    Title = "Select Others to Bring",
+    Options = OTHERS_ITEM_OPTIONS,
+    Multi = true,
+    Default = {},
+    Flag = "SelectedOthersBring",
+    Callback = function(selected)
+        getgenv().OthersItemsToBring = selected
+    end
+})
+
+local isOthersButtonOnCooldown = false
+BringTab:Button({
+    Title = "Bring Selected Others",
+    Desc = "Bring Others",
+    Callback = function()
+        if isOthersButtonOnCooldown then
+            return
+        end
+        isOthersButtonOnCooldown = true
+        task.spawn(bringSelectedItems, getgenv().OthersItemsToBring, "Other Items")
+        
+        task.spawn(function()
+            task.wait(getgenv().BringCooldown)
+            isOthersButtonOnCooldown = false
+        end)
+    end
+})
+
