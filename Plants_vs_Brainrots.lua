@@ -48,12 +48,13 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.8.4)
+    Code = [[# PvB Script Update! (v1.8.5)
 
 ## What’s new:
 
 - [/] Support other Bats
-- [+] Add Auto Continue if Victory ]]
+- [+] Add Auto Continue if Victory
+- [+] Add Auto Confirm Sell ]]
 })
 
 infoTab:Section("Discord")
@@ -1768,6 +1769,63 @@ local AutoSellAllFullToggle = SellTab:Toggle({
     end
 })
 
+
+SellTab:Section("Auto Confirm")
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local AutoConfirmEnabled = false
+
+local AutoConfirmSellToggle = SellTab:Toggle({
+    Title = "Auto Confirm Brainrot or Plants Sell",
+    Desc = "Auto Confirm",
+    Default = false,
+    Flag = "AutoConfirmPopUp",
+    Callback = function(state)
+        AutoConfirmEnabled = state
+
+        if state then
+            task.spawn(function()
+                while AutoConfirmEnabled do
+                    task.wait(0.5)
+
+                    local touchGui = PlayerGui:FindFirstChild("TouchGui")
+                    if touchGui and touchGui.Enabled == false then
+                        touchGui.Enabled = true
+                    end
+
+                    local hud = PlayerGui:FindFirstChild("HUD")
+                    local popup = hud and hud:FindFirstChild("PopUp")
+                    local content = popup and popup:FindFirstChild("Content")
+                    local textLabel = content and content:FindFirstChild("TextLabel")
+                    if textLabel and textLabel.Text then
+                        local text = textLabel.Text:lower()
+                        if string.find(text, "are you sure you want to sell your brainrots") then
+                            pcall(function()
+                                local cam = workspace.CurrentCamera
+                                VirtualInputManager:SendMouseButtonEvent(
+                                    cam.ViewportSize.X * 0.53,
+                                    cam.ViewportSize.Y * 0.629999995,
+                                    0, true, nil, 0
+                                )
+                                VirtualInputManager:SendMouseButtonEvent(
+                                    cam.ViewportSize.X * 0.53,
+                                    cam.ViewportSize.Y * 0.629999995,
+                                    0, false, nil, 0
+                                )
+                            end)
+                            task.wait(1)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
 local TeleportTab = Window:Tab("Teleport", "rbxassetid://6723742952")
 
 TeleportTab:Section("Home")
@@ -2657,7 +2715,8 @@ local languageScripts = {
 ## What’s new:
 
 - [/] Support other Bats
-- [+] Add Auto Continue if Victory ]])
+- [+] Add Auto Continue if Victory
+- [+] Add Auto Confirm Sell ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2706,6 +2765,7 @@ local languageScripts = {
         AutoSellPlantsToggle:SetTitle("Auto Sell Plants All")
         AutoSellPlantsFullToggle:SetTitle("Auto Sell Plants All When Inventory Full")
         AutoSellAllFullToggle:SetTitle("Auto Sell All When Inventory Full")
+        AutoConfirmSellToggle:SetTitle("Auto Confirm Sell")
         TeleportGrassButton:SetTitle("Teleport to Plots")
         TeleportGrassButton:SetDesc("Goto Your Plots")
         TeleportFixedButton:SetTitle("Teleport to Prison Event")
@@ -2730,7 +2790,8 @@ local languageScripts = {
 ## มีอะไรใหม่บ้าง:
 
 - [/] รองรับไม้อย่างอื่น
-- [+] เพิ่มการดำเนินการต่ออัตโนมัติหากได้รับชัยชนะ ]])
+- [+] เพิ่มการดำเนินการต่ออัตโนมัติหากได้รับชัยชนะ
+- [+] เพิ่ม ออโต้กดยืนยันเมื่อขาย เบรนล็อต หรือ พืช ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2779,6 +2840,7 @@ local languageScripts = {
         AutoSellPlantsToggle:SetTitle("ขาย Plant ทั้งหมดอัตโนมัติ")
         AutoSellPlantsFullToggle:SetTitle("ขาย Plant ทั้งหมดอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
         AutoSellAllFullToggle:SetTitle("ขายทั้งสองอัตโนมัติ [เมื่อกระเป๋าเต็ม]")
+        AutoConfirmSellToggle:SetTitle("ออโต้ยืนยันการขายอัตโนมัติ (เมื่อมีuiให้กดยืนยัน)")
         TeleportGrassButton:SetTitle("วาปไปสวนของตัวเอง")
         TeleportGrassButton:SetDesc("วาปไปที่พล็อต")
         TeleportFixedButton:SetTitle("วาปไปอีเว้น")
