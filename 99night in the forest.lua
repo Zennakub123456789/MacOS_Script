@@ -37,6 +37,10 @@ local Window = MacUI:Window({
 
 local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 
+local Comingabel1 = infoTab:Label({
+    Text = "ตอนนี้ยังเป็นเบต้าอยู่ ฟังชั่นยังน้อย ตอนนี้กำลังไล่เพื่ม โปรดรอ / It's still in beta, so there are few features. We're working on adding more. Please wait."
+})
+
 infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
