@@ -1412,7 +1412,7 @@ BringTab:Divider()
 BringTab:Section("Bring Food and Healing")
 
 BringTab:Dropdown({
-    Title = "Select Food/Healing to Bring",
+    Title = "Select Food and Healing to Bring",
     Options = FOOD_AND_HEALING_ITEM_OPTIONS,
     Multi = true,
     Default = {},
@@ -1424,7 +1424,7 @@ BringTab:Dropdown({
 
 local isFoodAndHealingButtonOnCooldown = false
 BringTab:Button({
-    Title = "Bring Selected Food/Healing",
+    Title = "Bring Selected Food and Healing",
     Desc = "Bring Food And Healing",
     Callback = function()
         if isFoodAndHealingButtonOnCooldown then
@@ -1476,7 +1476,7 @@ BringTab:Divider()
 BringTab:Section("Bring Guns And Armor")
 
 BringTab:Dropdown({
-    Title = "Select Guns/Armor to Bring",
+    Title = "Select Guns And Armor to Bring",
     Options = GUNS_AND_ARMOR_ITEM_OPTIONS,
     Multi = true,
     Default = {},
@@ -1488,7 +1488,7 @@ BringTab:Dropdown({
 
 local isGunsAndArmorButtonOnCooldown = false
 BringTab:Button({
-    Title = "Bring Selected Guns/Armor",
+    Title = "Bring Selected Guns and Armor",
     Desc = "Bring Gun And Armor",
     Callback = function()
         if isGunsAndArmorButtonOnCooldown then
