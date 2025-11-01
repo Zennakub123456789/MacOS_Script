@@ -1131,7 +1131,7 @@ if PreviewToggle:Get() == false then
     end)
 end
 
-local BringTab = Window:Tab("Main", "rbxassetid://7733779610")
+local BringTab = Window:Tab("Bring", "rbxassetid://7733779610")
 
 local player = game.Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
