@@ -45,13 +45,11 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.8.5)
+    Code = [[# PvB Script Update! (v1.8.6)
 
 ## What’s new:
 
-- [/] Support other Bats
-- [+] Add Auto Continue if Victory
-- [+] Add Auto Confirm Sell ]]
+- [+] Add New Seed In Buy Seed Dropdown ]]
 })
 
 infoTab:Section("Discord")
@@ -1467,7 +1465,7 @@ ShopTab:Section("Auto Buy Seed")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
-local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed" }
+local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed", "Starfruit Seed" }
 
 getgenv().SelectedBuySeeds = {}
 getgenv().AutoBuySeedSelected = false
@@ -2707,13 +2705,11 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.8.5)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.8.6)
 
 ## What’s new:
 
-- [/] Support other Bats
-- [+] Add Auto Continue if Victory
-- [+] Add Auto Confirm Sell ]])
+- [+] Add New Seed In Buy Seed Dropdown ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2782,13 +2778,11 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.5)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.6)
 
 ## มีอะไรใหม่บ้าง:
 
-- [/] รองรับไม้อย่างอื่น
-- [+] เพิ่มการดำเนินการต่ออัตโนมัติหากได้รับชัยชนะ
-- [+] เพิ่ม ออโต้กดยืนยันเมื่อขาย เบรนล็อต หรือ พืช ]])
+- [+] เพิ่มเมล็ดพันธุ์ใหม่ในเมนูซื้อเมล็ดพันธุ์ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2875,7 +2869,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.8.5",
+    Content = "Tad Hub PvB | 1.8.6",
     Duration = 10
 })
 
