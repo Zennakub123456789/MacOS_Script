@@ -45,11 +45,12 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.8.6)
+    Code = [[# PvB Script Update! (v1.8.7)
 
 ## What’s new:
 
-- [+] Add New Seed In Buy Seed Dropdown ]]
+- [/] Fixed auto confirm Brainrots or Plants Unsupport Other DPI
+- [/] Fixed Auto Continue When Victory Unsupport Other DPI ]]
 })
 
 infoTab:Section("Discord")
@@ -1796,21 +1797,19 @@ local AutoConfirmSellToggle = SellTab:Toggle({
                     local popup = hud and hud:FindFirstChild("PopUp")
                     local content = popup and popup:FindFirstChild("Content")
                     local textLabel = content and content:FindFirstChild("TextLabel")
-                    if textLabel and textLabel.Text then
+                    local buttons = content and content:FindFirstChild("Buttons")
+                    local yesButton = buttons and buttons:FindFirstChild("Yes")
+
+                    if textLabel and textLabel.Text and yesButton and yesButton.Visible then
                         local text = textLabel.Text:lower()
                         if string.find(text, "are you sure you want to sell your brainrots") then
                             pcall(function()
-                                local cam = workspace.CurrentCamera
-                                VirtualInputManager:SendMouseButtonEvent(
-                                    cam.ViewportSize.X * 0.53,
-                                    cam.ViewportSize.Y * 0.629999995,
-                                    0, true, nil, 0
-                                )
-                                VirtualInputManager:SendMouseButtonEvent(
-                                    cam.ViewportSize.X * 0.53,
-                                    cam.ViewportSize.Y * 0.629999995,
-                                    0, false, nil, 0
-                                )
+                                local absPos = yesButton.AbsolutePosition
+                                local absSize = yesButton.AbsoluteSize
+                                local clickX = absPos.X + absSize.X * 1
+                                local clickY = absPos.Y + absSize.Y * 1.75
+                                VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, nil, 0)
+                                VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, false, nil, 0)
                             end)
                             task.wait(1)
                         end
@@ -2208,22 +2207,24 @@ local AutoContinueToggle = EventTab:Toggle({
                     if touchGui and touchGui.Enabled == false then
                         touchGui.Enabled = true
                     end
-                    local gui = PlayerGui:FindFirstChild("Main") and PlayerGui.Main:FindFirstChild("Victory_Screen")
-                    if gui and gui.Visible then
+
+                    local mainGui = PlayerGui:FindFirstChild("Main")
+                    local victory = mainGui and mainGui:FindFirstChild("Victory_Screen")
+                    local main = victory and victory:FindFirstChild("Main")
+                    local buttonList = main and main:FindFirstChild("Button_List")
+                    local closeButton = buttonList and buttonList:FindFirstChild("Close_Button")
+
+                    if victory and victory.Visible and closeButton then
                         task.wait(5)
-                        while AutoClickEnabled and gui.Visible do
+                        while AutoClickEnabled and victory.Visible do
                             pcall(function()
                                 local cam = workspace.CurrentCamera
-                                VirtualInputManager:SendMouseButtonEvent(
-                                    cam.ViewportSize.X * 0.5,
-                                    cam.ViewportSize.Y * 0.8,
-                                    0, true, nil, 0
-                                )
-                                VirtualInputManager:SendMouseButtonEvent(
-                                    cam.ViewportSize.X * 0.5,
-                                    cam.ViewportSize.Y * 0.8,
-                                    0, false, nil, 0
-                                )
+                                local absPos = closeButton.AbsolutePosition
+                                local absSize = closeButton.AbsoluteSize
+                                local clickX = absPos.X + (absSize.X / 2) + (absSize.X * 0.4)
+                                local clickY = absPos.Y + (absSize.Y / 2) + (absSize.Y * 2)
+                                VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, nil, 0)
+                                VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, false, nil, 0)
                             end)
                             task.wait(0.1)
                         end
@@ -2557,11 +2558,12 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.8.6)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.8.7)
 
 ## What’s new:
 
-- [+] Add New Seed In Buy Seed Dropdown ]])
+- [/] Fixed auto confirm sell Brainrots or Plants Unsupport Other DPI
+- [/] Fixed Auto Continue When Victory Unsupport Other DPI ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2630,11 +2632,12 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.6)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.7)
 
 ## มีอะไรใหม่บ้าง:
 
-- [+] เพิ่มเมล็ดพันธุ์ใหม่ในเมนูซื้อเมล็ดพันธุ์ ]])
+- [/] แก้ไขการยืนยันการขาย Brainrots หรือ Plants อัตโนมัติ ไม่สนับสนุน DPI อื่นๆ
+- [/] แก้ไขการดำเนินการต่ออัตโนมัติเมื่อชัยชนะ ไม่สนับสนุน DPI อื่นๆ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2721,7 +2724,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.8.6",
+    Content = "Tad Hub PvB | 1.8.7",
     Duration = 10
 })
 
