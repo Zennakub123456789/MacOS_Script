@@ -1,0 +1,221 @@
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextChatService = game:GetService("TextChatService")
+
+local Window = MacUI:Window({
+    Title = "Tad Hub | Chat Follow",
+    Theme = "Dark"
+})
+
+local ChatTab = Window:Tab("Chat")
+
+local targetPlayerName = ""
+local chatEnabled = false
+local hotkeyControlEnabled = false
+local hotkeyActive = false
+
+local connectedPlayers = {}
+
+local statusGui = nil
+local statusLabel = nil
+
+local function sendMessage(msg)
+    if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+        local channels = TextChatService:FindFirstChild("TextChannels")
+        if channels then
+            local channel = channels:FindFirstChild("RBXGeneral")
+            if channel then
+                channel:SendAsync(msg)
+            else
+                warn("W")
+            end
+        else
+            warn("W")
+        end
+    else
+        local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+        if chatEvent and chatEvent:FindFirstChild("SayMessageRequest") then
+            chatEvent.SayMessageRequest:FireServer(msg, "All")
+        else
+            warn("W")
+        end
+    end
+end
+
+local function onPlayerChatted(player, msg)
+    local enabledNow = chatEnabled
+    if hotkeyControlEnabled then
+        enabledNow = hotkeyActive
+    end
+
+    if not enabledNow or player.Name ~= targetPlayerName then
+        return
+    end
+
+    local isBlacklisted = (targetPlayerName:lower() == "solid_chicken4391")
+
+    if not isBlacklisted then
+        sendMessage(msg)
+    else
+        print("W")
+    end
+end
+
+local function connectPlayer(player)
+    if connectedPlayers[player.UserId] then return end
+    connectedPlayers[player.UserId] = true
+    player.Chatted:Connect(function(msg)
+        onPlayerChatted(player, msg)
+    end)
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    connectPlayer(player)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    connectPlayer(player)
+end)
+
+local function createStatusLabel()
+    local oldGui = Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("ChatFollowStatusGUI")
+    if oldGui then 
+        oldGui:Destroy() 
+    end
+
+    statusGui = Instance.new("ScreenGui")
+    statusGui.Name = "ChatFollowStatusGUI"
+    statusGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+    statusGui.ResetOnSpawn = false
+    statusGui.Visible = false
+
+    local Frame = Instance.new("Frame")
+    Frame.Name = "StatusFrame"
+    Frame.Parent = statusGui
+    Frame.AnchorPoint = Vector2.new(1, 0)
+    Frame.Position = UDim2.new(1, -10, 0, 10)
+    Frame.Size = UDim2.new(0, 150, 0, 30)
+    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Frame.BackgroundTransparency = 0.3
+    Frame.BorderSizePixel = 0
+
+    statusLabel = Instance.new("TextLabel")
+    statusLabel.Name = "ChatFollowStatusLabel"
+    statusLabel.Parent = Frame
+    statusLabel.Size = UDim2.new(1, 0, 1, 0)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.TextColor3 = Color3.new(1, 1, 1)
+    statusLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    statusLabel.TextStrokeTransparency = 0.7
+    statusLabel.Font = Enum.Font.SourceSansBold
+    statusLabel.TextSize = 18
+    statusLabel.Text = "สถานะ: ปิด"
+end
+
+local function updateStatusLabel()
+    if not statusLabel then return end
+    local statusText = hotkeyActive and "สถานะ: เปิด" or "สถานะ: ปิด"
+    statusLabel.Text = statusText
+end
+
+createStatusLabel()
+
+local targetInput = ChatTab:Input({
+    Placeholder = "Enter players name.",
+    Default = "",
+    Flag = "TadHub_ChatFollowTarget",
+    Callback = function(text)
+        if text == "" then
+            targetPlayerName = ""
+            return
+        end
+
+        local text_lower = text:lower()
+        local exactMatch = nil
+        local prefixMatch = nil
+
+        for _, plr in ipairs(game.Players:GetPlayers()) do
+            local plr_name = plr.Name
+            local plr_lower = plr_name:lower()
+
+            if plr_lower == text_lower then
+                exactMatch = plr_name
+                break 
+            end
+
+            if prefixMatch == nil and plr_lower:sub(1, #text_lower) == text_lower then
+                prefixMatch = plr_name
+                break 
+            end
+        end
+
+        local finalName = ""
+        local updateTextBox = false
+
+        if exactMatch then
+            finalName = exactMatch
+            updateTextBox = false
+
+        elseif prefixMatch then
+            finalName = prefixMatch
+            updateTextBox = true
+
+        else
+            finalName = text
+            updateTextBox = false
+        end
+        
+        targetPlayerName = finalName
+        
+        if updateTextBox and targetInput and targetInput.SetValue then
+            if targetInput:Get() ~= finalName then
+                targetInput:SetValue(finalName)
+            end
+        end
+    end,
+})
+
+ChatTab:Toggle({
+    Title = "Enable Auto Chat follow",
+    Default = false,
+    Flag = "TadHub_ChatFollowToggle",
+    Callback = function(state)
+        chatEnabled = state
+        if state and hotkeyControlEnabled then
+            hotkeyControlEnabled = false
+            hotkeyActive = false
+            updateStatusLabel()
+            if statusGui then statusGui.Visible = false end
+        end
+    end,
+})
+
+ChatTab:Toggle({
+    Title = "Enable Auto Chat Follow (Hotkey F)",
+    Default = false,
+    Flag = "TadHub_ChatFollowHotkey",
+    Callback = function(state)
+        hotkeyControlEnabled = state
+        if state then
+            hotkeyActive = false
+            updateStatusLabel()
+            if statusGui then statusGui.Visible = true end
+        else
+            hotkeyActive = false
+            updateStatusLabel()
+            if statusGui then statusGui.Visible = false end
+        end
+    end,
+})
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if hotkeyControlEnabled and input.KeyCode == Enum.KeyCode.F then
+        hotkeyActive = not hotkeyActive
+        updateStatusLabel()
+    end
+end)
