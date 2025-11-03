@@ -2250,8 +2250,6 @@ local AutoStartInvasionToggle = EventTab:Toggle({
         
         if value then
             task.spawn(function()
-                local isWaitingForVictory = false
-                
                 while _G.AutoStartInvasion do
                     local player = Players.LocalPlayer
                     if not player or not player.Character then 
@@ -2259,33 +2257,21 @@ local AutoStartInvasionToggle = EventTab:Toggle({
                         break 
                     end
                     
-                    if not isWaitingForVictory then 
-                        local timerFrame = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Right") and player.PlayerGui.Main.Right:FindFirstChild("ImminentAttackTimer")
-                        if timerFrame and timerFrame.Visible then
-                            local timeLabel = timerFrame:FindFirstChild("Main", true) and timerFrame.Main:FindFirstChild("Time")
-                            if timeLabel and timeLabel.Text == "READY!" then
-                                
-                                pcall(function() ReplicatedStorage.Remotes.MissionServicesRemotes.RequestStartInvasion:FireServer() end)
-                                
-                                task.wait(1) 
-                                isWaitingForVictory = true
-                            end
-                        end
-                        task.wait(0.5)
-                    
-                    else 
-                        local victoryScreen = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Victory_Screen")
-                        if victoryScreen and victoryScreen.Visible then
-                            isWaitingForVictory = false
-                            task.wait(2)
-                        else
-                            task.wait(1)
+                    local timerFrame = player.PlayerGui:FindFirstChild("Main", true) and player.PlayerGui.Main:FindFirstChild("Right") and player.PlayerGui.Main.Right:FindFirstChild("ImminentAttackTimer")
+                    if timerFrame and timerFrame.Visible then
+                        local timeLabel = timerFrame:FindFirstChild("Main", true) and timerFrame.Main:FindFirstChild("Time")
+                        if timeLabel and timeLabel.Text == "READY!" then
+                            
+                            pcall(function() ReplicatedStorage.Remotes.MissionServicesRemotes.RequestStartInvasion:FireServer() end)
+                            
+                            task.wait(5) 
                         end
                     end
+                    task.wait(0.5)
                 end
             end)
         else
-            -- Stop
+            _G.AutoStartInvasion = false
         end
     end
 })
