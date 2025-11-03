@@ -1,15 +1,45 @@
-local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qqqqd3783-collab/MacOS_UI/refs/heads/main/Main.lua"))()
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/Apple-Library/refs/heads/main/Main_Fixed_WithWhiteBorder.lua"))()
+
+local imageUrl = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png"
+local imageName = "TadHub-Icon.png"
+
+if not isfile(imageName) then
+    local imageData = game:HttpGet(imageUrl)
+    writefile(imageName, imageData)
+end
+
+local iconPath = getcustomasset(imageName)
+
+local Window = MacUI:Window({
+    Title = "Tad Hub | Chat Follow",
+    Size = UDim2.new(0, 500, 0, 350),
+    Theme = "Dark",
+    Icon = iconPath,
+    LoadingTitle = "MacUI",
+    LoadingSubtitle = "Loading...",
+    ToggleUIKeybind = "K",
+    ShowToggleButton = true,
+    ToggleIcon = iconPath,
+    NotifyFromBottom = true,
+    ConfigurationSaving = {
+        Enabled = true,
+        FileName = "MacUI_Config"
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "Tad Hub | Key System",
+        Subtitle = "เข้าดิสคอสต์เพื่อเอาคีย์ คีย์จะรีเซ็ตทุก24ชั่วโมง (เดี๋ยวตื่นจะมาปิดระบบคีย์ให้ ตอนนี้คนในดิสมันเงียบ55) / Join Discord to get key And Keys reset every 24 H",
+        Key = {"Key_A3rTadHub_z8Nq4yF", "TadHub67"},
+        KeyLink = "https://discord.gg/VA35fm4r8f",
+        SaveKey = true
+    }
+})
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
-
-local Window = MacUI:Window({
-    Title = "Tad Hub | Chat Follow",
-    Theme = "Dark"
-})
 
 local ChatTab = Window:Tab("Chat")
 
