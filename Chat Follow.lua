@@ -146,8 +146,9 @@ end
 
 createStatusLabel()
 
-local targetInput = ChatTab:Input({
-    Placeholder = "Enter players name.",
+local targetInput
+targetInput = ChatTab:Input({
+    Placeholder = "ใส่ชื่อผู้เล่นที่ต้องการ",
     Default = "",
     Flag = "TadHub_ChatFollowTarget",
     Callback = function(text)
@@ -194,15 +195,13 @@ local targetInput = ChatTab:Input({
         targetPlayerName = finalName
         
         if updateTextBox and targetInput and targetInput.SetValue then
-            if targetInput:Get() ~= finalName then
-                targetInput:SetValue(finalName)
-            end
+            targetInput:SetValue(finalName)
         end
     end,
 })
 
 ChatTab:Toggle({
-    Title = "Enable Auto Chat follow",
+    Title = "Enable Chat Follow (Toggle)",
     Default = false,
     Flag = "TadHub_ChatFollowToggle",
     Callback = function(state)
@@ -217,7 +216,7 @@ ChatTab:Toggle({
 })
 
 ChatTab:Toggle({
-    Title = "Enable Auto Chat Follow (Hotkey F)",
+    Title = "Enable Chat Follow (Hotkey F)",
     Default = false,
     Flag = "TadHub_ChatFollowHotkey",
     Callback = function(state)
