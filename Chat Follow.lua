@@ -60,18 +60,12 @@ local function sendMessage(msg)
             local channel = channels:FindFirstChild("RBXGeneral")
             if channel then
                 channel:SendAsync(msg)
-            else
-                warn("W")
             end
-        else
-            warn("W")
         end
     else
         local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
         if chatEvent and chatEvent:FindFirstChild("SayMessageRequest") then
             chatEvent.SayMessageRequest:FireServer(msg, "All")
-        else
-            warn("W")
         end
     end
 end
@@ -90,8 +84,6 @@ local function onPlayerChatted(player, msg)
 
     if not isBlacklisted then
         sendMessage(msg)
-    else
-        print("W")
     end
 end
 
@@ -121,7 +113,7 @@ local function createStatusLabel()
     statusGui.Name = "ChatFollowStatusGUI"
     statusGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
     statusGui.ResetOnSpawn = false
-    statusGui.Visible = false
+    statusGui.Enabled = false
 
     local Frame = Instance.new("Frame")
     Frame.Name = "StatusFrame"
@@ -219,7 +211,7 @@ ChatTab:Toggle({
             hotkeyControlEnabled = false
             hotkeyActive = false
             updateStatusLabel()
-            if statusGui then statusGui.Visible = false end
+            if statusGui then statusGui.Enabled = false end
         end
     end,
 })
@@ -233,11 +225,11 @@ ChatTab:Toggle({
         if state then
             hotkeyActive = false
             updateStatusLabel()
-            if statusGui then statusGui.Visible = true end
+            if statusGui then statusGui.Enabled = true end
         else
             hotkeyActive = false
             updateStatusLabel()
-            if statusGui then statusGui.Visible = false end
+            if statusGui then statusGui.Enabled = false end
         end
     end,
 })
