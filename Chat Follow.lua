@@ -12,7 +12,7 @@ local iconPath = getcustomasset(imageName)
 
 local Window = MacUI:Window({
     Title = "Tad Hub | Chat Follow",
-    Size = UDim2.new(0, 500, 0, 350),
+    Size = UDim2.new(0, 500, 0, 300),
     Theme = "Dark",
     Icon = iconPath,
     LoadingTitle = "MacUI",
@@ -148,7 +148,7 @@ createStatusLabel()
 
 local targetInput
 targetInput = ChatTab:Input({
-    Placeholder = "ใส่ชื่อผู้เล่นที่ต้องการ",
+    Placeholder = "Enter players name",
     Default = "",
     Flag = "TadHub_ChatFollowTarget",
     Callback = function(text)
@@ -201,7 +201,7 @@ targetInput = ChatTab:Input({
 })
 
 ChatTab:Toggle({
-    Title = "Enable Chat Follow (Toggle)",
+    Title = "Enable Auto Chat follow",
     Default = false,
     Flag = "TadHub_ChatFollowToggle",
     Callback = function(state)
@@ -216,7 +216,7 @@ ChatTab:Toggle({
 })
 
 ChatTab:Toggle({
-    Title = "Enable Chat Follow (Hotkey F)",
+    Title = "Enable Auto Chat Follow (Hotkey F)",
     Default = false,
     Flag = "TadHub_ChatFollowHotkey",
     Callback = function(state)
