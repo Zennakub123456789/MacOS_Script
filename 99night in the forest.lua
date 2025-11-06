@@ -1029,7 +1029,7 @@ end
 
 local ItemSelector = AutoTab:Dropdown({
     Title = "Fuel Select",
-    Options = {"Log", "Fuel Canister", "Coal", "AnotherItem1", "AnotherItem2", "AnotherItem3", "AnotherItem4"}, 
+    Options = {"Log", "Biofuel", "Oil Barrel", "Fuel Canister", "Coal", "Chair", "Alien", "Feather", "Cultist", "Crossbow Cultist"}, 
     Multi = true,
     Default = {"Log"},
     Flag = "SelectedItems",
