@@ -1119,7 +1119,10 @@ local chestNamesToOpen = {
     "Snow Chest1",
     "Snow Chest2",
     "Volcanic Chest1",
-    "Volcanic Chest2"
+    "Volcanic Chest2",
+    "Halloween Chest",
+    "Halloween Chest1",
+    "Halloween Maze Chest"
 }
 
 local function bringItemToPlayer(item)
