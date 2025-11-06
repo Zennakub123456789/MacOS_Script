@@ -12,7 +12,7 @@ local iconPath = getcustomasset(imageName)
 
 local Window = MacUI:Window({
     Title = "Tad Hub | 99 Night In The Forest (Beta)",
-    Size = UDim2.new(0, 475, 0, 325),
+    Size = UDim2.new(0, 550, 0, 325),
     Theme = "Dark",
     Icon = iconPath,
     LoadingTitle = "Beta",
