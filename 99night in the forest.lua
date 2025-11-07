@@ -1099,6 +1099,310 @@ CheckFireToggle = AutoTab:Toggle({
     end
 })
 
+AutoTab:Section("Auto Cooked")
+
+local MacUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/Apple-Library/refs/heads/main/Main_Fixed_Improved(2).lua"))()
+
+local imageUrl = "https://raw.githubusercontent.com/Zennakub123456789/picture/main/TadHub-Icon.png"
+local imageName = "TadHub-Icon.png"
+
+if not isfile(imageName) then
+    local imageData = game:HttpGet(imageUrl)
+    writefile(imageName, imageData)
+end
+
+local iconPath = getcustomasset(imageName)
+
+local Window = MacUI:Window({
+    Title = "Tad Hub | 99 Night In The Forest (Beta)",
+    Size = UDim2.new(0, 550, 0, 325),
+    Theme = "Dark",
+    Icon = iconPath,
+    LoadingTitle = "Beta",
+    LoadingSubtitle = "Loading...",
+    ToggleUIKeybind = "K",
+    ShowToggleButton = true,
+    ToggleIcon = iconPath,
+    NotifyFromBottom = true,
+    ConfigurationSaving = {
+        Enabled = true,
+        FileName = "MacUI_Config"
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "Enter Key",
+        Subtitle = "Join Discord for key",
+        Key = {"TestKey123", "Premium456"},
+        KeyLink = "https://discord.gg/yourserver",
+        SaveKey = true
+    }
+})
+
+local AutoTab = Window:Tab("Info", "rbxassetid://76311199408449")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = game:GetService("Players").LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+
+local StartDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("RequestStartDraggingItem")
+local StopDragging = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StopDraggingItem")
+
+local function clearItemsNearCrockPot(crockPot, player)
+    if not player.Character or not player.Character.PrimaryPart then return end
+    local playerPosition = player.Character.PrimaryPart.Position
+    
+    if not crockPot or not crockPot.PrimaryPart then return end
+    local potPosition = crockPot.PrimaryPart.Position
+    
+    local itemsFolder = workspace:FindFirstChild("Items")
+    if not itemsFolder then return end
+
+    for _, item in ipairs(itemsFolder:GetChildren()) do
+        if item:IsA("Model") and item.PrimaryPart then
+            if (item.PrimaryPart.Position - potPosition).Magnitude <= 3 then
+                task.spawn(function()
+                    local targetCFrame = CFrame.new(playerPosition + Vector3.new(0, 5, 0))
+                    
+                    item.PrimaryPart.Anchored = true
+                    item:SetPrimaryPartCFrame(targetCFrame)
+                    task.wait(0.1) 
+
+                    local args = {item}
+                    StartDragging:FireServer(unpack(args))
+                    task.wait(0.1)
+                    
+                    if item.PrimaryPart.Anchored then
+                        item.PrimaryPart.Anchored = false
+                    end
+                    StopDragging:FireServer(unpack(args))
+                end)
+            end
+        end
+    end
+    task.wait(0.25)
+end
+
+local function bringItemsToCrockPot(crockPot)
+    if not crockPot or not crockPot.PrimaryPart then return end
+    local targetPosition = crockPot.PrimaryPart.Position
+
+    local itemsFolder = workspace:FindFirstChild("Items")
+    if not itemsFolder then return end
+    
+    local selectedTypes = getgenv().ItemsToBring
+    if not selectedTypes or #selectedTypes == 0 then return end
+
+    local availableItemsByType = {}
+    local availableSelectedTypes = {}
+    
+    for _, item in ipairs(itemsFolder:GetChildren()) do
+        if item:IsA("Model") and item.PrimaryPart then
+            local itemType = item.Name
+            if table.find(selectedTypes, itemType) then
+                if not availableItemsByType[itemType] then
+                    availableItemsByType[itemType] = {}
+                    table.insert(availableSelectedTypes, itemType)
+                end
+                table.insert(availableItemsByType[itemType], item)
+            end
+        end
+    end
+
+    if #availableSelectedTypes == 0 then return end
+    
+    local logicTypes = {}
+    for i = 1, math.min(3, #availableSelectedTypes) do
+        table.insert(logicTypes, availableSelectedTypes[i])
+    end
+
+    local itemsToBring = {}
+    local itemsToBringMap = {}
+    
+    local function tryAddItem(item)
+        if item and not itemsToBringMap[item] then
+            table.insert(itemsToBring, item)
+            itemsToBringMap[item] = true
+            return true
+        end
+        return false
+    end
+    
+    local function getAvailableItem(itemType, startIndex)
+        local items = availableItemsByType[itemType]
+        if not items then return nil, 0 end
+        for i = (startIndex or 1), #items do
+            if not itemsToBringMap[items[i]] then
+                return items[i], i
+            end
+        end
+        return nil, 0
+    end
+
+    if #logicTypes == 1 then
+        local itemType = logicTypes[1]
+        local item1, idx1 = getAvailableItem(itemType)
+        local item2, idx2 = getAvailableItem(itemType, idx1 + 1)
+        local item3, idx3 = getAvailableItem(itemType, idx2 + 1)
+        tryAddItem(item1)
+        tryAddItem(item2)
+        tryAddItem(item3)
+        
+    elseif #logicTypes == 2 then
+        local type1 = logicTypes[1]
+        local type2 = logicTypes[2]
+        
+        local type1_count, type2_count
+        if math.random() > 0.5 then
+            type1_count, type2_count = 2, 1
+        else
+            type1_count, type2_count = 1, 2
+        end
+
+        local item, idx = nil, 0
+        for i = 1, type1_count do
+            item, idx = getAvailableItem(type1, idx + 1)
+            tryAddItem(item)
+        end
+        
+        idx = 0
+        for i = 1, type2_count do
+            item, idx = getAvailableItem(type2, idx + 1)
+            tryAddItem(item)
+        end
+        
+    elseif #logicTypes >= 3 then
+        local item1, _ = getAvailableItem(logicTypes[1])
+        local item2, _ = getAvailableItem(logicTypes[2])
+        local item3, _ = getAvailableItem(logicTypes[3])
+        tryAddItem(item1)
+        tryAddItem(item2)
+        tryAddItem(item3)
+    end
+
+    local itemsNeeded = 3 - #itemsToBring
+    if itemsNeeded > 0 then
+        for _, itemType in ipairs(availableSelectedTypes) do
+            if itemsNeeded == 0 then break end
+            
+            local item, idx = nil, 0
+            while itemsNeeded > 0 do
+                item, idx = getAvailableItem(itemType, idx + 1)
+                if item then
+                    if tryAddItem(item) then
+                        itemsNeeded = itemsNeeded - 1
+                    end
+                else
+                    break
+                end
+            end
+        end
+    end
+
+    local spacing = 3
+    local offsetIndex = 0
+
+    for _, item in ipairs(itemsToBring) do
+        task.spawn(function()
+            local primaryPart = item.PrimaryPart
+            if not primaryPart then return end
+
+            primaryPart.Anchored = true
+            
+            local angle = math.rad(offsetIndex * 120) 
+            local xOffset = math.cos(angle) * spacing
+            local zOffset = math.sin(angle) * spacing
+            local targetCFrame = CFrame.new(targetPosition.X + xOffset, targetPosition.Y + 5, targetPosition.Z + zOffset)
+            
+            item:SetPrimaryPartCFrame(targetCFrame)
+
+            while not (crockPot and crockPot.PrimaryPart) do task.wait(0.1) end
+
+            local args = {item}
+            StartDragging:FireServer(unpack(args))
+            
+            local expectedHeight = targetPosition.Y + 5
+            if math.abs(primaryPart.Position.Y - expectedHeight) > 0.5 then
+                item:SetPrimaryPartCFrame(targetCFrame)
+                task.wait(0.1)
+            end
+            
+            if primaryPart.Anchored then
+                primaryPart.Anchored = false
+            end
+            
+            StopDragging:FireServer(unpack(args))
+        end)
+        
+        offsetIndex = offsetIndex + 1
+    end
+end
+
+local FoodSelector = AutoTab:Dropdown({
+    Title = "Food Select",
+    Options = {"Carrot", "Apple", "Cake", "Mackerel", "Ribs", "Morsel"}, 
+    Multi = true,
+    Default = {"Carrot"},
+    Flag = "SelectedFood",
+    Callback = function(selectedItems)
+        getgenv().ItemsToBring = selectedFood
+    end
+})
+getgenv().ItemsToBring = FoodSelector:Get()
+
+local AutoCookToggle = AutoTab:Toggle({
+    Title = "Auto Cooked",
+    Default = false,
+    Flag = "AutoBringItems",
+    Callback = function(state)
+        getgenv().AutoBringItems = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().AutoBringItems do
+                    
+                    local crockPot = workspace:FindFirstChild("Structures") and workspace.Structures:FindFirstChild("Crock Pot")
+                    while not crockPot and getgenv().AutoBringItems do
+                        
+                        MacUI:Notify({
+                            Title = "Searching",
+                            Content = "Crock Pot not found. Retrying...",
+                            Duration = 1.5
+                        })
+                        
+                        task.wait(1.5)
+                        crockPot = workspace:FindFirstChild("Structures") and workspace.Structures:FindFirstChild("Crock Pot")
+                    end
+                    
+                    if not getgenv().AutoBringItems then break end 
+                    
+                    if crockPot and crockPot.PrimaryPart then
+                        local isCooking = crockPot:GetAttribute("Cooking")
+
+                        if isCooking == true then
+                            task.wait(0.5)
+                        elseif isCooking == false then
+                            clearItemsNearCrockPot(crockPot, player)
+                            
+                            task.wait(1)
+                            
+                            if not getgenv().AutoBringItems then break end
+
+                            bringItemsToCrockPot(crockPot)
+                            
+                            task.wait(1) 
+                        else
+                            task.wait(1)
+                        end
+                    else
+                        task.wait(1)
+                    end
+                end
+            end)
+        end
+    end
+})
+
 AutoTab:Section("Auto Open Chest And Bring")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
