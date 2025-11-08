@@ -38,7 +38,7 @@ local Window = MacUI:Window({
 local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 
 local Comingabel1 = infoTab:Label({
-    Text = "สคริปแมพ 99คืนในป่า กับ แมพขโมย กำลังจะมา!"
+    Text = "เดี๋ยวอัพเดทให้ ขอไปนอนก่อน"
 })
 
 infoTab:Section("Update")
