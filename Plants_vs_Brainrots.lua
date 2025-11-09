@@ -41,12 +41,14 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.8.7)
+    Code = [[# PvB Script Update! (v1.9.7)
 
 ## What’s new:
 
-- [/] Fixed auto confirm Brainrots or Plants Unsupport Other DPI
-- [/] Fixed Auto Continue When Victory Unsupport Other DPI ]]
+- [+] Added Auto Merge Madness Event (Toggle)
+- [+] Added Favorite Only (Toggle) For Auto Merge Madness Event
+- [+] Added  Auto Add XP (Toggle)
+- [+] Added Auto Reset Merge Madness Event (Toggle) ]]
 })
 
 infoTab:Section("Discord")
@@ -3079,8 +3081,10 @@ local languageScripts = {
 
 ## What’s new:
 
-- [/] Fixed auto confirm sell Brainrots or Plants Unsupport Other DPI
-- [/] Fixed Auto Continue When Victory Unsupport Other DPI ]])
+- [+] Added Auto Merge Madness Event (Toggle)
+- [+] Added Favorite Only (Toggle) For Auto Merge Madness Event
+- [+] Added  Auto Add XP (Toggle)
+- [+] Added Auto Reset Merge Madness Event (Toggle) ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -3156,8 +3160,10 @@ local languageScripts = {
 
 ## มีอะไรใหม่บ้าง:
 
-- [/] แก้ไขการยืนยันการขาย Brainrots หรือ Plants อัตโนมัติ ไม่สนับสนุน DPI อื่นๆ
-- [/] แก้ไขการดำเนินการต่ออัตโนมัติเมื่อชัยชนะ ไม่สนับสนุน DPI อื่นๆ ]])
+- [+] เพิ่มออโต้ทำอีเว้นใหม่ (อีเว้นการผสาน) (Toggle)
+- [+] เพิ่ม เฉพาะรายการโปรด (เอาแค่ตัวที่ล็อคไว้) (Toggle) สำหรับ ออโต้ทำอีเว้นใหม่ (อีเว้นการผสาน) เท่านั้น
+- [+] เพิ่ม ออโต้ใส่ Xp (Toggle)
+- [+] เพิ่ม ออโต้รีเซ็ตอีเว้นใหม่เมื่อทำเสร็จ (Toggle) ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -3247,7 +3253,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.8.7",
+    Content = "Tad Hub PvB | 1.9.7",
     Duration = 10
 })
 
