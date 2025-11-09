@@ -37,10 +37,6 @@ local Window = MacUI:Window({
 
 local infoTab = Window:Tab("Info", "rbxassetid://76311199408449")
 
-local Comingabel1 = infoTab:Label({
-    Text = "เดี๋ยวอัพเดทให้ ขอไปนอนก่อน"
-})
-
 infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
@@ -3143,7 +3139,10 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
-        WantedItemFinderToggle:SetTitle("Auto Deliver Brainrot")
+        AutoMergeMadnessEventToggle:SetTitle("Auto Merge Madness Event")
+        FavoriteonlyMergeMadnessEventToggle:SetTitle("Favorite Only")
+        AutoAddEXP:SetTitle("Auto Add XP")
+        AutoResetMergeMadnessEvent:SetTitle("Auto Reset Merge Madness Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -3217,6 +3216,10 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        AutoMergeMadnessEventToggle:SetTitle("ออโต้วางตัวในเครื่องผสานอัตโนมัติ")
+        FavoriteonlyMergeMadnessEventToggle:SetTitle("เฉพาะรายการโปรด (เอาแค่ตัวที่ล็อคไว้)")
+        AutoAddEXP:SetTitle("เพิ่ม XP อัตโนมัติ")
+        AutoResetMergeMadnessEvent:SetTitle("ออโต้ รีเซ็ตอีเว้นการสผานเมื่อทำเสร็จ อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
