@@ -1492,11 +1492,13 @@ local AutoBuySeedSelectedToggle = ShopTab:Toggle({
                     if #getgenv().SelectedBuySeeds > 0 then
                         for _, seed in ipairs(getgenv().SelectedBuySeeds) do
                             if not getgenv().AutoBuySeedSelected then break end
-                            buySeedRemote:FireServer(seed, true)
-                            task.wait(0.5)
+                            task.spawn(function()
+                                buySeedRemote:FireServer(seed, true)
+                            end)
+                            task.wait(0.2)
                         end
                     else
-                        task.wait(1)
+                        task.wait(0.3)
                     end
                 end
             end)
@@ -1515,8 +1517,10 @@ local AutoBuyAllToggle = ShopTab:Toggle({
                 while getgenv().AutoBuySeedAll do
                     for _, seed in ipairs(AllSeeds) do
                         if not getgenv().AutoBuySeedAll then break end
-                        buySeedRemote:FireServer(seed, true)
-                        task.wait(0.5)
+                        task.spawn(function()
+                            buySeedRemote:FireServer(seed, true)
+                        end)
+                        task.wait(0.25)
                     end
                 end
             end)
@@ -1551,18 +1555,19 @@ local AutoBuySelectedToggle = ShopTab:Toggle({
     Flag = "AutoBuySelected",
     Callback = function(value)
         getgenv().AutoBuySelected = value
-
         if value then
             task.spawn(function()
                 while getgenv().AutoBuySelected do
                     if #getgenv().SelectedBuyItems > 0 then
                         for _, item in ipairs(getgenv().SelectedBuyItems) do
                             if not getgenv().AutoBuySelected then break end
-                            buyRemote:FireServer(item, true)
-                            task.wait(0.5)
+                            task.spawn(function()
+                                buyRemote:FireServer(item, true)
+                            end)
+                            task.wait(0.2)
                         end
                     else
-                        task.wait(1)
+                        task.wait(0.3)
                     end
                 end
             end)
@@ -1576,14 +1581,15 @@ local AutoBuyGearAllToggle = ShopTab:Toggle({
     Flag = "AutoBuyAll",
     Callback = function(value)
         getgenv().AutoBuyAll = value
-
         if value then
             task.spawn(function()
                 while getgenv().AutoBuyAll do
                     for _, item in ipairs(AllItems) do
                         if not getgenv().AutoBuyAll then break end
-                        buyRemote:FireServer(item, true)
-                        task.wait(0.5)
+                        task.spawn(function()
+                            buyRemote:FireServer(item, true)
+                        end)
+                        task.wait(0.25)
                     end
                 end
             end)
