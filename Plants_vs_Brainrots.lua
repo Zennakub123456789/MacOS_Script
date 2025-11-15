@@ -2375,7 +2375,254 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
     end
 })
 
-EventTab:Section("Plant Pantry Event Coming Soon...")
+EventTab:Section("Plant Pantry Event")
+
+local TargetPos = Vector3.new(-165.79, 12.56, 1014.72)
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local ToolMode = "No Favorite"
+
+local ModeDropdown = Tab:Dropdown({
+    Title = "Tool Search Mode",
+    Options = {"No Favorite", "Favorite Only", "All"},
+    Default = "All",
+    Callback = function(selected)
+        ToolMode = selected
+    end
+})
+
+local function isToolFavorited(tool)
+    local playerGui = player.PlayerGui
+    if not playerGui then return false end
+
+    local UserInputService = game:GetService("UserInputService")
+    local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
+
+    local backpackGui = playerGui:FindFirstChild("BackpackGui", true)
+    if not backpackGui then return false end
+
+    local hotbar = backpackGui.Backpack:FindFirstChild("Hotbar")
+    if hotbar then
+        for i = 1, hotbarSlots do
+            local slot = hotbar:FindFirstChild(tostring(i))
+            local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+            if toolNameLabel and toolNameLabel.Text == tool.Name then
+                if slot:FindFirstChild("HeartIcon") then return true end
+            end
+        end
+    end
+
+    local inventoryFrame = backpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
+    if inventoryFrame then
+        for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
+            if itemSlot:IsA("TextButton") then
+                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                if toolNameLabel and toolNameLabel.Text == tool.Name then
+                    if itemSlot:FindFirstChild("HeartIcon") then return true end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+local function getRewardName()
+    local path = workspace.ScriptedMap.PlantPantry.FavoriteFood.Billboard.Reward.Icon.Reward_Detail
+    return path and path.Text or nil
+end
+
+local function getCheckmark()
+    return workspace.ScriptedMap.PlantPantry.FavoriteFood.Billboard.Reward.Checkmark
+end
+
+local function waitForCheckmark()
+    local checkmark = getCheckmark()
+    if not checkmark then return end
+    while checkmark.Visible == true do
+        task.wait(0.2)
+    end
+end
+
+local function characterHasTool()
+    local character = player.Character
+    if not character then return false end
+    for _, v in ipairs(character:GetChildren()) do
+        if v:IsA("Tool") then return true end
+    end
+    return false
+end
+
+local function findSimilarItems(keyword)
+    keyword = keyword:lower()
+    local backpack = player.Backpack
+    local list = {}
+
+    for _, tool in ipairs(backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            local lowerName = tool.Name:lower()
+
+            if lowerName:find("seed") then
+                continue
+            end
+
+            if lowerName:find(keyword) then
+
+                if ToolMode == "No Favorite" and isToolFavorited(tool) then
+                    continue
+                end
+
+                if ToolMode == "Favorite Only" and not isToolFavorited(tool) then
+                    continue
+                end
+
+                table.insert(list, tool)
+            end
+        end
+    end
+
+    return list
+end
+
+local function equipItem(item)
+    if not item then return end
+
+    local lowerName = item.Name:lower()
+    if lowerName:find("seed") then
+        return
+    end
+
+    if characterHasTool() then
+        return
+    end
+
+    local character = player.Character or player.CharacterAdded:Wait()
+    item.Parent = character
+end
+
+local function teleportToTarget()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local root = character:WaitForChild("HumanoidRootPart", 5)
+    if root then
+        root.CFrame = CFrame.new(TargetPos)
+    end
+end
+
+local function checkAndHoldPrompt(rewardName)
+    local gui = player.PlayerGui:FindFirstChild("ProximityPrompts")
+    if not gui then return false end
+
+    local default = gui:FindFirstChild("Default")
+    if not default then return false end
+
+    local frame = default:FindFirstChild("PromptFrame")
+    if not frame then return false end
+
+    local objectText = frame:FindFirstChild("ObjectText")
+    local actionText = frame:FindFirstChild("ActionText")
+
+    if not objectText or not actionText then return false end
+    if objectText.Text ~= "Give" then return false end
+    if actionText.Text ~= rewardName then return false end
+
+    local character = player.Character
+    if not character then return false end
+
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return false end
+
+    for _, inst in ipairs(workspace:GetDescendants()) do
+        if inst:IsA("ProximityPrompt") then
+            local prompt = inst
+            local parentPart = prompt.Parent
+
+            if parentPart:IsA("BasePart") then
+                local dist = (parentPart.Position - root.Position).Magnitude
+                if dist <= prompt.MaxActivationDistance then
+                    prompt:InputHoldBegin()
+                    task.wait(prompt.HoldDuration)
+                    prompt:InputHoldEnd()
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+local PantryeventToggle = EventTab:Toggle({
+    Title = "Auto Pantry Event",
+    Default = false,
+    Callback = function(state)
+        _G.AutoPantry = state
+
+        while _G.AutoPantry do
+            task.wait(0.3)
+
+            waitForCheckmark()
+
+            if characterHasTool() then
+                continue
+            end
+
+            local rewardName = getRewardName()
+            if not rewardName then continue end
+
+            local items = findSimilarItems(rewardName)
+            if #items == 1 then
+                equipItem(items[1])
+            elseif #items > 1 then
+                equipItem(items[math.random(1, #items)])
+            else
+                continue
+            end
+
+            teleportToTarget()
+            task.wait(0.3)
+
+            local success = checkAndHoldPrompt(rewardName)
+            if success then
+                waitForCheckmark()
+            end
+        end
+    end
+})
+
+local ResetpantryToggle = EventTab:Toggle({
+    Title = "Auto Restart Pantry Event",
+    Default = false,
+    Callback = function(state)
+        _G.AutoResetPantry = state
+
+        while _G.AutoResetPantry do
+            task.wait(0.3)
+
+            local player = game:GetService("Players").LocalPlayer
+            local gui = player.PlayerGui
+
+            local completeGui = gui:FindFirstChild("Main")
+            if completeGui then
+                local surface = completeGui:FindFirstChild("SurfaceGui")
+                if surface then
+                    local mainComplete = surface:FindFirstChild("Main_Complete")
+                    if mainComplete and mainComplete.Visible == true then
+
+                        local args = {
+                            [1] = "ResetRequest"
+                        }
+
+                        game:GetService("ReplicatedStorage")
+                            .Remotes
+                            .Events
+                            .PlantPantry
+                            .Interact:FireServer(unpack(args))
+                    end
+                end
+            end
+        end
+    end
+})
 
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
