@@ -2383,7 +2383,7 @@ local player = Players.LocalPlayer
 
 local ToolMode = "No Favorite"
 
-local ModeDropdown = Tab:Dropdown({
+local FavoriteModeDropdown = EventTab:Dropdown({
     Title = "Tool Search Mode",
     Options = {"No Favorite", "Favorite Only", "All"},
     Default = "All",
