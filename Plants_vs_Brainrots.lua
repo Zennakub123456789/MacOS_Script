@@ -2390,9 +2390,9 @@ local player = Players.LocalPlayer
 local ToolMode = "No Favorite"
 
 local FavoriteModeDropdown = EventTab:Dropdown({
-    Title = "Tool Search Mode",
+    Title = "Favorite Mode",
     Options = {"No Favorite", "Favorite Only", "All"},
-    Default = "All",
+    Default = "No Favorite",
     Callback = function(selected)
         ToolMode = selected
     end
@@ -2877,6 +2877,7 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
+        FavoriteModeDropdown:SetTitle("Favorite Mode")
         PantryeventToggle:SetTitle("Auto Pantry Event")
         ResetpantryToggle:SetTitle("Auto Restart Pantry Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
@@ -2954,6 +2955,7 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        FavoriteModeDropdown:SetTitle("โหมดที่ชื่นชอบ")
         PantryeventToggle:SetTitle("ออโต้ ส่งพืชให้เชฟ ชับเบโลนี่ อัตโนมัติ")
         ResetpantryToggle:SetTitle("ออโต้ เริ่มต้นอีเว้นส่งพืชใหม่ อัตโนมัติ (เมื่อทำเสร็จ)")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
