@@ -41,14 +41,14 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.9.7)
+    Code = [[# PvB Script Update! (v1.10.7)
 
 ## What’s new:
 
-- [+] Added Auto Merge Madness Event (Toggle)
-- [+] Added Favorite Only (Toggle) For Auto Merge Madness Event
-- [+] Added  Auto Add XP (Toggle)
-- [+] Added Auto Reset Merge Madness Event (Toggle) ]]
+- [+] Added Auto Pantry Event (Toggle)
+- [+] Added can Select Favorite Mode (Dropdown)
+- [+] Added Auto Restart Pantry Event (Toggle)
+- [/] Improved performance and increased speed to Buy Seed and Gear ]]
 })
 
 infoTab:Section("Discord")
@@ -2811,14 +2811,14 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.8.7)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.10.7)
 
 ## What’s new:
 
-- [+] Added Auto Merge Madness Event (Toggle)
-- [+] Added Favorite Only (Toggle) For Auto Merge Madness Event
-- [+] Added  Auto Add XP (Toggle)
-- [+] Added Auto Reset Merge Madness Event (Toggle) ]])
+- [+] Added Auto Pantry Event (Toggle)
+- [+] Added can Select Favorite Mode (Dropdown)
+- [+] Added Auto Restart Pantry Event (Toggle)
+- [/] Improved performance and increased speed to Buy Seed and Gear ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2877,6 +2877,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
+        PantryeventToggle:SetTitle("Auto Pantry Event")
+        ResetpantryToggle:SetTitle("Auto Restart Pantry Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2886,14 +2888,14 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.8.7)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.10.7)
 
 ## มีอะไรใหม่บ้าง:
 
-- [+] เพิ่มออโต้ทำอีเว้นใหม่ (อีเว้นการผสาน) (Toggle)
-- [+] เพิ่ม เฉพาะรายการโปรด (เอาแค่ตัวที่ล็อคไว้) (Toggle) สำหรับ ออโต้ทำอีเว้นใหม่ (อีเว้นการผสาน) เท่านั้น
-- [+] เพิ่ม ออโต้ใส่ Xp (Toggle)
-- [+] เพิ่ม ออโต้รีเซ็ตอีเว้นใหม่เมื่อทำเสร็จ (Toggle) ]])
+- [+] เพิ่ม ออโต้ ส่งพืชให้เซฟชับโบเลนี่ อัตโนมัติ
+- [+] เพิ่ม โหมดเลือกรายการโปรด
+- [+] เพิ่ม ออโต้ เริ่มต้นอีเว้นส่งพืชใหม่ อัตโนมัติ
+- [/] ปรับปรุงประสิทธิภาพและเพิ่มความเร็วในการซื้อเมล็ดพันธุ์และอุปกรณ์ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2952,6 +2954,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        PantryeventToggle:SetTitle("ออโต้ ส่งพืชให้เชฟ ชับเบโลนี่ อัตโนมัติ")
+        ResetpantryToggle:SetTitle("ออโต้ เริ่มต้นอีเว้นส่งพืชใหม่ อัตโนมัติ (เมื่อทำเสร็จ)")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
@@ -2979,7 +2983,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.9.7",
+    Content = "Tad Hub PvB | 1.10.7",
     Duration = 10
 })
 
