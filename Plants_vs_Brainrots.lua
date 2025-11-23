@@ -1739,10 +1739,14 @@ SellTab:Section("Auto Sell Brainrots + Plants")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+
 local itemSellRemote = ReplicatedStorage.Remotes.ItemSell
 local plantSellRemote = ReplicatedStorage.Remotes.ItemSell
 
 getgenv().AutoSellAllFull = false
+
+local FULL_TEXT = "Your inventory is full! (250/250)"
+local lastFullTriggered = false
 
 local AutoSellAllFullToggle = SellTab:Toggle({
     Title = "Auto Sell All When Inventory Full",
@@ -1750,25 +1754,50 @@ local AutoSellAllFullToggle = SellTab:Toggle({
     Flag = "AutoSellAllFull",
     Callback = function(value)
         getgenv().AutoSellAllFull = value
+
         if value then
             task.spawn(function()
-                while getgenv().AutoSellAllFull do
-                    local player = Players.LocalPlayer
-                    if player then
-                        local backpack = player:WaitForChild("Backpack")
-                        if #backpack:GetChildren() >= 250 then
+                local player = Players.LocalPlayer
+                local gui = player:WaitForChild("PlayerGui")
+                local notifications = gui:WaitForChild("Notifications")
+                local container = notifications:WaitForChild("Notifications")
+                local notif = container:WaitForChild("Notification")
+                local msg = notif:WaitForChild("Message")
+
+                msg:GetPropertyChangedSignal("Text"):Connect(function()
+                    if not getgenv().AutoSellAllFull then return end
+
+                    local text = msg.Text
+
+                    if text == FULL_TEXT then
+                        if not lastFullTriggered then
+                            lastFullTriggered = true
                             local args = { [2] = true }
                             itemSellRemote:FireServer(unpack(args))
                             plantSellRemote:FireServer(unpack(args))
                         end
+                    else
+                        lastFullTriggered = false
                     end
-                    task.wait(1)
+                end)
+
+                while getgenv().AutoSellAllFull do
+                    if msg.Text == FULL_TEXT then
+                        if not lastFullTriggered then
+                            lastFullTriggered = true
+                            local args = { [2] = true }
+                            itemSellRemote:FireServer(unpack(args))
+                            plantSellRemote:FireServer(unpack(args))
+                        end
+                    else
+                        lastFullTriggered = false
+                    end
+                    task.wait(0.3)
                 end
             end)
         end
     end
 })
-
 
 SellTab:Section("Auto Confirm")
 
