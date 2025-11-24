@@ -41,14 +41,14 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.10.7)
+    Code = [[# PvB Script Update! (v1.10.8)
 
 ## What’s new:
 
-- [+] Added Auto Pantry Event (Toggle)
-- [+] Added can Select Favorite Mode (Dropdown)
-- [+] Added Auto Restart Pantry Event (Toggle)
-- [/] Improved performance and increased speed to Buy Seed and Gear ]]
+- [-] Remove Auto Plant Pantry
+- [-] Remove Auto Restart Plant Pantry
+- [+] Added Auto Corrupted Plant Pantry [Toggle]
+- [/] Fixed Auto Sell Both Don't Work ]]
 })
 
 infoTab:Section("Discord")
@@ -2747,14 +2747,14 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.10.7)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.10.8)
 
 ## What’s new:
 
-- [+] Added Auto Pantry Event (Toggle)
-- [+] Added can Select Favorite Mode (Dropdown)
-- [+] Added Auto Restart Pantry Event (Toggle)
-- [/] Improved performance and increased speed to Buy Seed and Gear ]])
+- [-] Remove Auto Plant Pantry
+- [-] Remove Auto Restart Plant Pantry
+- [+] Added Auto Corrupted Plant Pantry [Toggle]
+- [/] Fixed Auto Sell Both Don't Work ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2824,14 +2824,14 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.10.7)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.10.8)
 
 ## มีอะไรใหม่บ้าง:
 
-- [+] เพิ่ม ออโต้ ส่งพืชให้เซฟชับโบเลนี่ อัตโนมัติ
-- [+] เพิ่ม โหมดเลือกรายการโปรด
-- [+] เพิ่ม ออโต้ เริ่มต้นอีเว้นส่งพืชใหม่ อัตโนมัติ
-- [/] ปรับปรุงประสิทธิภาพและเพิ่มความเร็วในการซื้อเมล็ดพันธุ์และอุปกรณ์ ]])
+- [-] ลบ ออโต้ ส่งพืชให้เซฟชับโบเลนี่ อัตโนมัติ
+- [-] ลบ ออโต้เริ่มต้นการส่งพืชใหม่ เมื่อชนะ
+- [+] เพิ่ม ออโต้ ส่งพืชให้เซฟขับโลเลนี่เพื่อเอาสถานะใหม่ อัตโนมัติ [Toggle]
+- [/] แก้ไข การขายอัตโนมัติทั้งสองไม่ทำงาน ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2891,7 +2891,7 @@ local languageScripts = {
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
         FavoriteModeDropdown:SetTitle("โหมดที่ชื่นชอบ")
-        CorruptedPantryeventToggle:SetTitle("ออโต้ ส่งพืชเพื่อเอาสถานะใหม่ อัตโนมัติ")
+        CorruptedPantryeventToggle:SetTitle("ออโต้ ส่งพืชให้เซฟชับโบเลนี่เพื่อเอาสถานะใหม่ อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
