@@ -2412,6 +2412,160 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
 
 EventTab:Section("Corrupted Plant Pantry Event")
 
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local ToolMode = "No Favorite"
+
+local FavoriteModeDropdown = EventTab:Dropdown({
+    Title = "Favorite Mode",
+    Options = {"No Favorite", "Favorite Only", "All"},
+    Default = "No Favorite",
+    Callback = function(selected)
+        ToolMode = selected
+    end
+})
+
+local function isToolFavorited(tool)
+    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+    if not playerGui then return false end
+
+    local backpackGui = playerGui:FindFirstChild("BackpackGui", true)
+    if not backpackGui then return false end
+
+    local hotbar = backpackGui:FindFirstChild("Backpack") and backpackGui.Backpack:FindFirstChild("Hotbar")
+    if hotbar then
+        for i = 1, 10 do
+            local slot = hotbar:FindFirstChild(tostring(i))
+            local toolNameLabel = slot and slot:FindFirstChild("ToolName")
+            if toolNameLabel and toolNameLabel.Text == tool.Name then
+                if slot:FindFirstChild("HeartIcon") then return true end
+            end
+        end
+    end
+
+    local inventory = backpackGui:FindFirstChild("Backpack") and backpackGui.Backpack:FindFirstChild("Inventory")
+    local scroll = inventory and inventory:FindFirstChild("ScrollingFrame")
+    local grid = scroll and scroll:FindFirstChild("UIGridFrame")
+    
+    if grid then
+        for _, itemSlot in ipairs(grid:GetChildren()) do
+            if itemSlot:IsA("TextButton") then
+                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
+                if toolNameLabel and toolNameLabel.Text == tool.Name then
+                    if itemSlot:FindFirstChild("HeartIcon") then return true end
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+local function isValidPlant(tool)
+    if string.find(tool.Name, "Seed") then return false end
+
+    local plantName = tool:GetAttribute("Plant")
+    if plantName then
+        local nestedModel = tool:FindFirstChild(plantName)
+        if nestedModel then
+            local mutationValue = nestedModel:GetAttribute("Mutation")
+            if mutationValue == "Corrupted" then return false end
+        end
+    end
+
+    local isFav = isToolFavorited(tool)
+    if ToolMode == "No Favorite" and isFav then return false
+    elseif ToolMode == "Favorite Only" and not isFav then return false end
+
+    return true
+end
+
+local function getAvailablePlants()
+    local results = {}
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    
+    if backpack then
+        for _, tool in ipairs(backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                if tool:GetAttribute("Plant") and isValidPlant(tool) then
+                    table.insert(results, tool)
+                end
+            end
+        end
+    end
+    return results
+end
+
+local function equipItem(item)
+    if not item then return end
+    local character = LocalPlayer.Character
+    local humanoid = character and character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid:EquipTool(item)
+    end
+end
+
+local function getTimerLabel()
+    local map = Workspace:FindFirstChild("ScriptedMap")
+    if not map then return nil end
+    local pantry = map:FindFirstChild("CorruptedPlantPantry")
+    if not pantry then return nil end
+    local timerUI = pantry:FindFirstChild("TimerUI")
+    if not timerUI then return nil end
+    local gui = timerUI:FindFirstChild("GUI")
+    if not gui then return nil end
+    return gui:FindFirstChild("Timer")
+end
+
+local CorruptedPantryeventToggle = EventTab:Toggle({
+    Title = "Auto Corrupted Plant Pantry",
+    Default = false,
+    Callback = function(state)
+        _G.AutoPantry = state
+
+        task.spawn(function()
+            while _G.AutoPantry do
+                local timerLabel = getTimerLabel()
+
+                if not timerLabel then
+                    task.wait(1)
+                    continue
+                end
+
+                local timerText = timerLabel.Text
+
+                if timerText ~= "" then
+                    task.wait(1)
+                    continue
+                end
+
+                local items = getAvailablePlants()
+                
+                if #items > 0 then
+                    local selectedTool = items[math.random(1, #items)]
+                    equipItem(selectedTool)
+                    
+                    task.wait(0.5)
+
+                    pcall(function()
+                        local remote = ReplicatedStorage.Remotes.Events.CorruptedPlantPantry.Interact
+                        remote:FireServer("RequestGive")
+                    end)
+                    
+                    task.wait(2) 
+                else
+                    task.wait(1)
+                end
+                
+                task.wait(0.5)
+            end
+        end)
+    end
+})
+
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
 SettingTab:Section("Performance")
@@ -2660,8 +2814,7 @@ local languageScripts = {
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
         FavoriteModeDropdown:SetTitle("Favorite Mode")
-        PantryeventToggle:SetTitle("Auto Pantry Event")
-        ResetpantryToggle:SetTitle("Auto Restart Pantry Event")
+        CorruptedPantryeventToggle:SetTitle("Auto Corrupted Plant Pantry")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2738,8 +2891,7 @@ local languageScripts = {
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
         FavoriteModeDropdown:SetTitle("โหมดที่ชื่นชอบ")
-        PantryeventToggle:SetTitle("ออโต้ ส่งพืชให้เชฟ ชับเบโลนี่ อัตโนมัติ")
-        ResetpantryToggle:SetTitle("ออโต้ เริ่มต้นอีเว้นส่งพืชใหม่ อัตโนมัติ (เมื่อทำเสร็จ)")
+        CorruptedPantryeventToggle:SetTitle("ออโต้ ส่งพืชเพื่อเอาสถานะใหม่ อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
