@@ -45,10 +45,11 @@ local UpdateCode = infoTab:Code({
 
 ## What’s new:
 
-- [-] Remove Auto Plant Pantry
-- [-] Remove Auto Restart Plant Pantry
-- [+] Added Auto Corrupted Plant Pantry [Toggle]
-- [/] Fixed Auto Sell Both Don't Work ]]
+- [-] Removed Auto Corrupted Plant Pantry [Toggle]
+- [+] Added Auto Snow Bridge Event
+- [+] Added Auto Reset Snow Bridge Event 
+- [+] Added Auto Buy New Seed
+- NEW FUNCTION COMING... ]]
 })
 
 infoTab:Section("Discord")
@@ -2621,10 +2622,11 @@ local languageScripts = {
 
 ## What’s new:
 
-- [-] Remove Auto Plant Pantry
-- [-] Remove Auto Restart Plant Pantry
-- [+] Added Auto Corrupted Plant Pantry [Toggle]
-- [/] Fixed Auto Sell Both Don't Work ]])
+- [-] Removed Auto Corrupted Plant Pantry [Toggle]
+- [+] Added Auto Snow Bridge Event
+- [+] Added Auto Reset Snow Bridge Event 
+- [+] Added Auto Buy New Seed
+- NEW FUNCTION COMING... ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2697,10 +2699,11 @@ local languageScripts = {
 
 ## มีอะไรใหม่บ้าง:
 
-- [-] ลบ ออโต้ ส่งพืชให้เซฟชับโบเลนี่ อัตโนมัติ
-- [-] ลบ ออโต้เริ่มต้นการส่งพืชใหม่ เมื่อชนะ
-- [+] เพิ่ม ออโต้ ส่งพืชให้เซฟขับโลเลนี่เพื่อเอาสถานะใหม่ อัตโนมัติ [Toggle]
-- [/] แก้ไข การขายอัตโนมัติทั้งสองไม่ทำงาน ]])
+- [-] ลบ ออโต้ ส่งพืชให้เซฟขับโลเลนี่เพื่อเอาสถานะใหม่ อัตโนมัติ [Toggle]
+- [+] เพิ่ม ออโต้สร้างสะพานหิมะอัตโนมัติ
+- [+] เพิ่ม ออโต้รีเซ็ตสร้างสะพานหิมะอัตโนมัติเมื่อเสร็จ
+- [+] เพิ่ม ซื้อเมล็ดพันธุ์ใหม่ได้แล้ว
+- ฟังชั่นอื่นจะมาในอีกไม่ช้า... ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
