@@ -41,7 +41,7 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.10.8)
+    Code = [[# PvB Script Update! (v1.10.9)
 
 ## What’s new:
 
@@ -1464,7 +1464,7 @@ ShopTab:Section("Auto Buy Seed")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
-local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed", "Starfruit Seed" }
+local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed", "Starfruit Seed", "Brussel Sprouts Seed" }
 
 getgenv().SelectedBuySeeds = {}
 getgenv().AutoBuySeedSelected = false
@@ -1895,163 +1895,6 @@ local TeleportFixedButton = TeleportTab:Button({
 
 local EventTab = Window:Tab("Event", "rbxassetid://128706247346129")
 
-EventTab:Section("Card Event")
-
-getgenv().ActionLock = false
-
-getgenv().AutoDailyEvent = false
-local isDailyLoopRunning = false
-local dailyEventZonePart = nil
-
-local AutoDailyEventToggle = EventTab:Toggle({
-    Title = "Auto Daily Event",
-    Desc = "Auto Card event",
-    Default = false,
-    Flag = "AutoDailyEvent",
-    Callback = function(value)
-        getgenv().AutoDailyEvent = value
-        if value then
-            if isDailyLoopRunning then return end
-            isDailyLoopRunning = true
-            dailyEventZonePart = Instance.new("Part"); dailyEventZonePart.Name = "EventZone"; dailyEventZonePart.Size = Vector3.new(172, 66, 169); dailyEventZonePart.Position = Vector3.new(-176.95, 11.56, 976.97); dailyEventZonePart.Anchored = true; dailyEventZonePart.Transparency = 1; dailyEventZonePart.CanCollide = false; dailyEventZonePart.CastShadow = false; dailyEventZonePart.Parent = workspace
-            MacUI:Notify({ Title = "Started", Content = "Start Auto Event", Duration = 3 })
-            task.spawn(function()
-                while isDailyLoopRunning do
-                    if not getgenv().ActionLock then
-                        local player = game:GetService("Players").LocalPlayer
-                        if not player or not player.Character then break end
-                        local UserInputService = game:GetService("UserInputService")
-                        local teleportPositions = {
-                            ["-1"] = CFrame.new(-218.65, 13.68, 963.75),
-                            ["-2"] = CFrame.new(-218.81, 13.68, 973.73),
-                            ["-3"] = CFrame.new(-218.61, 13.68, 983.85),
-                            ["-4"] = CFrame.new(-218.10, 13.56, 993.87)
-                        }
-                        local function isToolFavorited(tool)
-                            local playerGui = player.PlayerGui
-                            if not playerGui then return false end
-                            local hotbarSlots = UserInputService.TouchEnabled and 6 or 10
-                            local hotbar = playerGui:FindFirstChild("BackpackGui", true) and playerGui.BackpackGui.Backpack:FindFirstChild("Hotbar")
-                            if hotbar then
-                                for i = 1, hotbarSlots do
-                                    local slot = hotbar:FindFirstChild(tostring(i))
-                                    local toolNameLabel = slot and slot:FindFirstChild("ToolName")
-                                    if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
-                                        if slot:FindFirstChild("HeartIcon") then return true end
-                                    end
-                                end
-                            end
-                            local inventoryFrame = playerGui:FindFirstChild("BackpackGui", true) and playerGui.BackpackGui.Backpack.Inventory.ScrollingFrame:FindFirstChild("UIGridFrame")
-                            if inventoryFrame then
-                                for _, itemSlot in ipairs(inventoryFrame:GetChildren()) do
-                                    if itemSlot:IsA("TextButton") then
-                                        local toolNameLabel = itemSlot:FindFirstChild("ToolName")
-                                        if toolNameLabel and toolNameLabel.Text ~= "" and toolNameLabel.Text == tool.Name then
-                                            if itemSlot:FindFirstChild("HeartIcon") then return true end
-                                        end
-                                    end
-                                end
-                            end
-                            return false
-                        end
-                        local function isPlayerInZone(character, zone)
-                            if not character or not zone then return false end
-                            local hrp = character:FindFirstChild("HumanoidRootPart")
-                            if not hrp then return false end
-                            local playerPos = hrp.Position; local zonePos = zone.Position; local zoneSize = zone.Size
-                            local minX = zonePos.X - zoneSize.X / 2; local maxX = zonePos.X + zoneSize.X / 2
-                            local minY = zonePos.Y - zoneSize.Y / 2; local maxY = zonePos.Y + zoneSize.Y / 2
-                            local minZ = zonePos.Z - zoneSize.Z / 2; local maxZ = zonePos.Z + zoneSize.Z / 2
-                            return (playerPos.X >= minX and playerPos.X <= maxX and playerPos.Y >= minY and playerPos.Y <= maxY and playerPos.Z >= minZ and playerPos.Z <= maxZ)
-                        end
-                        local myPlot
-                        for i = 1, 6 do
-                            local plot = workspace.Plots:FindFirstChild(tostring(i))
-                            if plot and plot:GetAttribute("Owner") == player.Name then
-                                myPlot = plot
-                                break
-                            end
-                        end
-                        if myPlot then
-                            for i = -1, -4, -1 do
-                                local platform = myPlot.EventPlatforms:FindFirstChild(tostring(i))
-                                if platform then
-                                    local ui = platform:FindFirstChild("PlatformEventUI", true)
-                                    if ui and ui.Enabled then
-                                        local titleLabel = ui:FindFirstChild("Title")
-                                        if titleLabel then
-                                            local targetBrainrotName = titleLabel.Text
-                                            if targetBrainrotName and targetBrainrotName ~= "" and targetBrainrotName ~= "None" then
-                                                local backpack = player:WaitForChild("Backpack")
-                                                local character = player.Character
-                                                local matches = {}
-                                                for _, tool in ipairs(backpack:GetChildren()) do
-                                                    if tool:IsA("Tool") and string.find(tool.Name, targetBrainrotName) and not isToolFavorited(tool) then
-                                                        table.insert(matches, tool)
-                                                    end
-                                                end
-                                                if character then
-                                                    for _, tool in ipairs(character:GetChildren()) do
-                                                        if tool:IsA("Tool") and string.find(tool.Name, targetBrainrotName) and not isToolFavorited(tool) then
-                                                            table.insert(matches, tool)
-                                                        end
-                                                    end
-                                                end
-                                                if #matches > 0 then
-                                                    getgenv().ActionLock = true
-                                                    local toolToEquip = matches[math.random(1, #matches)]
-                                                    local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                                                    local targetPosition = teleportPositions[tostring(i)]
-                                                    if humanoidRootPart and targetPosition then
-                                                        humanoidRootPart.CFrame = targetPosition
-                                                        task.wait(0.5)
-                                                    end
-                                                    if player.Character and player.Character:FindFirstChild("Humanoid") then
-                                                       player.Character.Humanoid:EquipTool(toolToEquip)
-                                                       MacUI:Notify({ Title = "Platform Event", Content = "Equipped: " .. toolToEquip.Name, Duration = 2 })
-                                                       task.wait(0.5)
-                                                       if isPlayerInZone(player.Character, dailyEventZonePart) then
-                                                           local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                                                            if rootPart then
-                                                                for _, instance in ipairs(workspace:GetDescendants()) do
-                                                                    if instance:IsA("ProximityPrompt") then
-                                                                        local prompt = instance
-                                                                        local targetPart = prompt.Parent
-                                                                        if targetPart and targetPart:IsA("BasePart") then
-                                                                            local distance = (targetPart.Position - rootPart.Position).Magnitude
-                                                                            if distance <= prompt.MaxActivationDistance then
-                                                                                prompt:InputHoldBegin(); task.wait(prompt.HoldDuration); prompt:InputHoldEnd()
-                                                                                MacUI:Notify({ Title = "Event", Content = "Placed Brainrot!", Duration = 2 }); break 
-                                                                            end
-                                                                        end
-                                                                    end
-                                                                end
-                                                            end
-                                                       end
-                                                    end
-                                                    getgenv().ActionLock = false
-                                                    break 
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    task.wait(1.5)
-                end
-            end)
-        else
-            if isDailyLoopRunning then
-                isDailyLoopRunning = false
-                if dailyEventZonePart then dailyEventZonePart:Destroy(); dailyEventZonePart = nil end
-                MacUI:Notify({ Title = "Stopped", Content = "Stop Auto Event", Duration = 4 })
-            end
-        end
-    end
-})
-
 EventTab:Section("Invasion Event")
 
 local Players = game:GetService("Players")
@@ -2410,154 +2253,181 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
     end
 })
 
-EventTab:Section("Corrupted Plant Pantry Event")
+EventTab:Section("Build a Snow Bridge Event")
 
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
-local ToolMode = "No Favorite"
+_G.AutoBridgeActive = false
 
-local FavoriteModeDropdown = EventTab:Dropdown({
-    Title = "Favorite Mode",
-    Options = {"No Favorite", "Favorite Only", "All"},
-    Default = "No Favorite",
-    Callback = function(selected)
-        ToolMode = selected
-    end
-})
+local function GetBridgeCurrency()
+    local Map = Workspace:FindFirstChild("ScriptedMap")
+    local Bridge = Map and Map:FindFirstChild("ChristmasBridge")
+    local BillAlways = Bridge and Bridge:FindFirstChild("BillAlways")
+    local CurrencyUI = BillAlways and BillAlways:FindFirstChild("CurrencyUI")
+    local GUI = CurrencyUI and CurrencyUI:FindFirstChild("GUI")
+    local AmountLabel = GUI and GUI:FindFirstChild("Amount")
 
-local function isToolFavorited(tool)
-    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
-    if not playerGui then return false end
-
-    local backpackGui = playerGui:FindFirstChild("BackpackGui", true)
-    if not backpackGui then return false end
-
-    local hotbar = backpackGui:FindFirstChild("Backpack") and backpackGui.Backpack:FindFirstChild("Hotbar")
-    if hotbar then
-        for i = 1, 10 do
-            local slot = hotbar:FindFirstChild(tostring(i))
-            local toolNameLabel = slot and slot:FindFirstChild("ToolName")
-            if toolNameLabel and toolNameLabel.Text == tool.Name then
-                if slot:FindFirstChild("HeartIcon") then return true end
-            end
+    if AmountLabel and AmountLabel:IsA("TextLabel") and AmountLabel.Text then
+        local cur, max = string.match(AmountLabel.Text, "(%d+)/(%d+)")
+        if cur and max then
+            return tonumber(cur), tonumber(max)
         end
     end
+    return nil, nil
+end
 
-    local inventory = backpackGui:FindFirstChild("Backpack") and backpackGui.Backpack:FindFirstChild("Inventory")
-    local scroll = inventory and inventory:FindFirstChild("ScrollingFrame")
-    local grid = scroll and scroll:FindFirstChild("UIGridFrame")
+local function TeleportToBill()
+    local Map = Workspace:FindFirstChild("ScriptedMap")
+    local CBridge = Map and Map:FindFirstChild("ChristmasBridge")
+    local Bill = CBridge and CBridge:FindFirstChild("Bill")
+    local CurrencyUI = Bill and Bill:FindFirstChild("CurrencyUI")
     
-    if grid then
-        for _, itemSlot in ipairs(grid:GetChildren()) do
-            if itemSlot:IsA("TextButton") then
-                local toolNameLabel = itemSlot:FindFirstChild("ToolName")
-                if toolNameLabel and toolNameLabel.Text == tool.Name then
-                    if itemSlot:FindFirstChild("HeartIcon") then return true end
+    if CurrencyUI and CurrencyUI:IsA("Attachment") then
+        local HumanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if HumanoidRootPart then
+            HumanoidRootPart.CFrame = CurrencyUI.WorldCFrame
+        end
+    end
+end
+
+local function PressAndVerifyBuild(rootPart)
+    if not rootPart then return false end
+    
+    local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+    local ProximityPrompts = PlayerGui and PlayerGui:FindFirstChild("ProximityPrompts")
+    local Default = ProximityPrompts and ProximityPrompts:FindFirstChild("Default")
+    local PromptFrame = Default and Default:FindFirstChild("PromptFrame")
+    
+    if not PromptFrame then return false end
+    
+    local ActionText = PromptFrame:FindFirstChild("ActionText")
+    local ObjectText = PromptFrame:FindFirstChild("ObjectText")
+
+    if not (ActionText and ObjectText and ActionText.Text == "Build" and ObjectText.Text == "Bridge") then
+        return false 
+    end
+
+    local prompt = nil
+    for attempt = 1, 10 do
+        for _, instance in ipairs(Workspace:GetDescendants()) do
+            if instance:IsA("ProximityPrompt") and instance.Enabled then
+                local targetPart = instance.Parent
+                if targetPart and targetPart:IsA("BasePart") then
+                    if (targetPart.Position - rootPart.Position).Magnitude <= instance.MaxActivationDistance then
+                        prompt = instance 
+                        break
+                    end
                 end
             end
         end
+        if prompt then break else task.wait(0.1) end
     end
 
+    if not prompt then return false end
+
+    while _G.AutoBridgeActive do
+        prompt:InputHoldBegin()
+        task.wait(prompt.HoldDuration)
+        prompt:InputHoldEnd()
+        
+        local startTime = tick()
+        local uiGone = false
+        
+        while tick() - startTime < 3 do
+            if not _G.AutoBridgeActive then return false end
+            
+            local CheckFrame = LocalPlayer.PlayerGui.ProximityPrompts.Default.PromptFrame
+            local CheckAction = CheckFrame:FindFirstChild("ActionText")
+            local CheckObject = CheckFrame:FindFirstChild("ObjectText")
+            
+            if not (CheckAction and CheckObject and CheckAction.Text == "Build" and CheckObject.Text == "Bridge") then
+                uiGone = true
+                break
+            end
+            task.wait(0.1)
+        end
+
+        if uiGone then
+            return true
+        end
+    end
     return false
 end
 
-local function isValidPlant(tool)
-    if string.find(tool.Name, "Seed") then return false end
-
-    local plantName = tool:GetAttribute("Plant")
-    if plantName then
-        local nestedModel = tool:FindFirstChild(plantName)
-        if nestedModel then
-            local mutationValue = nestedModel:GetAttribute("Mutation")
-            if mutationValue == "Corrupted" then return false end
-        end
-    end
-
-    local isFav = isToolFavorited(tool)
-    if ToolMode == "No Favorite" and isFav then return false
-    elseif ToolMode == "Favorite Only" and not isFav then return false end
-
-    return true
-end
-
-local function getAvailablePlants()
-    local results = {}
-    local backpack = LocalPlayer:FindFirstChild("Backpack")
-    
-    if backpack then
-        for _, tool in ipairs(backpack:GetChildren()) do
-            if tool:IsA("Tool") then
-                if tool:GetAttribute("Plant") and isValidPlant(tool) then
-                    table.insert(results, tool)
-                end
-            end
-        end
-    end
-    return results
-end
-
-local function equipItem(item)
-    if not item then return end
-    local character = LocalPlayer.Character
-    local humanoid = character and character:FindFirstChild("Humanoid")
-    if humanoid then
-        humanoid:EquipTool(item)
-    end
-end
-
-local function getTimerLabel()
-    local map = Workspace:FindFirstChild("ScriptedMap")
-    if not map then return nil end
-    local pantry = map:FindFirstChild("CorruptedPlantPantry")
-    if not pantry then return nil end
-    local timerUI = pantry:FindFirstChild("TimerUI")
-    if not timerUI then return nil end
-    local gui = timerUI:FindFirstChild("GUI")
-    if not gui then return nil end
-    return gui:FindFirstChild("Timer")
-end
-
-local CorruptedPantryeventToggle = EventTab:Toggle({
-    Title = "Auto Corrupted Plant Pantry",
+local AutoBridgeToggle = EventTab:Toggle({
+    Title = "Auto Snow Bridge",
+    Desc = "วาปไปจ่ายเงินสร้างสะพานเมื่อเงินพอ",
     Default = false,
-    Callback = function(state)
-        _G.AutoPantry = state
+    Flag = "AutoBridgeToggle",
+    
+    Callback = function(value)
+        _G.AutoBridgeActive = value
+        
+        if not _G.AutoBridgeActive then return end
 
         task.spawn(function()
-            while _G.AutoPantry do
-                local timerLabel = getTimerLabel()
-
-                if not timerLabel then
-                    task.wait(1)
-                    continue
-                end
-
-                local timerText = timerLabel.Text
-
-                if timerText ~= "" then
-                    task.wait(1)
-                    continue
-                end
-
-                local items = getAvailablePlants()
+            while _G.AutoBridgeActive do
+                local cur, max = GetBridgeCurrency()
                 
-                if #items > 0 then
-                    local selectedTool = items[math.random(1, #items)]
-                    equipItem(selectedTool)
+                if cur and max and cur > max then
                     
-                    task.wait(0.5)
+                    TeleportToBill()
+                    
+                    task.wait(0.5) 
+                    
+                    local HumanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if HumanoidRootPart then
+                        PressAndVerifyBuild(HumanoidRootPart)
+                    end
+                end
+                
+                task.wait(0.5)
+            end
+        end)
+    end
+})
 
-                    pcall(function()
-                        local remote = ReplicatedStorage.Remotes.Events.CorruptedPlantPantry.Interact
-                        remote:FireServer("RequestGive")
-                    end)
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+_G.AutoResetBridgeActive = false
+
+local AutoResetBridgeToggle = EventTab:Toggle({
+    Title = "Auto Reset Snow Bridge Event",
+    Desc = "รีเซ็ตสะพานอัตโนมัติเมื่อจบ",
+    Default = false,
+    Flag = "AutoResetBridge",
+    Callback = function(value)
+        _G.AutoResetBridgeActive = value
+        
+        if not _G.AutoResetBridgeActive then return end
+
+        task.spawn(function()
+            while _G.AutoResetBridgeActive do
+                local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+                local Main = PlayerGui and PlayerGui:FindFirstChild("Main")
+                local SurfaceGui = Main and Main:FindFirstChild("SurfaceGui")
+                local MainFrame = SurfaceGui and SurfaceGui:FindFirstChild("Main")
+                local BodyReset = MainFrame and MainFrame:FindFirstChild("BodyReset")
+
+                if BodyReset and BodyReset.Visible == true then
                     
-                    task.wait(2) 
-                else
-                    task.wait(1)
+                    local Remote = ReplicatedStorage:FindFirstChild("Remotes")
+                        and ReplicatedStorage.Remotes:FindFirstChild("Events")
+                        and ReplicatedStorage.Remotes.Events:FindFirstChild("Christmas")
+                        and ReplicatedStorage.Remotes.Events.Christmas:FindFirstChild("InteractBridge")
+
+                    if Remote then
+                        local args = {
+                            [1] = "ResetRequest"
+                        }
+                        Remote:FireServer(unpack(args))
+                        
+                        task.wait(1)
+                    end
                 end
                 
                 task.wait(0.5)
@@ -2747,7 +2617,7 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.10.8)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.10.9)
 
 ## What’s new:
 
@@ -2808,13 +2678,12 @@ local languageScripts = {
         TeleportGrassButton:SetDesc("Goto Your Plots")
         TeleportFixedButton:SetTitle("Teleport to Prison Event")
         TeleportFixedButton:SetDesc("Goto Event Area")
-        AutoDailyEventToggle:SetTitle("Auto Daily Event")
         AutoMissionBrainrotToggle:SetTitle("Auto Farm Mission Brainrots + Everything")
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
-        FavoriteModeDropdown:SetTitle("Favorite Mode")
-        CorruptedPantryeventToggle:SetTitle("Auto Corrupted Plant Pantry")
+        AutoBridgeToggle:SetTitle("Auto Snow Bridge")
+        AutoResetBridgeToggle:SetTitle("Auto Reset Snow Bridge Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2824,7 +2693,7 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.10.8)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.10.9)
 
 ## มีอะไรใหม่บ้าง:
 
@@ -2885,13 +2754,12 @@ local languageScripts = {
         TeleportGrassButton:SetDesc("วาปไปที่พล็อต")
         TeleportFixedButton:SetTitle("วาปไปอีเว้น")
         TeleportFixedButton:SetDesc("วาปไปสถานที่อีเว้น")
-        AutoDailyEventToggle:SetTitle("ออโต้ทำอีเว้นรายวันอัตโนมัติ")
         AutoMissionBrainrotToggle:SetTitle("ออโต้ฟาร์มภารกิจ เบรนร็อต + ทำทุกอย่างในอีเว้น")
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
-        FavoriteModeDropdown:SetTitle("โหมดที่ชื่นชอบ")
-        CorruptedPantryeventToggle:SetTitle("ออโต้ ส่งพืชให้เซฟชับโบเลนี่เพื่อเอาสถานะใหม่ อัตโนมัติ")
+        AutoBridgeToggle:SetTitle("ออโต้สร้างสะพานหิมะอัตโนมัติ")
+        AutoResetBridgeToggle:SetTitle("ออโต้รีเซ็ตสร้างสะพานหิมะอัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
@@ -2919,7 +2787,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.10.7",
+    Content = "Tad Hub PvB | 1.10.9",
     Duration = 10
 })
 
