@@ -2372,7 +2372,7 @@ local AutoBridgeToggle = EventTab:Toggle({
             while _G.AutoBridgeActive do
                 local cur, max = GetBridgeCurrency()
                 
-                if cur and max and cur > max then
+                if cur and max and cur >= max then
                     
                     TeleportToBill()
                     
