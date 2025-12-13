@@ -45,11 +45,13 @@ local UpdateCode = infoTab:Code({
 
 ## What’s new:
 
-- [-] Removed Auto Corrupted Plant Pantry [Toggle]
-- [+] Added Auto Snow Bridge Event
-- [+] Added Auto Reset Snow Bridge Event 
-- [+] Added Auto Buy New Seed
-- NEW FUNCTION COMING... ]]
+- [-] Added Auto Snow Bridge Event
+- [-] Added Auto Reset Snow Bridge Event 
+- [+] Added Can Buy New Gear
+- [+] Added Shoot Auto King Krakolem [Toggle]
+- [+] Added Auto Reset King Krakolem Event [Toggle]
+- [+] Added Select Dropdown for Buy King Krakolem Shop [Dropdown]
+- [+] Added Auto Buy King Krakolem Shop [Toggle] ]]
 })
 
 infoTab:Section("Discord")
@@ -2667,11 +2669,13 @@ local languageScripts = {
 
 ## What’s new:
 
-- [-] Removed Auto Corrupted Plant Pantry [Toggle]
-- [+] Added Auto Snow Bridge Event
-- [+] Added Auto Reset Snow Bridge Event 
-- [+] Added Auto Buy New Seed
-- NEW FUNCTION COMING... ]])
+- [-] Added Auto Snow Bridge Event
+- [-] Added Auto Reset Snow Bridge Event 
+- [+] Added Can Buy New Gear
+- [+] Added Shoot Auto King Krakolem [Toggle]
+- [+] Added Auto Reset King Krakolem Event [Toggle]
+- [+] Added Select Dropdown for Buy King Krakolem Shop [Dropdown]
+- [+] Added Auto Buy King Krakolem Shop [Toggle] ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2749,10 +2753,10 @@ local languageScripts = {
 - [-] ลบ ออโต้สร้างสะพายหิมะอัตโนมัติ
 - [-] ลบ ออโต้รีเซ้ตสร้างสะพานหิมะอัตโนมัติ
 - [+] เพิ่ม สามารถซื้อเกียร์ใหม่ได้แล้ว
-- [+]  [Toggle]
-- [+]  [Toggle]
-- [+] Added Select Dropdown for Buy King Krakolem Shop [Dropdown]
-- [+] Added Auto Buy King Krakolem Shop [Toggle] ]])
+- [+] ออโต้ยิงกษัตริย์คราโคเลม [Toggle]
+- [+] ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ [Toggle]
+- [+] เพิ่ม เมนูแบบดรอปดาวน์สำหรับซื้อสินค้าจากร้านกษัตริย์คราโคเลม [Dropdown]
+- [+] เพิ่ม ออโต้ ซื้อของจากร้านกษัตริย์คราโคเลม [Toggle] ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
