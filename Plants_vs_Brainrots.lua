@@ -2427,6 +2427,61 @@ local AutoResetChristmasBoss = EventTab:Toggle({
     end
 })
 
+EventTab:Section("King Krakolem Shop")
+
+local PurchaseItems = {
+    ["Item 1"] = 1,
+    ["Plants"] = 2,
+    ["Item 3"] = 3,
+    ["Item 4"] = 4
+}
+
+local SelectedPurchases = {}
+local ChristmasBossAutoBuyActive = false
+
+local SelectKingKrakolemShop = EventTab:Dropdown({
+    Title = "Select Items to Buy",
+    Options = {"Item 1", "Plants", "Item 3", "Item 4"},
+    Multi = true,
+    Default = {},
+    Flag = "ChristmasShopSelection",
+    Callback = function(selected)
+        SelectedPurchases = selected
+    end
+})
+
+local AutoBuyKingKrakolemShop = EventTab:Toggle({
+    Title = "Auto Buy King Krakolem Shop",
+    Default = false,
+    Flag = "AutoBuyChristmasItems",
+    Callback = function(value)
+        ChristmasBossAutoBuyActive = value
+        
+        if value then
+            task.spawn(function()
+                while ChristmasBossAutoBuyActive do
+                    task.wait(0.5)
+                    
+                    for _, itemName in pairs(SelectedPurchases) do
+                        if not ChristmasBossAutoBuyActive then break end
+                        
+                        local id = PurchaseItems[itemName]
+                        
+                        if id then
+                            local args = {
+                                [1] = "RequestPurchase",
+                                [2] = id
+                            }
+                            game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractBoss:FireServer(unpack(args))
+                            task.wait(0.1)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
 local SettingTab = Window:Tab("Settings", "rbxassetid://128706247346129")
 
 SettingTab:Section("Performance")
@@ -2749,6 +2804,9 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        AutoChristmasBossCannon:SetTitle("ออโต้ยิงกษัตริย์คราโคเลม")
+        AutoResetChristmasBoss:SetTitle("ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ")
+        
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
