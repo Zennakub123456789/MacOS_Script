@@ -41,7 +41,7 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.10.9)
+    Code = [[# PvB Script Update! (v1.11.0)
 
 ## What’s new:
 
@@ -2254,24 +2254,20 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
     end
 })
 
-EventTab:Section("Build a Snow Bridge Event")
+EventTab:Section("Ice Boss (King Krakolem) Event")
 
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local LocalPlayer = Players.LocalPlayer
+local ChristmasBossEventActive = false
 
-_G.AutoBridgeActive = false
+local function GetBossCurrency()
+    local gui = workspace:FindFirstChild("ScriptedMap") 
+        and workspace.ScriptedMap:FindFirstChild("ChristmasBoss") 
+        and workspace.ScriptedMap.ChristmasBoss:FindFirstChild("Bill")
+        and workspace.ScriptedMap.ChristmasBoss.Bill:FindFirstChild("CurrencyUI")
+        and workspace.ScriptedMap.ChristmasBoss.Bill.CurrencyUI:FindFirstChild("GUI")
+        and workspace.ScriptedMap.ChristmasBoss.Bill.CurrencyUI.GUI:FindFirstChild("Amount")
 
-local function GetBridgeCurrency()
-    local Map = Workspace:FindFirstChild("ScriptedMap")
-    local Bridge = Map and Map:FindFirstChild("ChristmasBridge")
-    local BillAlways = Bridge and Bridge:FindFirstChild("BillAlways")
-    local CurrencyUI = BillAlways and BillAlways:FindFirstChild("CurrencyUI")
-    local GUI = CurrencyUI and CurrencyUI:FindFirstChild("GUI")
-    local AmountLabel = GUI and GUI:FindFirstChild("Amount")
-
-    if AmountLabel and AmountLabel:IsA("TextLabel") and AmountLabel.Text then
-        local cur, max = string.match(AmountLabel.Text, "(%d+)/(%d+)")
+    if gui and gui:IsA("TextLabel") and gui.Text then
+        local cur, max = string.match(gui.Text, "(%d+)/(%d+)")
         if cur and max then
             return tonumber(cur), tonumber(max)
         end
@@ -2279,23 +2275,10 @@ local function GetBridgeCurrency()
     return nil, nil
 end
 
-local function TeleportToBill()
-    local Map = Workspace:FindFirstChild("ScriptedMap")
-    local CBridge = Map and Map:FindFirstChild("ChristmasBridge")
-    local Bill = CBridge and CBridge:FindFirstChild("Bill")
-    local CurrencyUI = Bill and Bill:FindFirstChild("CurrencyUI")
-    
-    if CurrencyUI and CurrencyUI:IsA("Attachment") then
-        local HumanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if HumanoidRootPart then
-            HumanoidRootPart.CFrame = CurrencyUI.WorldCFrame
-        end
-    end
-end
-
-local function PressAndVerifyBuild(rootPart)
+local function PressAndVerifyCannon(rootPart)
     if not rootPart then return false end
     
+    local LocalPlayer = game:GetService("Players").LocalPlayer
     local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
     local ProximityPrompts = PlayerGui and PlayerGui:FindFirstChild("ProximityPrompts")
     local Default = ProximityPrompts and ProximityPrompts:FindFirstChild("Default")
@@ -2306,19 +2289,21 @@ local function PressAndVerifyBuild(rootPart)
     local ActionText = PromptFrame:FindFirstChild("ActionText")
     local ObjectText = PromptFrame:FindFirstChild("ObjectText")
 
-    if not (ActionText and ObjectText and ActionText.Text == "Build" and ObjectText.Text == "Bridge") then
+    if not (ActionText and ObjectText and ActionText.Text == "Shoot" and ObjectText.Text == "Cannon") then
         return false 
     end
 
     local prompt = nil
     for attempt = 1, 10 do
-        for _, instance in ipairs(Workspace:GetDescendants()) do
+        for _, instance in ipairs(workspace:GetDescendants()) do
             if instance:IsA("ProximityPrompt") and instance.Enabled then
-                local targetPart = instance.Parent
-                if targetPart and targetPart:IsA("BasePart") then
-                    if (targetPart.Position - rootPart.Position).Magnitude <= instance.MaxActivationDistance then
-                        prompt = instance 
-                        break
+                if instance.ObjectText == "Cannon" and instance.ActionText == "Shoot" then
+                    local targetPart = instance.Parent
+                    if targetPart and targetPart:IsA("BasePart") then
+                        if (targetPart.Position - rootPart.Position).Magnitude <= instance.MaxActivationDistance then
+                            prompt = instance 
+                            break
+                        end
                     end
                 end
             end
@@ -2328,7 +2313,7 @@ local function PressAndVerifyBuild(rootPart)
 
     if not prompt then return false end
 
-    while _G.AutoBridgeActive do
+    while ChristmasBossEventActive do
         prompt:InputHoldBegin()
         task.wait(prompt.HoldDuration)
         prompt:InputHoldEnd()
@@ -2337,13 +2322,20 @@ local function PressAndVerifyBuild(rootPart)
         local uiGone = false
         
         while tick() - startTime < 3 do
-            if not _G.AutoBridgeActive then return false end
+            if not ChristmasBossEventActive then return false end
             
-            local CheckFrame = LocalPlayer.PlayerGui.ProximityPrompts.Default.PromptFrame
-            local CheckAction = CheckFrame:FindFirstChild("ActionText")
-            local CheckObject = CheckFrame:FindFirstChild("ObjectText")
+            local CheckFrame = LocalPlayer.PlayerGui:FindFirstChild("ProximityPrompts") 
+                and LocalPlayer.PlayerGui.ProximityPrompts.Default.PromptFrame
             
-            if not (CheckAction and CheckObject and CheckAction.Text == "Build" and CheckObject.Text == "Bridge") then
+            if CheckFrame then
+                local CheckAction = CheckFrame:FindFirstChild("ActionText")
+                local CheckObject = CheckFrame:FindFirstChild("ObjectText")
+                
+                if not (CheckFrame.Visible and CheckAction and CheckObject and CheckAction.Text == "Shoot" and CheckObject.Text == "Cannon") then
+                    uiGone = true
+                    break
+                end
+            else
                 uiGone = true
                 break
             end
@@ -2357,83 +2349,81 @@ local function PressAndVerifyBuild(rootPart)
     return false
 end
 
-local AutoBridgeToggle = EventTab:Toggle({
-    Title = "Auto Snow Bridge",
-    Desc = "วาปไปจ่ายเงินสร้างสะพานเมื่อเงินพอ",
+local AutoChristmasBossCannon = EventTab:Toggle({
+    Title = "Auto Shoot King Krakolem",
     Default = false,
-    Flag = "AutoBridgeToggle",
-    
+    Flag = "AutoCannonEvent",
     Callback = function(value)
-        _G.AutoBridgeActive = value
+        ChristmasBossEventActive = value
         
-        if not _G.AutoBridgeActive then return end
+        if value then
+            task.spawn(function()
+                while ChristmasBossEventActive do
+                    task.wait(0.5)
+                    
+                    pcall(function()
+                        local timerObj = workspace.ScriptedMap.ChristmasBoss.Timer.Timer
+                        if timerObj and timerObj.Enabled == true then
+                            repeat 
+                                task.wait(0.1)
+                            until timerObj.Enabled == false or not ChristmasBossEventActive
+                        end
 
-        task.spawn(function()
-            while _G.AutoBridgeActive do
-                local cur, max = GetBridgeCurrency()
-                
-                if cur and max and cur >= max then
-                    
-                    TeleportToBill()
-                    
-                    task.wait(0.5) 
-                    
-                    local HumanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    if HumanoidRootPart then
-                        PressAndVerifyBuild(HumanoidRootPart)
-                    end
+                        local cur, max = GetBossCurrency()
+                        
+                        if ChristmasBossEventActive and cur and max and cur >= max then
+                            local lp = game.Players.LocalPlayer
+                            if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                                lp.Character.HumanoidRootPart.CFrame = CFrame.new(-215.54, 13.60, 920.88)
+                                
+                                task.wait(0.5)
+
+                                PressAndVerifyCannon(lp.Character.HumanoidRootPart)
+                            end
+                        end
+                    end)
                 end
-                
-                task.wait(0.5)
-            end
-        end)
+            end)
+        end
     end
 })
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
+local ChristmasBossResetActive = false
 
-_G.AutoResetBridgeActive = false
-
-local AutoResetBridgeToggle = EventTab:Toggle({
-    Title = "Auto Reset Snow Bridge Event",
-    Desc = "รีเซ็ตสะพานอัตโนมัติเมื่อจบ",
+local AutoResetChristmasBoss = EventTab:Toggle({
+    Title = "Auto Reset King Krakolem Event",
     Default = false,
-    Flag = "AutoResetBridge",
+    Flag = "AutoChristmasBossReset",
     Callback = function(value)
-        _G.AutoResetBridgeActive = value
+        ChristmasBossResetActive = value
         
-        if not _G.AutoResetBridgeActive then return end
-
-        task.spawn(function()
-            while _G.AutoResetBridgeActive do
-                local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
-                local Main = PlayerGui and PlayerGui:FindFirstChild("Main")
-                local SurfaceGui = Main and Main:FindFirstChild("SurfaceGui")
-                local MainFrame = SurfaceGui and SurfaceGui:FindFirstChild("Main")
-                local BodyReset = MainFrame and MainFrame:FindFirstChild("BodyReset")
-
-                if BodyReset and BodyReset.Visible == true then
-                    
-                    local Remote = ReplicatedStorage:FindFirstChild("Remotes")
-                        and ReplicatedStorage.Remotes:FindFirstChild("Events")
-                        and ReplicatedStorage.Remotes.Events:FindFirstChild("Christmas")
-                        and ReplicatedStorage.Remotes.Events.Christmas:FindFirstChild("InteractBridge")
-
-                    if Remote then
-                        local args = {
-                            [1] = "ResetRequest"
-                        }
-                        Remote:FireServer(unpack(args))
+        if value then
+            task.spawn(function()
+                while ChristmasBossResetActive do
+                    task.wait(0.5)
+                    pcall(function()
+                        local lp = game:GetService("Players").LocalPlayer
+                        local mainGui = lp.PlayerGui:FindFirstChild("Main")
                         
-                        task.wait(1)
-                    end
+                        if mainGui then
+                            local children = mainGui:GetChildren()
+                            if #children >= 50 then
+                                local targetChild = children[50]
+                                
+                                if targetChild and targetChild:FindFirstChild("Main") and targetChild.Main:FindFirstChild("BodyReset") then
+                                    if targetChild.Main.BodyReset.Visible == true then
+                                        local args = {
+                                            [1] = "ResetRequest"
+                                        }
+                                        game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractBoss:FireServer(unpack(args))
+                                    end
+                                end
+                            end
+                        end
+                    end)
                 end
-                
-                task.wait(0.5)
-            end
-        end)
+            end)
+        end
     end
 })
 
@@ -2618,7 +2608,7 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.10.9)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.11.0)
 
 ## What’s new:
 
@@ -2684,8 +2674,6 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
-        AutoBridgeToggle:SetTitle("Auto Snow Bridge")
-        AutoResetBridgeToggle:SetTitle("Auto Reset Snow Bridge Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2695,7 +2683,7 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.10.9)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.0)
 
 ## มีอะไรใหม่บ้าง:
 
@@ -2761,8 +2749,6 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
-        AutoBridgeToggle:SetTitle("ออโต้สร้างสะพานหิมะอัตโนมัติ")
-        AutoResetBridgeToggle:SetTitle("ออโต้รีเซ็ตสร้างสะพานหิมะอัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
@@ -2790,7 +2776,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.10.9",
+    Content = "Tad Hub PvB | 1.11.0",
     Duration = 10
 })
 
