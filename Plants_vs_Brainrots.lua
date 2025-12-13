@@ -2444,7 +2444,7 @@ local ChristmasBossAutoBuyActive = false
 
 local SelectKingKrakolemShop = EventTab:Dropdown({
     Title = "Select Items to Buy",
-    Options = {"Snowglobe Grenade, "Hot Cocoa", "Christmas Card Pack", "Rocket Button", "Winter Rose"},
+    Options = {"Snowglobe Grenade", "Hot Cocoa", "Christmas Card Pack", "Rocket Button", "Winter Rose"},
     Multi = true,
     Default = {},
     Flag = "ChristmasShopSelection",
