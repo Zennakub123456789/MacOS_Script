@@ -2729,6 +2729,10 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
+        AutoChristmasBossCannon:SetTitle("Auto Shoot King Krakolem")
+        AutoResetChristmasBoss:SetTitle("Auto Reset King Krakolem Event")
+        SelectKingKrakolemShop:SetTitle("Select Items To Buy")
+        AutoBuyKingKrakolemShop:SetTitle("Auto Buy King Krakolem Shop")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2742,11 +2746,13 @@ local languageScripts = {
 
 ## มีอะไรใหม่บ้าง:
 
-- [-] ลบ ออโต้ ส่งพืชให้เซฟขับโลเลนี่เพื่อเอาสถานะใหม่ อัตโนมัติ [Toggle]
-- [+] เพิ่ม ออโต้สร้างสะพานหิมะอัตโนมัติ
-- [+] เพิ่ม ออโต้รีเซ็ตสร้างสะพานหิมะอัตโนมัติเมื่อเสร็จ
-- [+] เพิ่ม ซื้อเมล็ดพันธุ์ใหม่ได้แล้ว
-- ฟังชั่นอื่นจะมาในอีกไม่ช้า... ]])
+- [-] ลบ ออโต้สร้างสะพายหิมะอัตโนมัติ
+- [-] ลบ ออโต้รีเซ้ตสร้างสะพานหิมะอัตโนมัติ
+- [+] เพิ่ม สามารถซื้อเกียร์ใหม่ได้แล้ว
+- [+]  [Toggle]
+- [+]  [Toggle]
+- [+] Added Select Dropdown for Buy King Krakolem Shop [Dropdown]
+- [+] Added Auto Buy King Krakolem Shop [Toggle] ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2805,8 +2811,7 @@ local languageScripts = {
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
         AutoChristmasBossCannon:SetTitle("ออโต้ยิงกษัตริย์คราโคเลม")
-        AutoResetChristmasBoss:SetTitle("ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ")
-        
+        AutoResetChristmasBoss:SetTitle("ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ")K        SelectKingKrakolemShop:SetTitle("เลือกของที่ต้องการซื้อ")yKingKrakolemShop:SetTitle("ออโต้ ซื้อของจากร้านกษัตริย์คราโคเลม")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
