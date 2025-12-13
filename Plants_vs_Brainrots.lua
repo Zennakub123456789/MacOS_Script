@@ -2432,10 +2432,11 @@ local AutoResetChristmasBoss = EventTab:Toggle({
 EventTab:Section("King Krakolem Shop")
 
 local PurchaseItems = {
-    ["Item 1"] = 1,
-    ["Plants"] = 2,
-    ["Item 3"] = 3,
-    ["Item 4"] = 4
+    ["Snowglobe Grenade"] = 1,
+    ["Hot Cocoa"] = 2,
+    ["Christmas Card Pack"] = 3,
+    ["Rocket Button"] = 4,
+    ["Winter Rose"] = 5
 }
 
 local SelectedPurchases = {}
@@ -2443,7 +2444,7 @@ local ChristmasBossAutoBuyActive = false
 
 local SelectKingKrakolemShop = EventTab:Dropdown({
     Title = "Select Items to Buy",
-    Options = {"Item 1", "Plants", "Item 3", "Item 4"},
+    Options = {"Snowglobe Grenade, "Hot Cocoa", "Christmas Card Pack", "Rocket Button", "Winter Rose"},
     Multi = true,
     Default = {},
     Flag = "ChristmasShopSelection",
