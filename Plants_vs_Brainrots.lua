@@ -2467,21 +2467,24 @@ local AutoBuyKingKrakolemShop = EventTab:Toggle({
         if value then
             task.spawn(function()
                 while ChristmasBossAutoBuyActive do
-                    task.wait(0.5)
-                    
-                    for _, itemName in pairs(SelectedPurchases) do
-                        if not ChristmasBossAutoBuyActive then break end
-                        
-                        local id = PurchaseItems[itemName]
-                        
-                        if id then
-                            local args = {
-                                [1] = "RequestPurchase",
-                                [2] = id
-                            }
-                            game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractBoss:FireServer(unpack(args))
-                            task.wait(0.1)
+                    if #SelectedPurchases == 0 then
+                        task.wait(1)
+                    else
+                        for _, itemName in pairs(SelectedPurchases) do
+                            if not ChristmasBossAutoBuyActive then break end
+                            
+                            local id = PurchaseItems[itemName]
+                            
+                            if id then
+                                local args = {
+                                    [1] = "RequestPurchase",
+                                    [2] = id
+                                }
+                                game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractBoss:FireServer(unpack(args))
+                                task.wait(0.5)
+                            end
                         end
+                        task.wait(0.5)
                     end
                 end
             end)
