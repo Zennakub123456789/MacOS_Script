@@ -2405,20 +2405,24 @@ local AutoResetChristmasBoss = EventTab:Toggle({
                     task.wait(0.5)
                     pcall(function()
                         local lp = game:GetService("Players").LocalPlayer
-                        local mainGui = lp.PlayerGui:FindFirstChild("Main")
+                        local mainGuiFolder = lp.PlayerGui:FindFirstChild("Main")
                         
-                        if mainGui then
-                            local children = mainGui:GetChildren()
-                            if #children >= 50 then
-                                local targetChild = children[50]
-                                
-                                if targetChild and targetChild:FindFirstChild("Main") and targetChild.Main:FindFirstChild("BodyReset") then
-                                    if targetChild.Main.BodyReset.Visible == true then
-                                        local args = {
-                                            [1] = "ResetRequest"
-                                        }
-                                        game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractBoss:FireServer(unpack(args))
+                        local targetSurfacePart = workspace.ScriptedMap.ChristmasBoss.Surface
+                        
+                        if mainGuiFolder and targetSurfacePart then
+                            for _, child in pairs(mainGuiFolder:GetChildren()) do
+                                if child:IsA("SurfaceGui") and child.Adornee == targetSurfacePart then
+                                    
+                                    if child:FindFirstChild("Main") and child.Main:FindFirstChild("BodyReset") then
+                                        if child.Main.BodyReset.Visible == true then
+                                            local args = {
+                                                [1] = "ResetRequest"
+                                            }
+                                            game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractBoss:FireServer(unpack(args))
+                                        end
                                     end
+                                    
+                                    break
                                 end
                             end
                         end
