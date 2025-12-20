@@ -45,13 +45,13 @@ local UpdateCode = infoTab:Code({
 
 ## What’s new:
 
-- [-] Added Auto Snow Bridge Event
-- [-] Added Auto Reset Snow Bridge Event 
-- [+] Added Can Buy New Gear
-- [+] Added Shoot Auto King Krakolem [Toggle]
-- [+] Added Auto Reset King Krakolem Event [Toggle]
-- [+] Added Select Dropdown for Buy King Krakolem Shop [Dropdown]
-- [+] Added Auto Buy King Krakolem Shop [Toggle] ]]
+- [-] Remove Can Buy New Gear
+- [-] Remove Shoot Auto King Krakolem [Toggle]
+- [-] Remove Auto Reset King Krakolem Event [Toggle]
+- [-] Remove Select Dropdown for Buy King Krakolem Shop [Dropdown]
+- [-] Remove Auto Buy King Krakolem Shop [Toggle]
+- [+] Added Auto Give Sir Whiskerwood Plants [Toggle]
+- [+] Added Auto Reset Santa's Arrival Event ]]
 })
 
 infoTab:Section("Discord")
@@ -2793,13 +2793,13 @@ local languageScripts = {
 
 ## What’s new:
 
-- [-] Added Auto Snow Bridge Event
-- [-] Added Auto Reset Snow Bridge Event 
-- [+] Added Can Buy New Gear
-- [+] Added Shoot Auto King Krakolem [Toggle]
-- [+] Added Auto Reset King Krakolem Event [Toggle]
-- [+] Added Select Dropdown for Buy King Krakolem Shop [Dropdown]
-- [+] Added Auto Buy King Krakolem Shop [Toggle] ]])
+- [-] Remove Can Buy New Gear
+- [-] Remove Shoot Auto King Krakolem [Toggle]
+- [-] Remove Auto Reset King Krakolem Event [Toggle]
+- [-] Remove Select Dropdown for Buy King Krakolem Shop [Dropdown]
+- [-] Remove Auto Buy King Krakolem Shop [Toggle]
+- [+] Added Auto Give Sir Whiskerwood Plants [Toggle]
+- [+] Added Auto Reset Santa's Arrival Event ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2872,13 +2872,13 @@ local languageScripts = {
 
 ## มีอะไรใหม่บ้าง:
 
-- [-] ลบ ออโต้สร้างสะพายหิมะอัตโนมัติ
-- [-] ลบ ออโต้รีเซ้ตสร้างสะพานหิมะอัตโนมัติ
-- [+] เพิ่ม สามารถซื้อเกียร์ใหม่ได้แล้ว
-- [+] ออโต้ยิงกษัตริย์คราโคเลม [Toggle]
-- [+] ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ [Toggle]
-- [+] เพิ่ม เมนูแบบดรอปดาวน์สำหรับซื้อสินค้าจากร้านกษัตริย์คราโคเลม [Dropdown]
-- [+] เพิ่ม ออโต้ ซื้อของจากร้านกษัตริย์คราโคเลม [Toggle] ]])
+- [-] ลบ สามารถซื้อเกียร์ใหม่ได้แล้ว
+- [-] ลบ ออโต้ยิงกษัตริย์คราโคเลม [Toggle]
+- [-] ลบ ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ [Toggle]
+- [-] ลบ เมนูแบบดรอปดาวน์สำหรับซื้อสินค้าจากร้านกษัตริย์คราโคเลม [Dropdown]
+- [-] ลบ ออโต้ ซื้อของจากร้านกษัตริย์คราโคเลม [Toggle]
+- [+] เพิ่ม ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ [Toggle]
+- [+] เพิ่ม รีเซ็ต อีเว้นการมาถึงของซานตาคลอส อัตโนมัติ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
