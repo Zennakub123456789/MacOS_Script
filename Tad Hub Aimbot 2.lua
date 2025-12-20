@@ -277,5 +277,5 @@ task.spawn(function()
     task.wait(0.5)
     ScreenGui:Destroy()
     
-    print("Loader Finished.")
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zennakub123456789/MacOS_Script/refs/heads/main/TAD%20HUB%20AIMBOT.lua"))()
 end)
