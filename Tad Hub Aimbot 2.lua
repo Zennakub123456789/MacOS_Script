@@ -90,7 +90,7 @@ UIList.Parent = Content
 
 local Logo = Instance.new("TextLabel")
 Logo.LayoutOrder = 1
-Logo.Text = "MIDNIGHT <font color=\"rgb(50,215,75)\">PRO</font>"
+Logo.Text = "TAD HUB <font color=\"rgb(50,215,75)\">Aimbot</font>"
 Logo.RichText = true
 Logo.Font = Enum.Font.GothamBlack
 Logo.TextSize = 28
