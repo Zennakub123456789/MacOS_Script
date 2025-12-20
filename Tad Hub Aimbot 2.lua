@@ -152,7 +152,7 @@ Spinner.Parent = SpinnerWrapper
 
 RunService.RenderStepped:Connect(function(deltaTime)
     if Spinner.Parent then
-        Spinner.Rotation = Spinner.Rotation + (180 * deltaTime)
+        Spinner.Rotation = Spinner.Rotation + (500 * deltaTime)
     end
 end)
 
