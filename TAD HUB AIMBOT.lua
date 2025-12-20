@@ -20,6 +20,7 @@ local AimSettings = {
     Smoothness = 0.05
 }
 
+
 local ESPSettings = {
     Box = false,
     Line = false,
@@ -31,6 +32,15 @@ local ESPSettings = {
     AliveCheck = true,
     WallCheck = false,
     Color = Color3.fromRGB(255, 255, 255)
+}
+
+
+local ToggleCFG = {
+    WidthOpen = 225,   
+    WidthClosed = 200, 
+    LineHeight = 6,
+    LineColor = Color3.fromRGB(255, 255, 255),
+    AnimSpeed = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out) 
 }
 
 local CurrentTarget = nil
@@ -222,7 +232,6 @@ RunService.RenderStepped:Connect(function()
             local Head = Character and Character:FindFirstChild("Head")
 
             if Character and Humanoid and Root and Head then
-                
                 local IsAlive = Humanoid.Health > 0
                 local IsEnemy = (Player.Team ~= LocalPlayer.Team)
                 
@@ -246,14 +255,12 @@ RunService.RenderStepped:Connect(function()
                             local Size = Vector3.new(2, 3, 0) * (Camera.ViewportSize.Y / Vector.Z) * 2
                             local Pos = Vector3.new(Vector.X - Size.X/2, Vector.Y - Size.Y/2, 0)
 
-                            
                             if Cache.Box then
                                 Cache.Box.Visible = ESPSettings.Box
                                 Cache.Box.Size = Vector2.new(Size.X, Size.Y)
                                 Cache.Box.Position = Vector2.new(Pos.X, Pos.Y)
                             end
 
-                            
                             if Cache.Line then
                                 if ESPSettings.Line then
                                     local HeadVec, HeadOn = Camera:WorldToViewportPoint(Head.Position)
@@ -265,7 +272,6 @@ RunService.RenderStepped:Connect(function()
                                 else Cache.Line.Visible = false end
                             end
 
-                            
                             if Cache.Name then
                                 Cache.Name.Visible = ESPSettings.Name
                                 Cache.Name.Text = Player.Name
@@ -277,7 +283,7 @@ RunService.RenderStepped:Connect(function()
                                 if ESPSettings.Health then
                                     local hp = Humanoid.Health
                                     local maxHp = Humanoid.MaxHealth
-                                    if maxHp <= 0 then maxHp = 100 end 
+                                    if maxHp <= 0 then maxHp = 100 end
                                     local HealthPerc = math.clamp(hp / maxHp, 0, 1)
 
                                     local BarWidth = 2
@@ -292,7 +298,6 @@ RunService.RenderStepped:Connect(function()
                                     Cache.HealthBar.Visible = true
                                     Cache.HealthBar.Size = Vector2.new(BarWidth, BarHeight)
                                     Cache.HealthBar.Position = Vector2.new(BarX, BarY)
-                                    
                                     Cache.HealthBar.Color = Color3.fromHSV(HealthPerc * 0.33, 1, 1) 
                                 else
                                     Cache.HealthOutline.Visible = false
@@ -304,40 +309,27 @@ RunService.RenderStepped:Connect(function()
                             if ESPSettings.Skeleton and Cache.Skeleton then
                                 local RigType = Humanoid.RigType
                                 local Connections = {}
-                                
-                                if RigType == Enum.HumanoidRigType.R15 then
-                                    Connections = R15_CONNECTIONS
-                                elseif RigType == Enum.HumanoidRigType.R6 then
-                                    Connections = R6_CONNECTIONS
-                                end
+                                if RigType == Enum.HumanoidRigType.R15 then Connections = R15_CONNECTIONS
+                                elseif RigType == Enum.HumanoidRigType.R6 then Connections = R6_CONNECTIONS end
                                 
                                 for i, conn in ipairs(Connections) do
                                     local partA = Character:FindFirstChild(conn[1])
                                     local partB = Character:FindFirstChild(conn[2])
                                     local line = Cache.Skeleton[i]
-                                    
                                     if partA and partB and line then
                                         local posA, visA = Camera:WorldToViewportPoint(partA.Position)
                                         local posB, visB = Camera:WorldToViewportPoint(partB.Position)
-                                        
                                         if visA and visB then
                                             line.Visible = true
                                             line.From = Vector2.new(posA.X, posA.Y)
                                             line.To = Vector2.new(posB.X, posB.Y)
-                                        else
-                                            line.Visible = false
-                                        end
-                                    elseif line then
-                                        line.Visible = false
-                                    end
+                                        else line.Visible = false end
+                                    elseif line then line.Visible = false end
                                 end
-                                for i = #Connections + 1, #Cache.Skeleton do
-                                    Cache.Skeleton[i].Visible = false
-                                end
+                                for i = #Connections + 1, #Cache.Skeleton do Cache.Skeleton[i].Visible = false end
                             elseif Cache.Skeleton then
                                 for _, line in pairs(Cache.Skeleton) do line.Visible = false end
                             end
-
                         else
                             HideESP(Player)
                         end
@@ -358,14 +350,16 @@ end)
 
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MidnightBentoFixed"
+ScreenGui.Name = "MidnightBentoCombined"
 ScreenGui.ResetOnSpawn = false
 if pcall(function() return CoreGui end) then ScreenGui.Parent = CoreGui else ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
+
 
 local Wrapper = Instance.new("Frame")
 Wrapper.Name = "Wrapper"
 Wrapper.Size = CFG.MainSize
-Wrapper.Position = UDim2.new(0.5, -250, 0.5, -150)
+
+Wrapper.Position = UDim2.new(0.5, -250, 0.5, -150) 
 Wrapper.BackgroundColor3 = CFG.MainColor
 Wrapper.BorderSizePixel = 0
 Wrapper.ClipsDescendants = true
@@ -375,14 +369,122 @@ local WrapperCorner = Instance.new("UICorner") WrapperCorner.CornerRadius = UDim
 local WrapperStroke = Instance.new("UIStroke") WrapperStroke.Color = CFG.BorderColor WrapperStroke.Thickness = 1 WrapperStroke.Parent = Wrapper
 
 
-local dragging, dragInput, dragStart, startPos
-local function update(input)
-    local delta = input.Position - dragStart
-    TweenService:Create(Wrapper, TweenInfo.new(0.05), {Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)}):Play()
+local ToggleContainer = Instance.new("Frame")
+ToggleContainer.Name = "ToggleContainer"
+ToggleContainer.BackgroundTransparency = 1
+ToggleContainer.AnchorPoint = Vector2.new(0.5, 1)
+
+ToggleContainer.Position = UDim2.new(0.5, 0, 1, -15) 
+ToggleContainer.Size = UDim2.new(0, 300, 0, 60) 
+ToggleContainer.Parent = ScreenGui 
+
+local ToggleHitbox = Instance.new("TextButton")
+ToggleHitbox.Name = "Hitbox"
+ToggleHitbox.BackgroundTransparency = 1
+ToggleHitbox.Text = ""
+ToggleHitbox.Size = UDim2.new(1, 0, 1, 0)
+ToggleHitbox.Parent = ToggleContainer
+
+local ToggleLine = Instance.new("Frame")
+ToggleLine.Name = "Line"
+ToggleLine.BackgroundColor3 = ToggleCFG.LineColor
+ToggleLine.BackgroundTransparency = 0.1 
+
+ToggleLine.Size = UDim2.new(0, ToggleCFG.WidthOpen, 0, ToggleCFG.LineHeight) 
+ToggleLine.AnchorPoint = Vector2.new(0.5, 0.5)
+ToggleLine.Position = UDim2.new(0.5, 0, 0.5, 0)
+ToggleLine.Parent = ToggleHitbox
+
+local LineCorner = Instance.new("UICorner") LineCorner.CornerRadius = UDim.new(1, 0) LineCorner.Parent = ToggleLine
+
+
+local currentTween = nil 
+local function PlayTween(obj, info, props)
+	if currentTween then currentTween:Cancel() end
+	currentTween = TweenService:Create(obj, info, props)
+	currentTween:Play()
 end
-Wrapper.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true dragStart = input.Position startPos = Wrapper.Position input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end) end end)
-Wrapper.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end end)
-UserInputService.InputChanged:Connect(function(input) if input == dragInput and dragging then update(input) end end)
+
+local function OnOpen()
+	
+	TweenService:Create(ToggleContainer, ToggleCFG.AnimSpeed, {Position = UDim2.new(0.5, 0, 1, -15)}):Play()
+	PlayTween(ToggleLine, ToggleCFG.AnimSpeed, {
+		Size = UDim2.new(0, ToggleCFG.WidthOpen, 0, ToggleCFG.LineHeight),
+		BackgroundTransparency = 0.1
+	})
+    
+    TweenService:Create(Wrapper, ToggleCFG.AnimSpeed, {Position = UDim2.new(0.5, -250, 0.5, -150)}):Play()
+end
+
+local function OnClose()
+	
+	TweenService:Create(ToggleContainer, ToggleCFG.AnimSpeed, {Position = UDim2.new(0.5, 0, 1, 10)}):Play()
+	PlayTween(ToggleLine, ToggleCFG.AnimSpeed, {
+		Size = UDim2.new(0, ToggleCFG.WidthClosed, 0, ToggleCFG.LineHeight),
+		BackgroundTransparency = 0.7
+	})
+    
+    TweenService:Create(Wrapper, ToggleCFG.AnimSpeed, {Position = UDim2.new(0.5, -250, 1.5, 0)}):Play()
+end
+
+local isDragging = false
+local startY = 0
+local isOpen = true 
+
+ToggleHitbox.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		isDragging = true
+		startY = input.Position.Y
+		if currentTween then currentTween:Cancel() end 
+		TweenService:Create(ToggleLine, TweenInfo.new(0.1), {
+			BackgroundTransparency = 0.1,
+			Size = UDim2.new(0, (isOpen and ToggleCFG.WidthOpen or ToggleCFG.WidthClosed) + 10, 0, ToggleCFG.LineHeight + 2)
+		}):Play()
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		local currentY = input.Position.Y
+		local diff = currentY - startY
+		local dragOffset = diff * 0.6
+		dragOffset = math.clamp(dragOffset, -40, 40)
+		ToggleLine.Position = UDim2.new(0.5, 0, 0.5, dragOffset)
+	end
+end)
+
+ToggleHitbox.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		isDragging = false
+		local currentY = input.Position.Y
+		local diff = currentY - startY
+        
+        TweenService:Create(ToggleLine, TweenInfo.new(0.2), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+        
+		if diff > 15 then 
+			isOpen = false
+			OnClose()
+		elseif diff < -15 then
+			isOpen = true
+			OnOpen()
+		else
+			if math.abs(diff) < 5 then isOpen = not isOpen end
+			if isOpen then OnOpen() else OnClose() end
+		end
+	end
+end)
+
+
+
+
+local bDragging, bDragInput, bDragStart, bStartPos
+local function bUpdate(input)
+    local delta = input.Position - bDragStart
+    TweenService:Create(Wrapper, TweenInfo.new(0.05), {Position = UDim2.new(bStartPos.X.Scale, bStartPos.X.Offset + delta.X, bStartPos.Y.Scale, bStartPos.Y.Offset + delta.Y)}):Play()
+end
+Wrapper.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then bDragging = true bDragStart = input.Position bStartPos = Wrapper.Position input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then bDragging = false end end) end end)
+Wrapper.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then bDragInput = input end end)
+UserInputService.InputChanged:Connect(function(input) if input == bDragInput and bDragging then bUpdate(input) end end)
 
 
 local Sidebar = Instance.new("Frame") Sidebar.Size = UDim2.new(0, 50, 1, 0) Sidebar.BackgroundColor3 = Color3.fromRGB(8, 8, 8) Sidebar.BorderSizePixel = 0 Sidebar.Parent = Wrapper
@@ -515,4 +617,4 @@ AddToggle(Box4, "ESPAlive", "Alive Check", true, function(v) ESPSettings.AliveCh
 AddToggle(Box4, "ESPTeam", "Team Check", false, function(v) ESPSettings.TeamCheck = v end)
 AddToggle(Box4, "ESPWall", "Wall Check", false, function(v) ESPSettings.WallCheck = v end)
 
-print("Midnight Bento Loaded: Health Bar Fixed & Full Features")
+print("Midnight Bento Loaded: With Toggle Button")
