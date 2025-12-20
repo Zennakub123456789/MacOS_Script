@@ -2569,7 +2569,7 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
 local AutoSantaResetActive = false
 
 local AutoSantaResetEvent = EventTab:Toggle({
-    Title = "Auto Santa Reset",
+    Title = "Auto Reset Santa's Arrival Event",
     Default = false,
     Flag = "AutoSantaReset",
     Callback = function(value)
@@ -2857,6 +2857,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
+        AutoGiveSirWhiskerwood:SetTitle("Auto Give Sir Whiskerwood Plants")
+        AutoSantaResetEvent:SetTitle("Auto Reset Santa's Arrival Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2934,6 +2936,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        AutoGiveSirWhiskerwood:SetTitle("ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ")
+        AutoSantaResetEvent:SetTitle("รีเซ็ต อีเว้นการมาถึงของซานตาคลอส อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
