@@ -41,7 +41,7 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.11.1)
+    Code = [[# PvB Script Update! (v1.11.2)
 
 ## What’s new:
 
@@ -2258,7 +2258,7 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
 
 EventTab:Section("Santa's Arrival Event")
 
-local AutoFarmWhiskerwoodActive = false
+local AutoFarmPresentelloActive = false
 local TrackedPlants = {} 
 
 local function UnequipTools()
@@ -2313,14 +2313,14 @@ local function DeliverPlants()
             and player.PlayerGui.ProximityPrompts:FindFirstChild("Default") 
             and player.PlayerGui.ProximityPrompts.Default:FindFirstChild("PromptFrame")
             
-        if promptFrame and promptFrame.Visible and promptFrame:FindFirstChild("ActionText") and promptFrame.ActionText.Text == "Sir Whiskerwood" then
+        if promptFrame and promptFrame.Visible and promptFrame:FindFirstChild("ActionText") and promptFrame.ActionText.Text == "Presentello" then
             break
         end
         task.wait(0.1)
         waited = waited + 0.1
     end
 
-    while AutoFarmWhiskerwoodActive do
+    while AutoFarmPresentelloActive do
         local validTools = {}
         local allItems = {} 
         
@@ -2330,7 +2330,7 @@ local function DeliverPlants()
         for _, v in pairs(character:GetChildren()) do table.insert(allItems, v) end
 
         for _, item in pairs(allItems) do
-            if item:IsA("Tool") and string.find(item.Name, "Sir Whiskerwood") then
+            if item:IsA("Tool") and string.find(item.Name, "Presentello") then
                 if item:GetAttribute("IsPlant") then
                     table.insert(validTools, item)
                 end
@@ -2352,11 +2352,11 @@ local function DeliverPlants()
 
         local attempt = 0
         while targetTool.Parent == character and attempt < 30 do 
-            if not AutoFarmWhiskerwoodActive then break end
+            if not AutoFarmPresentelloActive then break end
             
             local foundPrompt = false
             for _, prompt in pairs(workspace:GetDescendants()) do
-                if prompt:IsA("ProximityPrompt") and prompt.ObjectText == "Give Plant" and prompt.ActionText == "Sir Whiskerwood" then
+                if prompt:IsA("ProximityPrompt") and prompt.ObjectText == "Give Plant" and prompt.ActionText == "Presentello" then
                     if (prompt.Parent.Position - character.HumanoidRootPart.Position).Magnitude < 15 then
                         fireproximityprompt(prompt)
                         foundPrompt = true
@@ -2390,23 +2390,23 @@ local function HasPlantItems()
     end
 
     for _, item in pairs(list) do
-        if item:IsA("Tool") and string.find(item.Name, "Sir Whiskerwood") and item:GetAttribute("IsPlant") then
+        if item:IsA("Tool") and string.find(item.Name, "Presentello") and item:GetAttribute("IsPlant") then
             return true
         end
     end
     return false
 end
 
-local AutoGiveSirWhiskerwood = EventTab:Toggle({
-    Title = "Auto Give Sir Whiskerwood Plant",
+local Autofillsantabag = EventTab:Toggle({
+    Title = "Auto Fill Santa's Bag",
     Default = false,
-    Flag = "AutoFarmWhiskerwoodFull",
+    Flag = "AutoFarmPresentelloFull",
     Callback = function(value)
-        AutoFarmWhiskerwoodActive = value
+        AutoFarmPresentelloActive = value
 
         if value then
             task.spawn(function()
-                while AutoFarmWhiskerwoodActive do
+                while AutoFarmPresentelloActive do
                     task.wait(0.5)
                     pcall(function()
                         local player = game:GetService("Players").LocalPlayer
@@ -2427,7 +2427,7 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
                                 local plantsToRemove = {}
                                 
                                 for _, plant in pairs(plantsFolder:GetChildren()) do
-                                    if plant.Name == "Sir Whiskerwood" then
+                                    if plant.Name == "Presentello" then
                                         local id = plant:GetAttribute("ID")
                                         if id then
                                             table.insert(plantsToRemove, id)
@@ -2440,7 +2440,7 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
                                     if shovel then
                                         task.wait(0.3)
                                         for _, id in ipairs(plantsToRemove) do
-                                            if not AutoFarmWhiskerwoodActive then break end
+                                            if not AutoFarmPresentelloActive then break end
                                             local args = { [1] = id }
                                             game:GetService("ReplicatedStorage").Remotes.RemoveItem:FireServer(unpack(args))
                                             task.wait(0.2)
@@ -2460,7 +2460,7 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
                                 end
                             end
 
-                            local seedTool = EquipTool("Sir Whiskerwood Seed")
+                            local seedTool = EquipTool("Presentello Seed")
                             local toolID = nil
                             
                             if seedTool then
@@ -2472,13 +2472,13 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
                                 local rows = myPlot:FindFirstChild("Rows")
                                 if rows then
                                     for i = 1, 7 do
-                                        if not AutoFarmWhiskerwoodActive then break end
+                                        if not AutoFarmPresentelloActive then break end
                                         local rowFolder = rows:FindFirstChild(tostring(i))
                                         if rowFolder then
                                             local grassFolder = rowFolder:FindFirstChild("Grass")
                                             if grassFolder then
                                                 for _, grassPart in pairs(grassFolder:GetChildren()) do
-                                                    if not AutoFarmWhiskerwoodActive then break end
+                                                    if not AutoFarmPresentelloActive then break end
                                                     if grassPart:IsA("BasePart") then
                                                         local args = {
                                                             [1] = {
@@ -2501,7 +2501,7 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
                             UnequipTools()
                             
                             local farmingCycle = true
-                            while farmingCycle and AutoFarmWhiskerwoodActive do
+                            while farmingCycle and AutoFarmPresentelloActive do
                                 task.wait(1)
                                 
                                 local countdowns = workspace.ScriptedMap.Countdowns
@@ -2509,7 +2509,7 @@ local AutoGiveSirWhiskerwood = EventTab:Toggle({
                                     local owner = part:GetAttribute("Owner")
                                     local plantType = part:GetAttribute("Plant")
                                     
-                                    if owner == player.Name and plantType == "Sir Whiskerwood" then
+                                    if owner == player.Name and plantType == "Presentello" then
                                         if TrackedPlants[part.Name] == nil then
                                             TrackedPlants[part.Name] = "Growing"
                                         end
@@ -2789,7 +2789,7 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.11.1)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.11.2)
 
 ## What’s new:
 
@@ -2857,7 +2857,7 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
-        AutoGiveSirWhiskerwood:SetTitle("Auto Give Sir Whiskerwood Plants")
+        Autofillsantabag:SetTitle("Auto Fill Santa's Bag")
         AutoSantaResetEvent:SetTitle("Auto Reset Santa's Arrival Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
@@ -2868,7 +2868,7 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.1)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.2)
 
 ## มีอะไรใหม่บ้าง:
 
@@ -2936,7 +2936,7 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
-        AutoGiveSirWhiskerwood:SetTitle("ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ")
+        Autofillsantabag:SetTitle("ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ")
         AutoSantaResetEvent:SetTitle("รีเซ็ต อีเว้นการมาถึงของซานตาคลอส อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
@@ -2965,7 +2965,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.11.1",
+    Content = "Tad Hub PvB | 1.11.2",
     Duration = 10
 })
 
