@@ -45,13 +45,8 @@ local UpdateCode = infoTab:Code({
 
 ## What’s new:
 
-- [-] Remove Can Buy New Gear
-- [-] Remove Shoot Auto King Krakolem [Toggle]
-- [-] Remove Auto Reset King Krakolem Event [Toggle]
-- [-] Remove Select Dropdown for Buy King Krakolem Shop [Dropdown]
-- [-] Remove Auto Buy King Krakolem Shop [Toggle]
-- [+] Added Auto Give Sir Whiskerwood Plants [Toggle]
-- [+] Added Auto Reset Santa's Arrival Event ]]
+- [-] Remove Auto Give Sir Whiskerwood Plants [Toggle]
+- [+] Added Auto Fill Santa's Bag ]]
 })
 
 infoTab:Section("Discord")
@@ -2793,13 +2788,8 @@ local languageScripts = {
 
 ## What’s new:
 
-- [-] Remove Can Buy New Gear
-- [-] Remove Shoot Auto King Krakolem [Toggle]
-- [-] Remove Auto Reset King Krakolem Event [Toggle]
-- [-] Remove Select Dropdown for Buy King Krakolem Shop [Dropdown]
-- [-] Remove Auto Buy King Krakolem Shop [Toggle]
-- [+] Added Auto Give Sir Whiskerwood Plants [Toggle]
-- [+] Added Auto Reset Santa's Arrival Event ]])
+- [-] Remove Auto Give Sir Whiskerwood Plants [Toggle]
+- [+] Added Auto Fill Santa's Bag ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
@@ -2872,13 +2862,8 @@ local languageScripts = {
 
 ## มีอะไรใหม่บ้าง:
 
-- [-] ลบ สามารถซื้อเกียร์ใหม่ได้แล้ว
-- [-] ลบ ออโต้ยิงกษัตริย์คราโคเลม [Toggle]
-- [-] ลบ ออโต้ เริ่มต้นอีเว้นยิงกษัตริย์คราโคเลม อัตโนมัติ [Toggle]
-- [-] ลบ เมนูแบบดรอปดาวน์สำหรับซื้อสินค้าจากร้านกษัตริย์คราโคเลม [Dropdown]
-- [-] ลบ ออโต้ ซื้อของจากร้านกษัตริย์คราโคเลม [Toggle]
-- [+] เพิ่ม ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ [Toggle]
-- [+] เพิ่ม รีเซ็ต อีเว้นการมาถึงของซานตาคลอส อัตโนมัติ ]])
+- [-] ลบ ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ [Toggle]
+- [+] เพิ่ม ออโต้ ใส่ของในกระเป๋าแซนต้า อัตโนมัติ [Toggle] ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2936,7 +2921,7 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
-        Autofillsantabag:SetTitle("ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ")
+        Autofillsantabag:SetTitle("ออโต้ ใส่ของในกระเป๋าแซนต้า อัตโนมัติ")
         AutoSantaResetEvent:SetTitle("รีเซ็ต อีเว้นการมาถึงของซานตาคลอส อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
