@@ -41,7 +41,7 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.11.2)
+    Code = [[# PvB Script Update! (v1.11.3)
 
 ## What’s new:
 
@@ -2251,10 +2251,15 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
     end
 })
 
-EventTab:Section("Santa's Arrival Event")
+EventTab:Section("New Year Event 2026 Event")
 
-local AutoFarmPresentelloActive = false
-local TrackedPlants = {} 
+local AutoDestroyFireworksActive = false
+
+local batPriority = {
+    "Rifling Bat", "Spiked Bat", "Fluted Bat",
+    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
+    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+}
 
 local function UnequipTools()
     local player = game:GetService("Players").LocalPlayer
@@ -2263,337 +2268,129 @@ local function UnequipTools()
     end
 end
 
-local function EquipTool(partialName)
+local function EquipBestBat()
     local player = game:GetService("Players").LocalPlayer
     local character = player.Character
-    local backpack = player.Backpack
+    local humanoid = character and character:FindFirstChild("Humanoid")
     
-    if not character or not character:FindFirstChild("Humanoid") then return nil end
-    
+    if not humanoid then return end
+
     local currentTool = character:FindFirstChildOfClass("Tool")
-    
-    if currentTool and string.find(currentTool.Name, partialName, 1, true) then
-        return currentTool
-    end
-    
     if currentTool then
-        character.Humanoid:UnequipTools()
-        task.wait(0.1) 
-    end
-    
-    if backpack then
-        for _, tool in pairs(backpack:GetChildren()) do
-            if tool:IsA("Tool") and string.find(tool.Name, partialName, 1, true) then
-                tool.Parent = character
-                return tool
+        for _, name in ipairs(batPriority) do
+            if currentTool.Name == name then
+                return currentTool 
             end
         end
     end
-    return nil
-end
 
-local function DeliverPlants()
-    local player = game:GetService("Players").LocalPlayer
-    local character = player.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-
-    character.HumanoidRootPart.CFrame = CFrame.new(-173.21, 11.57, 1013.62)
-    task.wait(0.5)
-
-    local maxWait = 10
-    local waited = 0
-    
-    while waited < maxWait do
-        local promptFrame = player.PlayerGui:FindFirstChild("ProximityPrompts") 
-            and player.PlayerGui.ProximityPrompts:FindFirstChild("Default") 
-            and player.PlayerGui.ProximityPrompts.Default:FindFirstChild("PromptFrame")
-            
-        if promptFrame and promptFrame.Visible and promptFrame:FindFirstChild("ActionText") and promptFrame.ActionText.Text == "Presentello" then
-            break
-        end
-        task.wait(0.1)
-        waited = waited + 0.1
-    end
-
-    while AutoFarmPresentelloActive do
-        local validTools = {}
-        local allItems = {} 
-        
-        if player.Backpack then 
-            for _, v in pairs(player.Backpack:GetChildren()) do table.insert(allItems, v) end 
-        end
-        for _, v in pairs(character:GetChildren()) do table.insert(allItems, v) end
-
-        for _, item in pairs(allItems) do
-            if item:IsA("Tool") and string.find(item.Name, "Presentello") then
-                if item:GetAttribute("IsPlant") then
-                    table.insert(validTools, item)
-                end
-            end
-        end
-
-        if #validTools == 0 then
+    local bestBatFound = nil
+    for _, batName in ipairs(batPriority) do
+        local foundBat = (character and character:FindFirstChild(batName)) or (player.Backpack and player.Backpack:FindFirstChild(batName))
+        if foundBat then 
+            bestBatFound = foundBat
             break 
         end
-
-        local targetTool = validTools[math.random(1, #validTools)]
-        
-        if targetTool.Parent ~= character then
-            UnequipTools()
-            task.wait(0.1)
-            targetTool.Parent = character
-            task.wait(0.3)
-        end
-
-        local attempt = 0
-        while targetTool.Parent == character and attempt < 30 do 
-            if not AutoFarmPresentelloActive then break end
-            
-            local foundPrompt = false
-            for _, prompt in pairs(workspace:GetDescendants()) do
-                if prompt:IsA("ProximityPrompt") and prompt.ObjectText == "Give Plant" and prompt.ActionText == "Presentello" then
-                    if (prompt.Parent.Position - character.HumanoidRootPart.Position).Magnitude < 15 then
-                        fireproximityprompt(prompt)
-                        foundPrompt = true
-                        break 
-                    end
-                end
-            end
-            
-            if not foundPrompt then
-                break
-            end
-            
-            task.wait(0.2)
-            attempt = attempt + 1
-        end
-        
-        task.wait(0.1)
     end
     
-    UnequipTools()
-end
-
-local function HasPlantItems()
-    local player = game:GetService("Players").LocalPlayer
-    local list = {}
-    if player.Backpack then 
-        for _, v in pairs(player.Backpack:GetChildren()) do table.insert(list, v) end 
-    end
-    if player.Character then
-        for _, v in pairs(player.Character:GetChildren()) do table.insert(list, v) end
-    end
-
-    for _, item in pairs(list) do
-        if item:IsA("Tool") and string.find(item.Name, "Presentello") and item:GetAttribute("IsPlant") then
-            return true
+    if bestBatFound then
+        if bestBatFound.Parent ~= character then
+            humanoid:EquipTool(bestBatFound)
+            task.wait(0.1)
         end
+        return bestBatFound
     end
-    return false
+    return currentTool
 end
 
-local Autofillsantabag = EventTab:Toggle({
-    Title = "Auto Fill Santa's Bag",
+local autohitfireworks = EventTab:Toggle({
+    Title = "Auto Hit Fireworks",
     Default = false,
-    Flag = "AutoFarmPresentelloFull",
+    Flag = "AutoDestroyFireworks",
     Callback = function(value)
-        AutoFarmPresentelloActive = value
-
+        AutoDestroyFireworksActive = value
+        
         if value then
             task.spawn(function()
-                while AutoFarmPresentelloActive do
-                    task.wait(0.5)
+                while AutoDestroyFireworksActive do
+                    task.wait(0.1)
                     pcall(function()
                         local player = game:GetService("Players").LocalPlayer
                         local character = player.Character
+                        local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+                        local folder = workspace.ScriptedMap.SpawnedFireworks
                         
-                        local myPlot
-                        for i = 1, 6 do
-                            local plot = workspace.Plots:FindFirstChild(tostring(i))
-                            if plot and plot:GetAttribute("Owner") == player.Name then
-                                myPlot = plot
-                                break
-                            end
-                        end
-
-                        if myPlot then
-                            local plantsFolder = myPlot:FindFirstChild("Plants")
-                            if plantsFolder then
-                                local plantsToRemove = {}
-                                
-                                for _, plant in pairs(plantsFolder:GetChildren()) do
-                                    if plant.Name == "Presentello" then
-                                        local id = plant:GetAttribute("ID")
-                                        if id then
-                                            table.insert(plantsToRemove, id)
-                                        end
-                                    end
-                                end
-                                
-                                if #plantsToRemove > 0 then
-                                    local shovel = EquipTool("Shovel [Pick Up Plants]")
-                                    if shovel then
-                                        task.wait(0.3)
-                                        for _, id in ipairs(plantsToRemove) do
-                                            if not AutoFarmPresentelloActive then break end
-                                            local args = { [1] = id }
-                                            game:GetService("ReplicatedStorage").Remotes.RemoveItem:FireServer(unpack(args))
-                                            task.wait(0.2)
-                                        end
-                                        UnequipTools()
-                                        task.wait(0.5)
-                                    end
-                                end
-                            end
-
-                            if HasPlantItems() and character and character:FindFirstChild("HumanoidRootPart") then
-                                local oldCFrame = character.HumanoidRootPart.CFrame
-                                DeliverPlants()
-                                if character and character:FindFirstChild("HumanoidRootPart") then
-                                    character.HumanoidRootPart.CFrame = oldCFrame
-                                    task.wait(0.5)
-                                end
-                            end
-
-                            local seedTool = EquipTool("Presentello Seed")
-                            local toolID = nil
-                            
-                            if seedTool then
-                                toolID = seedTool:GetAttribute("ID")
-                                task.wait(0.3)
-                            end
-
-                            if seedTool and toolID then
-                                local rows = myPlot:FindFirstChild("Rows")
-                                if rows then
-                                    for i = 1, 7 do
-                                        if not AutoFarmPresentelloActive then break end
-                                        local rowFolder = rows:FindFirstChild(tostring(i))
-                                        if rowFolder then
-                                            local grassFolder = rowFolder:FindFirstChild("Grass")
-                                            if grassFolder then
-                                                for _, grassPart in pairs(grassFolder:GetChildren()) do
-                                                    if not AutoFarmPresentelloActive then break end
-                                                    if grassPart:IsA("BasePart") then
-                                                        local args = {
-                                                            [1] = {
-                                                                ["ID"] = toolID,
-                                                                ["CFrame"] = grassPart.CFrame * CFrame.Angles(0, 0, 0),
-                                                                ["Item"] = "Watermelon", 
-                                                                ["Floor"] = grassPart
-                                                            }
-                                                        }
-                                                        game:GetService("ReplicatedStorage").Remotes.PlaceItem:FireServer(unpack(args))
-                                                        task.wait(0.1) 
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                            
-                            UnequipTools()
-                            
-                            local farmingCycle = true
-                            while farmingCycle and AutoFarmPresentelloActive do
-                                task.wait(1)
-                                
-                                local countdowns = workspace.ScriptedMap.Countdowns
-                                for _, part in pairs(countdowns:GetChildren()) do
-                                    local owner = part:GetAttribute("Owner")
-                                    local plantType = part:GetAttribute("Plant")
-                                    
-                                    if owner == player.Name and plantType == "Presentello" then
-                                        if TrackedPlants[part.Name] == nil then
-                                            TrackedPlants[part.Name] = "Growing"
-                                        end
-                                    end
-                                end
-                                
-                                local hasGrowing = false
-                                
-                                for uuid, status in pairs(TrackedPlants) do
-                                    if status == "Growing" then
-                                        if not countdowns:FindFirstChild(uuid) then
-                                            TrackedPlants[uuid] = "Ready"
-                                        end
-                                    elseif status == "Ready" then
-                                        local hitboxes = myPlot:FindFirstChild("Hitboxes")
-                                        if hitboxes then
-                                            local targetPart = hitboxes:FindFirstChild(uuid)
-                                            if targetPart then
-                                                local shovel = EquipTool("Shovel [Pick Up Plants]")
-                                                if shovel then
-                                                    task.wait(0.2)
-                                                    
-                                                    local args = { [1] = uuid }
-                                                    game:GetService("ReplicatedStorage").Remotes.RemoveItem:FireServer(unpack(args))
-                                                    task.wait(0.1)
-                                                    
-                                                    UnequipTools()
-                                                    DeliverPlants()
-
-                                                    TrackedPlants[uuid] = nil 
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                                
-                                for _, part in pairs(countdowns:GetChildren()) do
-                                    if part:GetAttribute("Owner") == player.Name then
-                                        hasGrowing = true
+                        local target = nil
+                        
+                        if folder then
+                            for _, child in pairs(folder:GetChildren()) do
+                                if child:IsA("Model") then
+                                    local health = child:GetAttribute("Health")
+                                    if health and health > 0 then
+                                        target = child
                                         break
                                     end
                                 end
-                                
-                                if not hasGrowing and next(TrackedPlants) == nil then
-                                    farmingCycle = false 
-                                end
                             end
-                        end 
+                        end
+                        
+                        if target and rootPart then
+                            while AutoDestroyFireworksActive and target and target.Parent do
+                                local currentHealth = target:GetAttribute("Health")
+                                
+                                if not currentHealth or currentHealth <= 0 then
+                                    break 
+                                end
+                                
+                                rootPart.CFrame = target:GetPivot() * CFrame.new(0, 0, 3) 
+                                
+                                local weapon = EquipBestBat()
+                                if weapon then
+                                    weapon:Activate()
+                                end
+                                
+                                task.wait(0.1) 
+                            end
+                        else
+                            UnequipTools()
+                            task.wait(0.5)
+                        end
                     end)
-                    task.wait(1)
                 end
+                UnequipTools()
             end)
+        else
+            UnequipTools()
         end
     end
 })
 
-local AutoSantaResetActive = false
+local AutoNewYearResetActive = false
 
-local AutoSantaResetEvent = EventTab:Toggle({
-    Title = "Auto Reset Santa's Arrival Event",
+local Autoresrt2026 = EventTab:Toggle({
+    Title = "Auto New Year 2026 Event Reset",
     Default = false,
-    Flag = "AutoSantaReset",
+    Flag = "AutoNewYearReset",
     Callback = function(value)
-        AutoSantaResetActive = value
+        AutoNewYearResetActive = value
         
         if value then
             task.spawn(function()
-                while AutoSantaResetActive do
+                while AutoNewYearResetActive do
                     task.wait(0.5)
                     pcall(function()
-                        local lp = game:GetService("Players").LocalPlayer
-                        local mainGuiFolder = lp.PlayerGui:FindFirstChild("Main")
-                        local targetSurfacePart = workspace.ScriptedMap.Santa.SurfaceModel.Surface
+                        local player = game:GetService("Players").LocalPlayer
                         
-                        if mainGuiFolder and targetSurfacePart then
-                            for _, child in pairs(mainGuiFolder:GetChildren()) do
-                                if child:IsA("SurfaceGui") and child.Adornee == targetSurfacePart then
-                                    
-                                    if child:FindFirstChild("Main") and child.Main:FindFirstChild("BodyReset") then
-                                        if child.Main.BodyReset.Visible == true then
-                                            local args = {
-                                                [1] = "ResetRequest"
-                                            }
-                                            game:GetService("ReplicatedStorage").Remotes.Events.Christmas.InteractSanta:FireServer(unpack(args))
-                                        end
-                                    end
-                                    
-                                    break
-                                end
+                        if player.PlayerGui:FindFirstChild("Main") and 
+                           player.PlayerGui.Main:FindFirstChild("NewYearSurfaceGUI") and 
+                           player.PlayerGui.Main.NewYearSurfaceGUI:FindFirstChild("Main") and 
+                           player.PlayerGui.Main.NewYearSurfaceGUI.Main:FindFirstChild("BodyReset") then
+                            
+                            if player.PlayerGui.Main.NewYearSurfaceGUI.Main.BodyReset.Visible == true then
+                                local args = {
+                                    [1] = "ResetRequest"
+                                }
+                                game:GetService("ReplicatedStorage").Remotes.Events.NewYears2026.Interact:FireServer(unpack(args))
                             end
                         end
                     end)
@@ -2784,7 +2581,7 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.11.2)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.11.3)
 
 ## What’s new:
 
@@ -2847,8 +2644,6 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
-        Autofillsantabag:SetTitle("Auto Fill Santa's Bag")
-        AutoSantaResetEvent:SetTitle("Auto Reset Santa's Arrival Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2858,7 +2653,7 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.2)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.3)
 
 ## มีอะไรใหม่บ้าง:
 
@@ -2921,8 +2716,6 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
-        Autofillsantabag:SetTitle("ออโต้ ใส่ของในกระเป๋าแซนต้า อัตโนมัติ")
-        AutoSantaResetEvent:SetTitle("รีเซ็ต อีเว้นการมาถึงของซานตาคลอส อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
@@ -2950,7 +2743,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.11.2",
+    Content = "Tad Hub PvB | 1.11.3",
     Duration = 10
 })
 
