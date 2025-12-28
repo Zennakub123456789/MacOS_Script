@@ -45,8 +45,9 @@ local UpdateCode = infoTab:Code({
 
 ## What’s new:
 
-- [-] Remove Auto Give Sir Whiskerwood Plants [Toggle]
-- [+] Added Auto Fill Santa's Bag ]]
+- [-] Removed Auto Fill Santa's Bag
+- [+] Added Auto Hit Fireworks
+- [+] Added Auto Reset New Year 2026 Event ]]
 })
 
 infoTab:Section("Discord")
@@ -2585,8 +2586,9 @@ local languageScripts = {
 
 ## What’s new:
 
-- [-] Remove Auto Give Sir Whiskerwood Plants [Toggle]
-- [+] Added Auto Fill Santa's Bag ]])
+- [-] Removed Auto Fill Santa's Bag
+- [+] Added Auto Hit Fireworks
+- [+] Added Auto Reset New Year 2026 Event ]])
         DiscordLabel:SetText("If you found errors or want to me create another map script, please let us know on Discord. We listen to all your problems.")
         CopyDiscordButton:SetTitle("Copy Discord Link")
         CopyDiscordButton:SetDesc("Click to copy the Discord invite link.")
