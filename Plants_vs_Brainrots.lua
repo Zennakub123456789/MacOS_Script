@@ -2644,6 +2644,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
+        autohitfireworks:SetTitle("Auto Hit Fireworks")
+        Autoresrt2026:SetTitle("Auto Reset New Year 2026 Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2657,8 +2659,9 @@ local languageScripts = {
 
 ## มีอะไรใหม่บ้าง:
 
-- [-] ลบ ให้ พืชเซอร์วิสเกอร์วู้ด อัตโนมัติ [Toggle]
-- [+] เพิ่ม ออโต้ ใส่ของในกระเป๋าแซนต้า อัตโนมัติ [Toggle] ]])
+- [-] ลบ ออโต้ เติมของในกระเป๋าแซนต้า
+- [+] เพิ่ม ออโต้ ตีดอกไม้ไฟ
+- [+] เพิ่ม ออโต้ รีเซ็ตอีเว้นปีใหม่ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2716,6 +2719,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
+        autohitfireworks:SetTitle("ออโต้ ตีดอกไม้ไฟ อัตโนมัติ")
+        Autoresrt2026:SetTitle("ออโต้ รีเซ็ตอีเว้นปีใหม่ อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
