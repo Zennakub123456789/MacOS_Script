@@ -821,8 +821,9 @@ local AutoFarmToggle = AutoTab:Toggle({
                 local player = game:GetService("Players").LocalPlayer
 
                 local batPriority = {
-                    "Rifling Bat", "Spiked Bat", "Fluted Bat",
-                    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat", "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
+                    "Monalith Bat", "Spiral Bat", "Rupturer Bat", "Rivet Bat", "Rifling Bat", "Spiked Bat", "Fluted Bat",
+    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
+    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
                 }
 
                 local function isPlayerInZone(character, zone)
@@ -2258,7 +2259,7 @@ EventTab:Section("New Year Event 2026 Event")
 local AutoDestroyFireworksActive = false
 
 local batPriority = {
-    "Rifling Bat", "Spiked Bat", "Fluted Bat",
+    "Monalith Bat", "Spiral Bat", "Rupturer Bat", "Rivet Bat", "Rifling Bat", "Spiked Bat", "Fluted Bat",
     "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
     "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
 }
