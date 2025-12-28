@@ -2370,7 +2370,7 @@ local autohitfireworks = EventTab:Toggle({
 local AutoNewYearResetActive = false
 
 local Autoresrt2026 = EventTab:Toggle({
-    Title = "Auto New Year 2026 Event Reset",
+    Title = "Auto Reset Rocket Event",
     Default = false,
     Flag = "AutoNewYearReset",
     Callback = function(value)
