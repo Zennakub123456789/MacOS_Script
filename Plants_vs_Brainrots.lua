@@ -47,7 +47,8 @@ local UpdateCode = infoTab:Code({
 
 - [-] Removed Auto Fill Santa's Bag
 - [+] Added Auto Hit Fireworks
-- [+] Added Auto Reset New Year 2026 Event ]]
+- [+] Added Auto Reset Rocket Event
+- [+] You Can Buy New Seed ]]
 })
 
 infoTab:Section("Discord")
@@ -1463,7 +1464,7 @@ ShopTab:Section("Auto Buy Seed")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local buySeedRemote = ReplicatedStorage.Remotes.BuyItem
 
-local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed", "Starfruit Seed", "Brussel Sprouts Seed" }
+local AllSeeds = { "Cactus Seed", "Strawberry Seed", "Pumpkin Seed", "Sunflower Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed", "Starfruit Seed", "Brussel Sprouts Seed", "Kiwi Cannoneer Seed" }
 
 getgenv().SelectedBuySeeds = {}
 getgenv().AutoBuySeedSelected = false
@@ -2647,7 +2648,7 @@ local languageScripts = {
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
         autohitfireworks:SetTitle("Auto Hit Fireworks")
-        Autoresrt2026:SetTitle("Auto Reset New Year 2026 Event")
+        Autoresrt2026:SetTitle("Auto Reset Rocket Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2663,7 +2664,7 @@ local languageScripts = {
 
 - [-] ลบ ออโต้ เติมของในกระเป๋าแซนต้า
 - [+] เพิ่ม ออโต้ ตีดอกไม้ไฟ
-- [+] เพิ่ม ออโต้ รีเซ็ตอีเว้นปีใหม่ ]])
+- [+] เพิ่ม ออโต้ รีเซ็ตอีเว้นดอกไม้ไฟ ]])
         DiscordLabel:SetText("เจอบัค, หรือต่าง, อยากให้สร้างสคริปแมพอื่น, แจ้งมาได้ที่ ดิสคอร์ด รับฟังทุกปัญหา")
         CopyDiscordButton:SetTitle("คักลอกลิ้งดิสคอร์ด")
         CopyDiscordButton:SetDesc("กดเพื่อคัดลอกลิงก์เชิญ Discord")
@@ -2722,7 +2723,7 @@ local languageScripts = {
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
         autohitfireworks:SetTitle("ออโต้ ตีดอกไม้ไฟ อัตโนมัติ")
-        Autoresrt2026:SetTitle("ออโต้ รีเซ็ตอีเว้นปีใหม่ อัตโนมัติ")
+        Autoresrt2026:SetTitle("ออโต้ รีเซ็ตอีเว้นดอกไม้ไฟ อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
