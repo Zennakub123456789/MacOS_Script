@@ -2275,35 +2275,34 @@ local function EquipBestBat()
     local player = game:GetService("Players").LocalPlayer
     local character = player.Character
     local humanoid = character and character:FindFirstChild("Humanoid")
+    local backpack = player.Backpack
     
     if not humanoid then return end
 
-    local currentTool = character:FindFirstChildOfClass("Tool")
-    if currentTool then
-        for _, name in ipairs(batPriority) do
-            if currentTool.Name == name then
-                return currentTool 
-            end
-        end
-    end
+    local targetBat = nil
 
-    local bestBatFound = nil
     for _, batName in ipairs(batPriority) do
-        local foundBat = (character and character:FindFirstChild(batName)) or (player.Backpack and player.Backpack:FindFirstChild(batName))
-        if foundBat then 
-            bestBatFound = foundBat
-            break 
+        local batInChar = character:FindFirstChild(batName)
+        local batInPack = backpack and backpack:FindFirstChild(batName)
+        
+        if batInChar then
+            targetBat = batInChar
+            break
+        elseif batInPack then
+            targetBat = batInPack
+            break
         end
     end
     
-    if bestBatFound then
-        if bestBatFound.Parent ~= character then
-            humanoid:EquipTool(bestBatFound)
+    if targetBat then
+        if targetBat.Parent ~= character then
+            humanoid:EquipTool(targetBat)
             task.wait(0.1)
         end
-        return bestBatFound
+        return targetBat
     end
-    return currentTool
+
+    return character:FindFirstChildOfClass("Tool")
 end
 
 local autohitfireworks = EventTab:Toggle({
