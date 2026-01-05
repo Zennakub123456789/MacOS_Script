@@ -2300,7 +2300,7 @@ local function CheckIsFavorite(tool)
 end
 
 local AutoGymEvent = EventTab:Toggle({
-    Title = "Auto Gym Gains Event",
+    Title = "Auto Quest Brainrot (No Favorite)",
     Default = false,
     Flag = "AutoQuestBrainrotNoFav",
     Callback = function(value)
@@ -2332,7 +2332,7 @@ local AutoGymEvent = EventTab:Toggle({
                         if minWeight and maxWeight and character and humanoid then
                             
                             local function getToolWeight(toolName)
-                                local weightStr = string.match(toolName, "^%[([%d%.]+)%s*kg%]")
+                                local weightStr = string.match(toolName, "%[([%d%.]+)%s*kg%]")
                                 return tonumber(weightStr)
                             end
 
