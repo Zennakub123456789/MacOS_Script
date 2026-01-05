@@ -2300,7 +2300,7 @@ local function CheckIsFavorite(tool)
 end
 
 local AutoGymEvent = EventTab:Toggle({
-    Title = "Auto Quest Brainrot (No Favorite)",
+    Title = "Auto Gym Gains Event",
     Default = false,
     Flag = "AutoQuestBrainrotNoFav",
     Callback = function(value)
