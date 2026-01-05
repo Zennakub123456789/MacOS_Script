@@ -41,7 +41,7 @@ infoTab:Section("Update")
 
 local UpdateCode = infoTab:Code({
     Title = "Script Update",
-    Code = [[# PvB Script Update! (v1.11.3)
+    Code = [[# PvB Script Update! (v1.11.4)
 
 ## What’s new:
 
@@ -2254,145 +2254,174 @@ local MissionBrainrotKillAuraToggle = EventTab:Toggle({
     end
 })
 
-EventTab:Section("New Year Event 2026 Event")
+EventTab:Section("Gym Gains Event")
 
-local AutoDestroyFireworksActive = false
+local AutoQuestBrainrotActive = false
 
-local batPriority = {
-    "Monalith Bat", "Spiral Bat", "Rupturer Bat", "Rivet Bat", "Rifling Bat", "Spiked Bat", "Fluted Bat",
-    "Skeletonized Bat", "Hammer Bat", "Aluminum Bat",
-    "Iron Core Bat", "Iron Plate Bat", "Leather Grip Bat", "Basic Bat"
-}
-
-local function UnequipTools()
-    local player = game:GetService("Players").LocalPlayer
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid:UnequipTools()
-    end
-end
-
-local function EquipBestBat()
-    local player = game:GetService("Players").LocalPlayer
-    local character = player.Character
-    local humanoid = character and character:FindFirstChild("Humanoid")
-    local backpack = player.Backpack
+local function CheckIsFavorite(tool)
+    if not tool then return false end
     
-    if not humanoid then return end
-
-    local targetBat = nil
-
-    for _, batName in ipairs(batPriority) do
-        local batInChar = character:FindFirstChild(batName)
-        local batInPack = backpack and backpack:FindFirstChild(batName)
-        
-        if batInChar then
-            targetBat = batInChar
-            break
-        elseif batInPack then
-            targetBat = batInPack
-            break
+    local player = game:GetService("Players").LocalPlayer
+    local playerGui = player:FindFirstChild("PlayerGui")
+    if not playerGui then return false end
+    
+    local backpackGui = playerGui:FindFirstChild("BackpackGui")
+    if not backpackGui then return false end
+    
+    local backpackFrame = backpackGui:FindFirstChild("Backpack")
+    if not backpackFrame then return false end
+    
+    local hotbar = backpackFrame:FindFirstChild("Hotbar")
+    if hotbar then
+        for _, slot in pairs(hotbar:GetChildren()) do
+            local nameLabel = slot:FindFirstChild("ToolName")
+            if nameLabel and nameLabel.Text == tool.Name then
+                if slot:FindFirstChild("HeartIcon") then return true end
+            end
         end
     end
     
-    if targetBat then
-        if targetBat.Parent ~= character then
-            humanoid:EquipTool(targetBat)
-            task.wait(0.1)
+    local inventory = backpackFrame:FindFirstChild("Inventory")
+    local scrollFrame = inventory and inventory:FindFirstChild("ScrollingFrame")
+    local gridFrame = scrollFrame and scrollFrame:FindFirstChild("UIGridFrame")
+    
+    if gridFrame then
+        for _, slot in pairs(gridFrame:GetChildren()) do
+            if slot:IsA("TextButton") then
+                local nameLabel = slot:FindFirstChild("ToolName")
+                if nameLabel and nameLabel.Text == tool.Name then
+                    if slot:FindFirstChild("HeartIcon") then return true end
+                end
+            end
         end
-        return targetBat
     end
-
-    return character:FindFirstChildOfClass("Tool")
+    
+    return false
 end
 
-local autohitfireworks = EventTab:Toggle({
-    Title = "Auto Hit Fireworks",
+local AutoGymEvent = EventTab:Toggle({
+    Title = "Auto Gym Gains Event",
     Default = false,
-    Flag = "AutoDestroyFireworks",
+    Flag = "AutoQuestBrainrotNoFav",
     Callback = function(value)
-        AutoDestroyFireworksActive = value
+        AutoQuestBrainrotActive = value
         
         if value then
             task.spawn(function()
-                while AutoDestroyFireworksActive do
-                    task.wait(0.1)
+                while AutoQuestBrainrotActive do
+                    task.wait(0.5)
                     pcall(function()
                         local player = game:GetService("Players").LocalPlayer
                         local character = player.Character
+                        local humanoid = character and character:FindFirstChild("Humanoid")
                         local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-                        local folder = workspace.ScriptedMap.SpawnedFireworks
+                        local backpack = player.Backpack
                         
-                        local target = nil
-                        
-                        if folder then
-                            for _, child in pairs(folder:GetChildren()) do
-                                if child:IsA("Model") then
-                                    local health = child:GetAttribute("Health")
-                                    if health and health > 0 then
-                                        target = child
-                                        break
+                        local questGui = workspace.ScriptedMap.Gym.Bill.SizeAttachment.GUI.Quest_Text
+                        local minWeight, maxWeight
+
+                        if questGui then
+                            local text = questGui.Text 
+                            local minStr, maxStr = string.match(text, "%[([%d%.]+)kg%-([%d%.]+)kg%]")
+                            if minStr and maxStr then
+                                minWeight = tonumber(minStr)
+                                maxWeight = tonumber(maxStr)
+                            end
+                        end
+
+                        if minWeight and maxWeight and character and humanoid then
+                            
+                            local function getToolWeight(toolName)
+                                local weightStr = string.match(toolName, "^%[([%d%.]+)%s*kg%]")
+                                return tonumber(weightStr)
+                            end
+
+                            local targetTool = nil
+
+                            local currentTool = character:FindFirstChildOfClass("Tool")
+                            
+                            if currentTool and currentTool:GetAttribute("Brainrot") then
+                                if not CheckIsFavorite(currentTool) then
+                                    local w = getToolWeight(currentTool.Name)
+                                    if w and w >= minWeight and w <= maxWeight then
+                                        targetTool = currentTool
                                     end
                                 end
                             end
-                        end
-                        
-                        if target and rootPart then
-                            while AutoDestroyFireworksActive and target and target.Parent do
-                                local currentHealth = target:GetAttribute("Health")
-                                
-                                if not currentHealth or currentHealth <= 0 then
-                                    break 
+
+                            if not targetTool and backpack then
+                                for _, tool in pairs(backpack:GetChildren()) do
+                                    if tool:IsA("Tool") and tool:GetAttribute("Brainrot") then
+                                        if not CheckIsFavorite(tool) then
+                                            local w = getToolWeight(tool.Name)
+                                            if w and w >= minWeight and w <= maxWeight then
+                                                targetTool = tool
+                                                break
+                                            end
+                                        end
+                                    end
                                 end
-                                
-                                rootPart.CFrame = target:GetPivot() * CFrame.new(0, 0, 3) 
-                                
-                                local weapon = EquipBestBat()
-                                if weapon then
-                                    weapon:Activate()
-                                end
-                                
-                                task.wait(0.1) 
                             end
-                        else
-                            UnequipTools()
-                            task.wait(0.5)
+
+                            if targetTool and rootPart then
+                                if targetTool.Parent ~= character then
+                                    humanoid:EquipTool(targetTool)
+                                    task.wait(0.2)
+                                end
+
+                                while targetTool.Parent == character and AutoQuestBrainrotActive do
+                                    rootPart.CFrame = CFrame.new(-174.00, 10.77, 1022.95)
+                                    
+                                    local promptFound = false
+                                    for _, prompt in pairs(workspace:GetDescendants()) do
+                                        if prompt:IsA("ProximityPrompt") and prompt.ActionText == "Give" and prompt.ObjectText == "Brainrot" then
+                                            if (prompt.Parent.Position - rootPart.Position).Magnitude < 15 then
+                                                fireproximityprompt(prompt)
+                                                promptFound = true
+                                                break
+                                            end
+                                        end
+                                    end
+                                    
+                                    task.wait(0.2)
+                                end
+                            end
                         end
                     end)
                 end
-                UnequipTools()
             end)
-        else
-            UnequipTools()
         end
     end
 })
 
-local AutoNewYearResetActive = false
+local AutoGymResetActive = false
 
-local Autoresrt2026 = EventTab:Toggle({
-    Title = "Auto Reset Rocket Event",
+local ResetGymEvent = EventTab:Toggle({
+    Title = "Auto Reset Gym Event",
     Default = false,
-    Flag = "AutoNewYearReset",
+    Flag = "AutoGymReset",
     Callback = function(value)
-        AutoNewYearResetActive = value
+        AutoGymResetActive = value
         
         if value then
             task.spawn(function()
-                while AutoNewYearResetActive do
+                while AutoGymResetActive do
                     task.wait(0.5)
                     pcall(function()
                         local player = game:GetService("Players").LocalPlayer
+                        local playerGui = player:FindFirstChild("PlayerGui")
                         
-                        if player.PlayerGui:FindFirstChild("Main") and 
-                           player.PlayerGui.Main:FindFirstChild("NewYearSurfaceGUI") and 
-                           player.PlayerGui.Main.NewYearSurfaceGUI:FindFirstChild("Main") and 
-                           player.PlayerGui.Main.NewYearSurfaceGUI.Main:FindFirstChild("BodyReset") then
+                        if playerGui then
+                            local main = playerGui:FindFirstChild("Main")
+                            local surfaceGui = main and main:FindFirstChild("CreatedNewSurfaceGui")
+                            local surfaceMain = surfaceGui and surfaceGui:FindFirstChild("Main")
+                            local bodyReset = surfaceMain and surfaceMain:FindFirstChild("BodyReset")
                             
-                            if player.PlayerGui.Main.NewYearSurfaceGUI.Main.BodyReset.Visible == true then
+                            if bodyReset and bodyReset.Visible == true then
                                 local args = {
-                                    [1] = "ResetRequest"
+                                    [1] = "Reset"
                                 }
-                                game:GetService("ReplicatedStorage").Remotes.Events.NewYears2026.Interact:FireServer(unpack(args))
+                                game:GetService("ReplicatedStorage").Remotes.Events.Gym.Interact:FireServer(unpack(args))
                             end
                         end
                     end)
@@ -2583,7 +2612,7 @@ local ApplyButton = SettingTab:Button({
 local languageScripts = {
     ["English"] = function()
         UpdateCode:SetTitle("Script Update")
-        UpdateCode:SetCode([[# PvB Script Update! (v1.11.3)
+        UpdateCode:SetCode([[# PvB Script Update! (v1.11.4)
 
 ## What’s new:
 
@@ -2647,8 +2676,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("Auto Continue Victory")
         AutoStartInvasionToggle:SetTitle("Auto Start Invasion Event")
         MissionBrainrotKillAuraToggle:SetTitle("Mission Brainrot kill Aura")
-        autohitfireworks:SetTitle("Auto Hit Fireworks")
-        Autoresrt2026:SetTitle("Auto Reset Rocket Event")
+        AutoGymEvent:SetTitle("Auto Gym Gains Event")
+        ResetGymEvent:SetTitle("Auto Reset Gym Event")
         HideNotificationsToggle:SetTitle("Hide Notifications")
         LowGraphicsToggle:SetTitle("Low Graphics")
         LanguageDropdown:SetTitle("Select Language")
@@ -2658,7 +2687,7 @@ local languageScripts = {
     
     ["ภาษาไทย"] = function()
         UpdateCode:SetTitle("อัพเดทสคริป")
-        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.3)
+        UpdateCode:SetCode([[# แมพ พืชปะทะเบรนล็อต สคริปอัพเดท (v1.11.4)
 
 ## มีอะไรใหม่บ้าง:
 
@@ -2722,8 +2751,8 @@ local languageScripts = {
         AutoContinueToggle:SetTitle("ออโต้กดดำเนินการต่อเมื่อชนะอัตโนมัติ")
         AutoStartInvasionToggle:SetTitle("เริ่มการบุกอัตโนมัติ")
         MissionBrainrotKillAuraToggle:SetTitle("ออโต้ โจมตีอัตโนมัติ (Kill Aura) สำหรับภารกิจ เบรนร็อต")
-        autohitfireworks:SetTitle("ออโต้ ตีดอกไม้ไฟ อัตโนมัติ")
-        Autoresrt2026:SetTitle("ออโต้ รีเซ็ตอีเว้นดอกไม้ไฟ อัตโนมัติ")
+        AutoGymEvent:SetTitle("ออโต้ ให้พืชในโรงยิม อัตโนมัติ")
+        ResetGymEvent:SetTitle("ออโต้ รีเซ็ตอีเว้นโรงยิม อัตโนมัติ")
         HideNotificationsToggle:SetTitle("ซ่อนการแจ้งเตือน")
         LowGraphicsToggle:SetTitle("ปรับกราฟิกให้ต่ำลงเพื่อเพิ่ม FPS")
         LanguageDropdown:SetTitle("เลือกภาษา")
@@ -2751,7 +2780,7 @@ end)
 
 MacUI:Notify({
     Title = "Script Loaded",
-    Content = "Tad Hub PvB | 1.11.3",
+    Content = "Tad Hub PvB | 1.11.4",
     Duration = 10
 })
 
